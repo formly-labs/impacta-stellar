@@ -72,7 +72,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  await prisma.form.delete({ where: { id: params.id } });
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  await prisma.form.delete({ where: { id } });
   return NextResponse.json({ message: 'Eliminado con éxito' });
 }

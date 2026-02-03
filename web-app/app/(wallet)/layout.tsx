@@ -1,7 +1,8 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren, Suspense, useEffect } from 'react';
+
 import { NetworkType, useWallet, WalletProvider } from 'stellar-wallet-kit';
 
 const Redirection = () => {
@@ -21,14 +22,16 @@ const Redirection = () => {
 
 export default function WalletLayout({ children }: PropsWithChildren) {
   return (
-    <WalletProvider
-      config={{
-        network: NetworkType.TESTNET,
-        autoConnect: true,
-      }}
-    >
-      <Redirection />
-      {children}
-    </WalletProvider>
+    <Suspense>
+      <WalletProvider
+        config={{
+          network: NetworkType.TESTNET,
+          autoConnect: true,
+        }}
+      >
+        <Redirection />
+        {children}
+      </WalletProvider>
+    </Suspense>
   );
 }
