@@ -1,0 +1,31 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider   = "prisma-client"
+  output     = "../prisma/generated"
+  engineType = "client"
+}
+
+model Form {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  ownerAddress String
+  budget       Float    @default(0) // En XLM
+  isActive     Boolean  @default(true)
+  fields       Field[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Field {
+  id          String  @id @default(cuid())
+  type        String // "text", "email", "phone"
+  label       String
+  placeholder String?
+  required    Boolean @default(false)
+  formId      String
+  form        Form    @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
