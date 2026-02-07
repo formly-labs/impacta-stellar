@@ -6,6 +6,7 @@ import NewQuestionnaireShell from './components/NewQuestionnaireShell';
 import ThemeStep from './steps/ThemeStep';
 import FirstQuestionStep from './steps/FirstQuestionStep';
 import QuestionsStep from './steps/QuestionsStep';
+import RewardsStep from './steps/RewardsStep';
 
 function NewQuestionnaireContent() {
   const searchParams = useSearchParams();
@@ -19,8 +20,10 @@ function NewQuestionnaireContent() {
         return <FirstQuestionStep />;
       case 'questions':
         return <QuestionsStep />;
+      case 'rewards':
+        return <RewardsStep />;
       case 'finalize':
-        return <PlaceholderStep title="Finalizar" stepNum={4} />;
+        return <PlaceholderStep title="Finalizar" stepNum={5} />;
       default:
         return <ThemeStep />;
     }

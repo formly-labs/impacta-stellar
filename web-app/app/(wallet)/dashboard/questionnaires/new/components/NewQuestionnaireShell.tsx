@@ -9,7 +9,7 @@ const STEPS = [
   { key: 'theme', label: 'INICIO', number: 1 },
   { key: 'question', label: 'DETALLES', number: 2 },
   { key: 'questions', label: 'PREGUNTAS', number: 3 },
-  { key: 'finalize', label: 'FINALIZAR', number: 4 },
+  { key: 'rewards', label: 'RECOMPENSAS', number: 4 },
 ] as const;
 
 export type StepKey = (typeof STEPS)[number]['key'];
@@ -18,7 +18,8 @@ export type StepKey = (typeof STEPS)[number]['key'];
 const PROGRESS: Record<string, number> = {
   theme: 0,
   question: 25,
-  questions: 75,
+  questions: 50,
+  rewards: 90,
   finalize: 100,
 };
 

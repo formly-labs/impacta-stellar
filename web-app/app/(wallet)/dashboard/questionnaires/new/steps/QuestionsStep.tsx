@@ -121,7 +121,7 @@ export default function QuestionsStep() {
     window.dispatchEvent(
       new CustomEvent('formly:toast', { detail: 'Guardado correctamente' }),
     );
-    router.push('/dashboard/questionnaires/new?step=finalize');
+    router.push('/dashboard/questionnaires/new?step=rewards');
   }, [questions, router]);
 
   return (

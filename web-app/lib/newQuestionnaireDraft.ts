@@ -10,10 +10,14 @@ export interface QuestionDraft {
   allowOther?: boolean;
 }
 
+export type RewardPreset = '5' | '10' | '15' | 'custom';
+
 export interface QuestionnaireDraft {
   theme?: QuestionnaireTheme;
   firstQuestion?: string;
   questions?: QuestionDraft[];
+  rewardPerGoodAnswer?: number;
+  rewardPreset?: RewardPreset;
 }
 
 const DRAFT_KEY = 'formly:newQuestionnaire:draft';
