@@ -1,15 +1,25 @@
 'use client';
 
 import { FormResponse } from '@/types';
+import { isOnboardingCompleted } from '@/lib/onboardingStorage';
 import { ChevronRight, Coins, FileText, Loader2, Plus, Search, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useWallet } from 'stellar-wallet-kit';
 
 export default function CreatorDashboard() {
   const { account } = useWallet();
+  const router = useRouter();
   const [ forms, setForms ] = useState<FormResponse[]>([]);
   const [ loading, setLoading ] = useState(true);
+
+  // Redirect to onboarding if not completed
+  useEffect(() => {
+    if (!isOnboardingCompleted()) {
+      router.replace('/dashboard/onboarding?step=details');
+    }
+  }, [router]);
   
   useEffect(() => {
     if (account?.address) {
@@ -33,7 +43,7 @@ export default function CreatorDashboard() {
             <p className="text-slate-400 mt-2">Gestiona tus encuestas e incentivos de Stellar.</p>
           </div>
           <Link
-            href="/dashboard/creator"
+            href="/dashboard/questionnaires/new?step=theme"
             className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20"
           >
             <Plus className="w-5 h-5" /> Crear Nuevo
