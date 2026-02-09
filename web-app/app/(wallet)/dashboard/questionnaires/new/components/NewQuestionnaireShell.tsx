@@ -10,6 +10,7 @@ const STEPS = [
   { key: 'question', label: 'DETALLES', number: 2 },
   { key: 'questions', label: 'PREGUNTAS', number: 3 },
   { key: 'rewards', label: 'RECOMPENSAS', number: 4 },
+  { key: 'finalize', label: 'FINALIZAR', number: 5 },
 ] as const;
 
 export type StepKey = (typeof STEPS)[number]['key'];
@@ -17,9 +18,9 @@ export type StepKey = (typeof STEPS)[number]['key'];
 // Progress percentages for each step
 const PROGRESS: Record<string, number> = {
   theme: 0,
-  question: 25,
-  questions: 50,
-  rewards: 90,
+  question: 20,
+  questions: 40,
+  rewards: 70,
   finalize: 100,
 };
 
