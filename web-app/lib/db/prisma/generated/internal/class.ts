@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider   = \"prisma-client\"\n  output     = \"../prisma/generated\"\n  engineType = \"client\"\n}\n\nmodel Form {\n  id           String   @id @default(cuid())\n  title        String\n  description  String?\n  ownerAddress String\n  budget       Float    @default(0) // En XLM\n  isActive     Boolean  @default(true)\n  fields       Field[]\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n}\n\nmodel Field {\n  id          String  @id @default(cuid())\n  type        String // \"text\", \"email\", \"phone\"\n  label       String\n  placeholder String?\n  required    Boolean @default(false)\n  formId      String\n  form        Form    @relation(fields: [formId], references: [id], onDelete: Cascade)\n}\n",
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider   = \"prisma-client\"\n  output     = \"../prisma/generated\"\n  engineType = \"client\"\n}\n\nmodel Form {\n  id                  String   @id @default(cuid())\n  title               String\n  description         String?\n  ownerAddress        String\n  budget              Float    @default(0) // En XLM\n  isActive            Boolean  @default(true)\n  theme               String? // \"Product UX\", \"Segmentation\", \"Sales\"\n  rewardPerGoodAnswer Float? // XLM por respuesta válida\n  fields              Field[]\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n}\n\nmodel Field {\n  id          String   @id @default(cuid())\n  type        String // \"text\", \"email\", \"phone\", \"radio\", \"checkbox\", \"short_text\", \"long_text\"\n  label       String\n  placeholder String?\n  required    Boolean  @default(false)\n  options     String[] @default([]) // Opciones para radio/checkbox\n  allowOther  Boolean  @default(false)\n  formId      String\n  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)\n}\n\nmodel UserProfile {\n  id            String   @id @default(cuid())\n  walletAddress String   @unique\n  firstName     String?\n  lastName      String?\n  email         String?\n  phone         String?\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Form\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"budget\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"fields\",\"kind\":\"object\",\"type\":\"Field\",\"relationName\":\"FieldToForm\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Field\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"placeholder\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"required\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"formId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"form\",\"kind\":\"object\",\"type\":\"Form\",\"relationName\":\"FieldToForm\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Form\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"budget\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"theme\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rewardPerGoodAnswer\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"fields\",\"kind\":\"object\",\"type\":\"Field\",\"relationName\":\"FieldToForm\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Field\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"placeholder\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"required\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"options\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"allowOther\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"formId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"form\",\"kind\":\"object\",\"type\":\"Form\",\"relationName\":\"FieldToForm\"}],\"dbName\":null},\"UserProfile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"walletAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -195,6 +195,16 @@ export interface PrismaClient<
     * ```
     */
   get field(): Prisma.FieldDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.userProfile`: Exposes CRUD operations for the **UserProfile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserProfiles
+    * const userProfiles = await prisma.userProfile.findMany()
+    * ```
+    */
+  get userProfile(): Prisma.UserProfileDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

@@ -27,3 +27,8 @@ export type Form = Prisma.FormModel
  * 
  */
 export type Field = Prisma.FieldModel
+/**
+ * Model UserProfile
+ * 
+ */
+export type UserProfile = Prisma.UserProfileModel

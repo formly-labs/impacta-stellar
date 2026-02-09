@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Form: 'Form',
-  Field: 'Field'
+  Field: 'Field',
+  UserProfile: 'UserProfile'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -78,6 +79,8 @@ export const FormScalarFieldEnum = {
   ownerAddress: 'ownerAddress',
   budget: 'budget',
   isActive: 'isActive',
+  theme: 'theme',
+  rewardPerGoodAnswer: 'rewardPerGoodAnswer',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -91,10 +94,26 @@ export const FieldScalarFieldEnum = {
   label: 'label',
   placeholder: 'placeholder',
   required: 'required',
+  options: 'options',
+  allowOther: 'allowOther',
   formId: 'formId'
 } as const
 
 export type FieldScalarFieldEnum = (typeof FieldScalarFieldEnum)[keyof typeof FieldScalarFieldEnum]
+
+
+export const UserProfileScalarFieldEnum = {
+  id: 'id',
+  walletAddress: 'walletAddress',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  phone: 'phone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum]
 
 
 export const SortOrder = {

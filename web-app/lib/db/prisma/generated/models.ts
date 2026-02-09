@@ -10,4 +10,5 @@
  */
 export type * from './models/Form'
 export type * from './models/Field'
+export type * from './models/UserProfile'
 export type * from './commonInputTypes'

@@ -5,15 +5,24 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const body: FormCreateInput = await req.json();
-    const { title, description, ownerAddress, fields } = body;
+    const { title, description, ownerAddress, fields, theme, rewardPerGoodAnswer } = body;
     
     const newForm = await prisma.form.create({
       data: {
         title,
         description,
         ownerAddress,
+        theme,
+        rewardPerGoodAnswer,
         fields: {
-          create: fields,
+          create: fields.map((f) => ({
+            type: f.type,
+            label: f.label,
+            placeholder: f.placeholder || '',
+            required: f.required ?? false,
+            options: f.options || [],
+            allowOther: f.allowOther ?? false,
+          })),
         },
       },
       include: { fields: true },

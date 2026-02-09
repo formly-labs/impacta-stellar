@@ -6,15 +6,18 @@ import {
   FileText,
   Coins,
   HelpCircle,
+  Loader2,
   Rocket,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useWallet } from 'stellar-wallet-kit';
 import {
   loadQuestionnaireDraft,
   clearQuestionnaireDraft,
   type QuestionnaireDraft,
 } from '@/lib/newQuestionnaireDraft';
+import type { FieldInput } from '@/types';
 
 const THEME_LABELS: Record<string, string> = {
   'Product UX': 'Experiencia de producto',
@@ -32,8 +35,11 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function FinalizeStep() {
   const router = useRouter();
+  const { account } = useWallet();
   const [draft, setDraft] = useState<QuestionnaireDraft>({});
   const [published, setPublished] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setDraft(loadQuestionnaireDraft());
@@ -43,10 +49,61 @@ export default function FinalizeStep() {
   const reward = draft.rewardPerGoodAnswer;
   const themeLabel = draft.theme ? (THEME_LABELS[draft.theme] ?? draft.theme) : '—';
 
-  const handlePublish = () => {
-    // For now: clear draft, show success, then redirect
-    clearQuestionnaireDraft();
-    setPublished(true);
+  const handlePublish = async () => {
+    if (!account?.address) {
+      setError('Wallet no conectada. Vuelve a conectar tu wallet.');
+      return;
+    }
+
+    setPublishing(true);
+    setError(null);
+
+    try {
+      // Transform questionnaire draft → API format
+      const fields: FieldInput[] = (draft.questions || []).map((q) => ({
+        type: q.type,
+        label: q.title,
+        required: true,
+        options:
+          q.type === 'radio' || q.type === 'checkbox'
+            ? q.options.filter((o) => o.trim())
+            : [],
+        allowOther: q.allowOther ?? false,
+      }));
+
+      const payload = {
+        title: draft.theme
+          ? `Encuesta: ${THEME_LABELS[draft.theme] || draft.theme}`
+          : 'Nueva encuesta',
+        description: `Cuestionario de ${THEME_LABELS[draft.theme || ''] || 'general'}`,
+        ownerAddress: account.address,
+        fields,
+        theme: draft.theme,
+        rewardPerGoodAnswer: draft.rewardPerGoodAnswer,
+      };
+
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Error del servidor');
+      }
+
+      clearQuestionnaireDraft();
+      setPublished(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Error al publicar la encuesta. Intenta de nuevo.',
+      );
+    } finally {
+      setPublishing(false);
+    }
   };
 
   if (published) {
@@ -187,12 +244,20 @@ export default function FinalizeStep() {
           </div>
         )}
 
+        {/* Error message */}
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex items-center justify-between pt-2">
           <button
             type="button"
+            disabled={publishing}
             onClick={() => router.push('/dashboard/questionnaires/new?step=rewards')}
-            className="inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver
@@ -200,10 +265,20 @@ export default function FinalizeStep() {
           <button
             type="button"
             onClick={handlePublish}
-            className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            disabled={publishing}
+            className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
           >
-            <CheckCircle className="h-4 w-4" />
-            Publicar encuesta
+            {publishing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Publicando…
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Publicar encuesta
+              </>
+            )}
           </button>
         </div>
       </div>

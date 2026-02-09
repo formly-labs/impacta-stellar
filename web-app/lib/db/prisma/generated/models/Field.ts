@@ -30,6 +30,7 @@ export type FieldMinAggregateOutputType = {
   label: string | null
   placeholder: string | null
   required: boolean | null
+  allowOther: boolean | null
   formId: string | null
 }
 
@@ -39,6 +40,7 @@ export type FieldMaxAggregateOutputType = {
   label: string | null
   placeholder: string | null
   required: boolean | null
+  allowOther: boolean | null
   formId: string | null
 }
 
@@ -48,6 +50,8 @@ export type FieldCountAggregateOutputType = {
   label: number
   placeholder: number
   required: number
+  options: number
+  allowOther: number
   formId: number
   _all: number
 }
@@ -59,6 +63,7 @@ export type FieldMinAggregateInputType = {
   label?: true
   placeholder?: true
   required?: true
+  allowOther?: true
   formId?: true
 }
 
@@ -68,6 +73,7 @@ export type FieldMaxAggregateInputType = {
   label?: true
   placeholder?: true
   required?: true
+  allowOther?: true
   formId?: true
 }
 
@@ -77,6 +83,8 @@ export type FieldCountAggregateInputType = {
   label?: true
   placeholder?: true
   required?: true
+  options?: true
+  allowOther?: true
   formId?: true
   _all?: true
 }
@@ -159,6 +167,8 @@ export type FieldGroupByOutputType = {
   label: string
   placeholder: string | null
   required: boolean
+  options: string[]
+  allowOther: boolean
   formId: string
   _count: FieldCountAggregateOutputType | null
   _min: FieldMinAggregateOutputType | null
@@ -189,6 +199,8 @@ export type FieldWhereInput = {
   label?: Prisma.StringFilter<"Field"> | string
   placeholder?: Prisma.StringNullableFilter<"Field"> | string | null
   required?: Prisma.BoolFilter<"Field"> | boolean
+  options?: Prisma.StringNullableListFilter<"Field">
+  allowOther?: Prisma.BoolFilter<"Field"> | boolean
   formId?: Prisma.StringFilter<"Field"> | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
 }
@@ -199,6 +211,8 @@ export type FieldOrderByWithRelationInput = {
   label?: Prisma.SortOrder
   placeholder?: Prisma.SortOrderInput | Prisma.SortOrder
   required?: Prisma.SortOrder
+  options?: Prisma.SortOrder
+  allowOther?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   form?: Prisma.FormOrderByWithRelationInput
 }
@@ -212,6 +226,8 @@ export type FieldWhereUniqueInput = Prisma.AtLeast<{
   label?: Prisma.StringFilter<"Field"> | string
   placeholder?: Prisma.StringNullableFilter<"Field"> | string | null
   required?: Prisma.BoolFilter<"Field"> | boolean
+  options?: Prisma.StringNullableListFilter<"Field">
+  allowOther?: Prisma.BoolFilter<"Field"> | boolean
   formId?: Prisma.StringFilter<"Field"> | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
 }, "id">
@@ -222,6 +238,8 @@ export type FieldOrderByWithAggregationInput = {
   label?: Prisma.SortOrder
   placeholder?: Prisma.SortOrderInput | Prisma.SortOrder
   required?: Prisma.SortOrder
+  options?: Prisma.SortOrder
+  allowOther?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   _count?: Prisma.FieldCountOrderByAggregateInput
   _max?: Prisma.FieldMaxOrderByAggregateInput
@@ -237,6 +255,8 @@ export type FieldScalarWhereWithAggregatesInput = {
   label?: Prisma.StringWithAggregatesFilter<"Field"> | string
   placeholder?: Prisma.StringNullableWithAggregatesFilter<"Field"> | string | null
   required?: Prisma.BoolWithAggregatesFilter<"Field"> | boolean
+  options?: Prisma.StringNullableListFilter<"Field">
+  allowOther?: Prisma.BoolWithAggregatesFilter<"Field"> | boolean
   formId?: Prisma.StringWithAggregatesFilter<"Field"> | string
 }
 
@@ -246,6 +266,8 @@ export type FieldCreateInput = {
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
   form: Prisma.FormCreateNestedOneWithoutFieldsInput
 }
 
@@ -255,6 +277,8 @@ export type FieldUncheckedCreateInput = {
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
   formId: string
 }
 
@@ -264,6 +288,8 @@ export type FieldUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
   form?: Prisma.FormUpdateOneRequiredWithoutFieldsNestedInput
 }
 
@@ -273,6 +299,8 @@ export type FieldUncheckedUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
   formId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -282,6 +310,8 @@ export type FieldCreateManyInput = {
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
   formId: string
 }
 
@@ -291,6 +321,8 @@ export type FieldUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type FieldUncheckedUpdateManyInput = {
@@ -299,6 +331,8 @@ export type FieldUncheckedUpdateManyInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
   formId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -312,12 +346,22 @@ export type FieldOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type FieldCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
   label?: Prisma.SortOrder
   placeholder?: Prisma.SortOrder
   required?: Prisma.SortOrder
+  options?: Prisma.SortOrder
+  allowOther?: Prisma.SortOrder
   formId?: Prisma.SortOrder
 }
 
@@ -327,6 +371,7 @@ export type FieldMaxOrderByAggregateInput = {
   label?: Prisma.SortOrder
   placeholder?: Prisma.SortOrder
   required?: Prisma.SortOrder
+  allowOther?: Prisma.SortOrder
   formId?: Prisma.SortOrder
 }
 
@@ -336,6 +381,7 @@ export type FieldMinOrderByAggregateInput = {
   label?: Prisma.SortOrder
   placeholder?: Prisma.SortOrder
   required?: Prisma.SortOrder
+  allowOther?: Prisma.SortOrder
   formId?: Prisma.SortOrder
 }
 
@@ -381,12 +427,23 @@ export type FieldUncheckedUpdateManyWithoutFormNestedInput = {
   deleteMany?: Prisma.FieldScalarWhereInput | Prisma.FieldScalarWhereInput[]
 }
 
+export type FieldCreateoptionsInput = {
+  set: string[]
+}
+
+export type FieldUpdateoptionsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type FieldCreateWithoutFormInput = {
   id?: string
   type: string
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
 }
 
 export type FieldUncheckedCreateWithoutFormInput = {
@@ -395,6 +452,8 @@ export type FieldUncheckedCreateWithoutFormInput = {
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
 }
 
 export type FieldCreateOrConnectWithoutFormInput = {
@@ -432,6 +491,8 @@ export type FieldScalarWhereInput = {
   label?: Prisma.StringFilter<"Field"> | string
   placeholder?: Prisma.StringNullableFilter<"Field"> | string | null
   required?: Prisma.BoolFilter<"Field"> | boolean
+  options?: Prisma.StringNullableListFilter<"Field">
+  allowOther?: Prisma.BoolFilter<"Field"> | boolean
   formId?: Prisma.StringFilter<"Field"> | string
 }
 
@@ -441,6 +502,8 @@ export type FieldCreateManyFormInput = {
   label: string
   placeholder?: string | null
   required?: boolean
+  options?: Prisma.FieldCreateoptionsInput | string[]
+  allowOther?: boolean
 }
 
 export type FieldUpdateWithoutFormInput = {
@@ -449,6 +512,8 @@ export type FieldUpdateWithoutFormInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type FieldUncheckedUpdateWithoutFormInput = {
@@ -457,6 +522,8 @@ export type FieldUncheckedUpdateWithoutFormInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type FieldUncheckedUpdateManyWithoutFormInput = {
@@ -465,6 +532,8 @@ export type FieldUncheckedUpdateManyWithoutFormInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
   placeholder?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  options?: Prisma.FieldUpdateoptionsInput | string[]
+  allowOther?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -475,6 +544,8 @@ export type FieldSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   label?: boolean
   placeholder?: boolean
   required?: boolean
+  options?: boolean
+  allowOther?: boolean
   formId?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["field"]>
@@ -485,6 +556,8 @@ export type FieldSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   label?: boolean
   placeholder?: boolean
   required?: boolean
+  options?: boolean
+  allowOther?: boolean
   formId?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["field"]>
@@ -495,6 +568,8 @@ export type FieldSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   label?: boolean
   placeholder?: boolean
   required?: boolean
+  options?: boolean
+  allowOther?: boolean
   formId?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["field"]>
@@ -505,10 +580,12 @@ export type FieldSelectScalar = {
   label?: boolean
   placeholder?: boolean
   required?: boolean
+  options?: boolean
+  allowOther?: boolean
   formId?: boolean
 }
 
-export type FieldOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "label" | "placeholder" | "required" | "formId", ExtArgs["result"]["field"]>
+export type FieldOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "label" | "placeholder" | "required" | "options" | "allowOther" | "formId", ExtArgs["result"]["field"]>
 export type FieldInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }
@@ -530,6 +607,8 @@ export type $FieldPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     label: string
     placeholder: string | null
     required: boolean
+    options: string[]
+    allowOther: boolean
     formId: string
   }, ExtArgs["result"]["field"]>
   composites: {}
@@ -960,6 +1039,8 @@ export interface FieldFieldRefs {
   readonly label: Prisma.FieldRef<"Field", 'String'>
   readonly placeholder: Prisma.FieldRef<"Field", 'String'>
   readonly required: Prisma.FieldRef<"Field", 'Boolean'>
+  readonly options: Prisma.FieldRef<"Field", 'String[]'>
+  readonly allowOther: Prisma.FieldRef<"Field", 'Boolean'>
   readonly formId: Prisma.FieldRef<"Field", 'String'>
 }
     

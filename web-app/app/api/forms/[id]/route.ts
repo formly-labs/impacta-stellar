@@ -7,17 +7,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const body: FormUpdateInput = await req.json();
     const { id } = await params;
     
-    const { title, description, fields } = body;
+    const { title, description, fields, theme, rewardPerGoodAnswer } = body;
     
     const updatedForm = await prisma.$transaction(async (tx) => {
       
       await tx.field.deleteMany({ where: { formId: id } });
       
-      const fieldsToCreate = fields?.map(({ type, label, placeholder, required }) => ({
-        type,
-        label,
-        placeholder: placeholder || '',
-        required: required ?? false,
+      const fieldsToCreate = fields?.map((f) => ({
+        type: f.type,
+        label: f.label,
+        placeholder: f.placeholder || '',
+        required: f.required ?? false,
+        options: f.options || [],
+        allowOther: f.allowOther ?? false,
       }));
       
       return await tx.form.update({
@@ -25,6 +27,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         data: {
           title,
           description,
+          theme,
+          rewardPerGoodAnswer,
           fields: {
             create: fieldsToCreate,
           },

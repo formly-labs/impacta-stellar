@@ -66,7 +66,7 @@ export default function EditFormPage() {
   const handleSave = async () => {
     setSaving(true);
     const method = formId ? 'PUT' : 'POST';
-    const url = formId ? `/api/forms/${formId}` : '/api/api/forms';
+    const url = formId ? `/api/forms/${formId}` : '/api/forms';
     
     try {
       await fetch(url, {

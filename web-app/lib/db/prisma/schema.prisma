@@ -9,23 +9,38 @@ generator client {
 }
 
 model Form {
-  id           String   @id @default(cuid())
-  title        String
-  description  String?
-  ownerAddress String
-  budget       Float    @default(0) // En XLM
-  isActive     Boolean  @default(true)
-  fields       Field[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  title               String
+  description         String?
+  ownerAddress        String
+  budget              Float    @default(0) // En XLM
+  isActive            Boolean  @default(true)
+  theme               String?  // "Product UX", "Segmentation", "Sales"
+  rewardPerGoodAnswer Float?   // XLM por respuesta válida
+  fields              Field[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model Field {
-  id          String  @id @default(cuid())
-  type        String // "text", "email", "phone"
+  id          String   @id @default(cuid())
+  type        String   // "text", "email", "phone", "radio", "checkbox", "short_text", "long_text"
   label       String
   placeholder String?
-  required    Boolean @default(false)
+  required    Boolean  @default(false)
+  options     String[] @default([])  // Opciones para radio/checkbox
+  allowOther  Boolean  @default(false)
   formId      String
-  form        Form    @relation(fields: [formId], references: [id], onDelete: Cascade)
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
+
+model UserProfile {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  firstName     String?
+  lastName      String?
+  email         String?
+  phone         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

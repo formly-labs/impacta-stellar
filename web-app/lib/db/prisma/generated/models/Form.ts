@@ -28,10 +28,12 @@ export type AggregateForm = {
 
 export type FormAvgAggregateOutputType = {
   budget: number | null
+  rewardPerGoodAnswer: number | null
 }
 
 export type FormSumAggregateOutputType = {
   budget: number | null
+  rewardPerGoodAnswer: number | null
 }
 
 export type FormMinAggregateOutputType = {
@@ -41,6 +43,8 @@ export type FormMinAggregateOutputType = {
   ownerAddress: string | null
   budget: number | null
   isActive: boolean | null
+  theme: string | null
+  rewardPerGoodAnswer: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +56,8 @@ export type FormMaxAggregateOutputType = {
   ownerAddress: string | null
   budget: number | null
   isActive: boolean | null
+  theme: string | null
+  rewardPerGoodAnswer: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +69,8 @@ export type FormCountAggregateOutputType = {
   ownerAddress: number
   budget: number
   isActive: number
+  theme: number
+  rewardPerGoodAnswer: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -71,10 +79,12 @@ export type FormCountAggregateOutputType = {
 
 export type FormAvgAggregateInputType = {
   budget?: true
+  rewardPerGoodAnswer?: true
 }
 
 export type FormSumAggregateInputType = {
   budget?: true
+  rewardPerGoodAnswer?: true
 }
 
 export type FormMinAggregateInputType = {
@@ -84,6 +94,8 @@ export type FormMinAggregateInputType = {
   ownerAddress?: true
   budget?: true
   isActive?: true
+  theme?: true
+  rewardPerGoodAnswer?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +107,8 @@ export type FormMaxAggregateInputType = {
   ownerAddress?: true
   budget?: true
   isActive?: true
+  theme?: true
+  rewardPerGoodAnswer?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +120,8 @@ export type FormCountAggregateInputType = {
   ownerAddress?: true
   budget?: true
   isActive?: true
+  theme?: true
+  rewardPerGoodAnswer?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +220,8 @@ export type FormGroupByOutputType = {
   ownerAddress: string
   budget: number
   isActive: boolean
+  theme: string | null
+  rewardPerGoodAnswer: number | null
   createdAt: Date
   updatedAt: Date
   _count: FormCountAggregateOutputType | null
@@ -238,6 +256,8 @@ export type FormWhereInput = {
   ownerAddress?: Prisma.StringFilter<"Form"> | string
   budget?: Prisma.FloatFilter<"Form"> | number
   isActive?: Prisma.BoolFilter<"Form"> | boolean
+  theme?: Prisma.StringNullableFilter<"Form"> | string | null
+  rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   fields?: Prisma.FieldListRelationFilter
@@ -250,6 +270,8 @@ export type FormOrderByWithRelationInput = {
   ownerAddress?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fields?: Prisma.FieldOrderByRelationAggregateInput
@@ -265,6 +287,8 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   ownerAddress?: Prisma.StringFilter<"Form"> | string
   budget?: Prisma.FloatFilter<"Form"> | number
   isActive?: Prisma.BoolFilter<"Form"> | boolean
+  theme?: Prisma.StringNullableFilter<"Form"> | string | null
+  rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   fields?: Prisma.FieldListRelationFilter
@@ -277,6 +301,8 @@ export type FormOrderByWithAggregationInput = {
   ownerAddress?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
@@ -296,6 +322,8 @@ export type FormScalarWhereWithAggregatesInput = {
   ownerAddress?: Prisma.StringWithAggregatesFilter<"Form"> | string
   budget?: Prisma.FloatWithAggregatesFilter<"Form"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Form"> | boolean
+  theme?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  rewardPerGoodAnswer?: Prisma.FloatNullableWithAggregatesFilter<"Form"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
 }
@@ -307,6 +335,8 @@ export type FormCreateInput = {
   ownerAddress: string
   budget?: number
   isActive?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldCreateNestedManyWithoutFormInput
@@ -319,6 +349,8 @@ export type FormUncheckedCreateInput = {
   ownerAddress: string
   budget?: number
   isActive?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -331,6 +363,8 @@ export type FormUpdateInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUpdateManyWithoutFormNestedInput
@@ -343,6 +377,8 @@ export type FormUncheckedUpdateInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -355,6 +391,8 @@ export type FormCreateManyInput = {
   ownerAddress: string
   budget?: number
   isActive?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -366,6 +404,8 @@ export type FormUpdateManyMutationInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -377,6 +417,8 @@ export type FormUncheckedUpdateManyInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -388,12 +430,15 @@ export type FormCountOrderByAggregateInput = {
   ownerAddress?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type FormAvgOrderByAggregateInput = {
   budget?: Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrder
 }
 
 export type FormMaxOrderByAggregateInput = {
@@ -403,6 +448,8 @@ export type FormMaxOrderByAggregateInput = {
   ownerAddress?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -414,12 +461,15 @@ export type FormMinOrderByAggregateInput = {
   ownerAddress?: Prisma.SortOrder
   budget?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type FormSumOrderByAggregateInput = {
   budget?: Prisma.SortOrder
+  rewardPerGoodAnswer?: Prisma.SortOrder
 }
 
 export type FormScalarRelationFilter = {
@@ -447,6 +497,14 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
@@ -472,6 +530,8 @@ export type FormCreateWithoutFieldsInput = {
   ownerAddress: string
   budget?: number
   isActive?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -483,6 +543,8 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   ownerAddress: string
   budget?: number
   isActive?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -510,6 +572,8 @@ export type FormUpdateWithoutFieldsInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -521,6 +585,8 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   budget?: Prisma.FloatFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -563,6 +629,8 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ownerAddress?: boolean
   budget?: boolean
   isActive?: boolean
+  theme?: boolean
+  rewardPerGoodAnswer?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
@@ -576,6 +644,8 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   ownerAddress?: boolean
   budget?: boolean
   isActive?: boolean
+  theme?: boolean
+  rewardPerGoodAnswer?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["form"]>
@@ -587,6 +657,8 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   ownerAddress?: boolean
   budget?: boolean
   isActive?: boolean
+  theme?: boolean
+  rewardPerGoodAnswer?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["form"]>
@@ -598,11 +670,13 @@ export type FormSelectScalar = {
   ownerAddress?: boolean
   budget?: boolean
   isActive?: boolean
+  theme?: boolean
+  rewardPerGoodAnswer?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "theme" | "rewardPerGoodAnswer" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
@@ -622,6 +696,8 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ownerAddress: string
     budget: number
     isActive: boolean
+    theme: string | null
+    rewardPerGoodAnswer: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["form"]>
@@ -1054,6 +1130,8 @@ export interface FormFieldRefs {
   readonly ownerAddress: Prisma.FieldRef<"Form", 'String'>
   readonly budget: Prisma.FieldRef<"Form", 'Float'>
   readonly isActive: Prisma.FieldRef<"Form", 'Boolean'>
+  readonly theme: Prisma.FieldRef<"Form", 'String'>
+  readonly rewardPerGoodAnswer: Prisma.FieldRef<"Form", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Form", 'DateTime'>
 }
