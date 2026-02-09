@@ -1,22 +1,135 @@
 @import "tailwindcss";
 
 :root {
+  /* ============================================
+     Paleta de colores basada en #865EFF
+     ============================================ */
+  
+  /* Escala de Primary (Púrpura) - Optimizada para contraste */
+  --primary-50: #f5f3ff;
+  --primary-100: #ede9fe;
+  --primary-200: #ddd6fe;
+  --primary-300: #c4b5fd;
+  --primary-400: #a78bfa;
+  --primary-500: #865EFF;  /* Color base */
+  --primary-600: #7c55f0;
+  --primary-700: #6b47d6;
+  --primary-800: #5a3bb8;
+  --primary-900: #4a2f99;
+  --primary-950: #2e1b5c;
+  
+  /* Colores base del tema */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
+  
+  /* Primary - Color principal */
+  --primary: var(--primary-500);
+  --primary-foreground: #ffffff;
+  
+  /* Secondary - Variante más clara del primary */
+  --secondary: var(--primary-100);
+  --secondary-foreground: var(--primary-700);
+  
+  /* Accent - Variante más saturada */
+  --accent: var(--primary-400);
+  --accent-foreground: #ffffff;
+  
+  /* Muted - Para fondos sutiles */
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  
+  /* Destructive - Rojo para acciones destructivas */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  /* Borders e inputs */
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: var(--primary-500);
+  
+  /* Success - Verde */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  
+  /* Warning - Ámbar */
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  
+  /* Info - Variante azulada del primary */
+  --info: var(--primary-400);
+  --info-foreground: #ffffff;
+  
+  /* Card */
+  --card: #ffffff;
+  --card-foreground: var(--foreground);
+  
+  /* Popover */
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  
+  /* Radius predeterminado */
+  --radius: 0.5rem;
 }
 
 @theme inline {
+  /* ============================================
+     Registro de colores para Tailwind CSS
+     ============================================ */
+  
+  /* Paleta Primary completa */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+  
+  /* Colores del tema */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

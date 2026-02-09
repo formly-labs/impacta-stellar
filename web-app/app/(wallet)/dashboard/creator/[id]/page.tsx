@@ -75,7 +75,7 @@ export default function FormDetailsPage() {
           </div>
           <div>
             <p className="text-slate-500 text-sm uppercase tracking-widest font-bold">Campos</p>
-            <p className="text-3xl font-mono mt-1">{form.fields.length}</p>
+            <p className="text-3xl font-mono mt-1">{form?.fields?.length}</p>
           </div>
           <div>
             <p className="text-slate-500 text-sm uppercase tracking-widest font-bold">Vistas</p>
