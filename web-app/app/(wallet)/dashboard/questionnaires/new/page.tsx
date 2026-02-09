@@ -7,6 +7,7 @@ import ThemeStep from './steps/ThemeStep';
 import FirstQuestionStep from './steps/FirstQuestionStep';
 import QuestionsStep from './steps/QuestionsStep';
 import RewardsStep from './steps/RewardsStep';
+import FinalizeStep from './steps/FinalizeStep';
 
 function NewQuestionnaireContent() {
   const searchParams = useSearchParams();
@@ -23,27 +24,13 @@ function NewQuestionnaireContent() {
       case 'rewards':
         return <RewardsStep />;
       case 'finalize':
-        return <PlaceholderStep title="Finalizar" stepNum={5} />;
+        return <FinalizeStep />;
       default:
         return <ThemeStep />;
     }
   };
 
   return <NewQuestionnaireShell>{renderStep()}</NewQuestionnaireShell>;
-}
-
-function PlaceholderStep({ title, stepNum }: { title: string; stepNum: number }) {
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md text-center space-y-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-blue-600">
-          Paso {stepNum < 10 ? `0${stepNum}` : stepNum}
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
-        <p className="text-gray-400">Este paso estará disponible pronto.</p>
-      </div>
-    </div>
-  );
 }
 
 export default function NewQuestionnairePage() {

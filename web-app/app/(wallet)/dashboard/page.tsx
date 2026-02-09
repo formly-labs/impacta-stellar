@@ -2,17 +2,26 @@
 
 import { FormResponse } from '@/types';
 import { isOnboardingCompleted } from '@/lib/onboardingStorage';
-import { ChevronRight, Coins, FileText, Loader2, Plus, Search, Users } from 'lucide-react';
+import { ChevronRight, Coins, FileText, Loader2, Moon, Plus, Search, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useWallet } from 'stellar-wallet-kit';
 
+// Demo data shown when no real forms exist
+const DEMO_FORMS = [
+  { id: 'demo-1', title: 'Encuesta de Satisfacción 2024', updatedLabel: 'Actualizado hace 2 horas', responses: 0, isActive: true },
+  { id: 'demo-2', title: 'Feedback de Producto Alpha', updatedLabel: 'Actualizado ayer', responses: 124, isActive: true },
+  { id: 'demo-3', title: 'Registro de Evento Stellar', updatedLabel: 'Actualizado el 15 Oct', responses: 56, isActive: false },
+  { id: 'demo-4', title: 'Test de UX Mobile', updatedLabel: 'Actualizado el 10 Oct', responses: 0, isActive: true },
+];
+
 export default function CreatorDashboard() {
   const { account } = useWallet();
   const router = useRouter();
-  const [ forms, setForms ] = useState<FormResponse[]>([]);
-  const [ loading, setLoading ] = useState(true);
+  const [forms, setForms] = useState<FormResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Redirect to onboarding if not completed
   useEffect(() => {
@@ -20,7 +29,7 @@ export default function CreatorDashboard() {
       router.replace('/dashboard/onboarding?step=details');
     }
   }, [router]);
-  
+
   useEffect(() => {
     if (account?.address) {
       fetch(`/api/forms?address=${account.address}`)
@@ -31,106 +40,200 @@ export default function CreatorDashboard() {
         })
         .catch(() => setLoading(false));
     }
-  }, [ account?.address ]);
-  
+  }, [account?.address]);
+
+  // Use demo data when no real forms
+  const showDemo = !loading && forms.length === 0;
+  const totalForms = showDemo ? 12 : forms.length;
+
+  const filteredDemo = DEMO_FORMS.filter(f =>
+    f.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const filteredForms = forms.filter(f =>
+    f.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white p-6 md:p-12">
-      <div className="max-w-6xl mx-auto space-y-10">
-        
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="min-h-screen bg-[#f8f9fb]">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-12">
+        {/* Header */}
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-4xl font-black tracking-tight">Mis Formularios</h1>
-            <p className="text-slate-400 mt-2">Gestiona tus encuestas e incentivos de Stellar.</p>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900">
+              Mis Formularios
+            </h1>
+            <p className="mt-1 text-gray-500">
+              Gestiona tus encuestas e incentivos de Stellar.
+            </p>
           </div>
           <Link
             href="/dashboard/questionnaires/new?step=theme"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/20"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
           >
-            <Plus className="w-5 h-5" /> Crear Nuevo
+            <Plus className="h-4 w-4" />
+            Crear Nuevo
           </Link>
         </header>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
-            <div className="flex items-center gap-4 text-slate-400 mb-2">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs font-bold uppercase tracking-widest">Total Formularios</span>
+
+        {/* Stats */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="flex items-center gap-3 text-gray-400">
+              <FileText className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                Total Formularios
+              </span>
             </div>
-            <p className="text-3xl font-mono">{forms.length}</p>
+            <p className="mt-3 text-3xl font-bold text-gray-900">{totalForms}</p>
           </div>
-          <div className="p-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
-            <div className="flex items-center gap-4 text-blue-400 mb-2">
-              <Users className="w-5 h-5" />
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Respuestas Totales</span>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="flex items-center gap-3 text-gray-400">
+              <Users className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                Respuestas Totales
+              </span>
             </div>
-            <p className="text-3xl font-mono">0</p>
+            <p className="mt-3 text-3xl font-bold text-gray-900">0</p>
           </div>
-          <div className="p-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
-            <div className="flex items-center gap-4 text-yellow-500 mb-2">
-              <Coins className="w-5 h-5" />
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Fondos en Circulación</span>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="flex items-center gap-3 text-gray-400">
+              <Coins className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
+                Fondos en Circulación
+              </span>
             </div>
-            <p className="text-3xl font-mono">0.00 XLM</p>
+            <p className="mt-3 text-3xl font-bold text-gray-900">
+              0.00 <span className="text-lg font-medium text-gray-400">XLM</span>
+            </p>
           </div>
         </div>
-        
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+
+        {/* Search */}
+        <div className="relative mt-8">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por título..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-blue-500/50 transition-all"
+            className="h-12 w-full rounded-2xl border border-gray-200 bg-white pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
           />
         </div>
-        
-        <div className="space-y-4">
+
+        {/* Form list */}
+        <div className="mt-6 space-y-3">
           {loading ? (
-            <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+            <div className="flex justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
             </div>
-          ) : forms.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
-              <p className="text-slate-500">No has creado ningún formulario todavía.</p>
-            </div>
-          ) : (
-            forms.map((form) => (
+          ) : showDemo ? (
+            // Demo forms
+            filteredDemo.map((form) => (
               <div
                 key={form.id}
-                className="group flex flex-col md:flex-row items-center justify-between p-6 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 hover:border-white/20 transition-all gap-6"
+                className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-4 transition-all hover:border-gray-300 hover:shadow-sm"
               >
-                <div className="flex items-center gap-6 w-full md:w-auto">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-600/20 flex items-center justify-center text-blue-400">
-                    <FileText className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold group-hover:text-blue-400 transition-colors">{form.title}</h3>
-                    <p className="text-slate-500 text-sm line-clamp-1">{form.description}</p>
-                  </div>
+                {/* Icon */}
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                  <FileText className="h-5 w-5 text-blue-600" />
                 </div>
-                
-                <div className="flex items-center gap-8 w-full md:w-auto justify-between md:justify-end">
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Respuestas</p>
-                    <p className="text-lg font-mono">0</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Estado</p>
-                    <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded-md font-bold">ACTIVO</span>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/dashboard/creator/${form.id}`}
-                      className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5"
-                    >
-                      <ChevronRight className="w-5 h-5 text-slate-400" />
-                    </Link>
-                  </div>
+
+                {/* Title + subtitle */}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {form.title}
+                  </p>
+                  <p className="text-xs text-gray-400">{form.updatedLabel}</p>
                 </div>
+
+                {/* Responses */}
+                <div className="hidden text-right sm:block">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Respuestas
+                  </p>
+                  <p className="text-lg font-bold text-gray-900">{form.responses}</p>
+                </div>
+
+                {/* Status */}
+                <div className="hidden text-right sm:block">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Estado
+                  </p>
+                  <span
+                    className={`text-[10px] font-bold uppercase ${
+                      form.isActive ? 'text-green-500' : 'text-gray-400'
+                    }`}
+                  >
+                    {form.isActive ? 'ACTIVO' : 'INACTIVO'}
+                  </span>
+                </div>
+
+                {/* Arrow */}
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-gray-300 transition-colors group-hover:text-gray-500" />
               </div>
+            ))
+          ) : filteredForms.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+              <p className="text-gray-400">No se encontraron formularios.</p>
+            </div>
+          ) : (
+            filteredForms.map((form) => (
+              <Link
+                key={form.id}
+                href={`/dashboard/creator/${form.id}`}
+                className="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-4 transition-all hover:border-gray-300 hover:shadow-sm"
+              >
+                {/* Icon */}
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                </div>
+
+                {/* Title + subtitle */}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {form.title}
+                  </p>
+                  <p className="text-xs text-gray-400">{form.description}</p>
+                </div>
+
+                {/* Responses */}
+                <div className="hidden text-right sm:block">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Respuestas
+                  </p>
+                  <p className="text-lg font-bold text-gray-900">0</p>
+                </div>
+
+                {/* Status */}
+                <div className="hidden text-right sm:block">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Estado
+                  </p>
+                  <span
+                    className={`text-[10px] font-bold uppercase ${
+                      form.isActive ? 'text-green-500' : 'text-gray-400'
+                    }`}
+                  >
+                    {form.isActive ? 'ACTIVO' : 'INACTIVO'}
+                  </span>
+                </div>
+
+                {/* Arrow */}
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-gray-300 transition-colors group-hover:text-gray-500" />
+              </Link>
             ))
           )}
         </div>
       </div>
+
+      {/* Moon icon bottom-right */}
+      <button
+        type="button"
+        className="fixed bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md transition-colors hover:bg-gray-50 hover:text-gray-700"
+        aria-label="Cambiar tema"
+      >
+        <Moon className="h-5 w-5" />
+      </button>
     </div>
   );
 }

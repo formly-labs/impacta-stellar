@@ -10,6 +10,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brand purple (#865efe) replacing default blue */
+  --color-blue-50: #f4f0ff;
+  --color-blue-100: #ebe3ff;
+  --color-blue-200: #d9ccff;
+  --color-blue-300: #bea8ff;
+  --color-blue-400: #a07efe;
+  --color-blue-500: #865efe;
+  --color-blue-600: #865efe;
+  --color-blue-700: #7046e6;
+  --color-blue-800: #5c38c2;
+  --color-blue-900: #4d2f9e;
 }
 
 @media (prefers-color-scheme: dark) {

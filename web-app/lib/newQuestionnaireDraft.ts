@@ -1,4 +1,4 @@
-export type QuestionnaireTheme = 'Product UX' | 'Segmentation' | 'Sales';
+export type QuestionnaireTheme = 'Product UX' | 'Segmentation' | 'Sales' | 'Other';
 
 export type AnswerType = 'radio' | 'checkbox' | 'short_text' | 'long_text';
 
