@@ -3,11 +3,12 @@
 import {
   ArrowLeft,
   CheckCircle,
+  Copy,
   FileText,
   Coins,
   HelpCircle,
   Loader2,
-  Rocket,
+  PartyPopper,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -40,6 +41,8 @@ export default function FinalizeStep() {
   const [published, setPublished] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formId, setFormId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setDraft(loadQuestionnaireDraft());
@@ -93,6 +96,9 @@ export default function FinalizeStep() {
         throw new Error(data?.error || 'Error del servidor');
       }
 
+      const created = await res.json().catch(() => null);
+      if (created?.id) setFormId(created.id);
+
       clearQuestionnaireDraft();
       setPublished(true);
     } catch (err) {
@@ -106,25 +112,95 @@ export default function FinalizeStep() {
     }
   };
 
+  const shareLink =
+    typeof window !== 'undefined' && formId
+      ? `${window.location.origin}/dashboard/creator/${formId}`
+      : '';
+
+  const handleCopy = async () => {
+    if (!shareLink) return;
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+      const input = document.createElement('input');
+      input.value = shareLink;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (published) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md space-y-6 text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-            <Rocket className="h-10 w-10 text-green-600" />
+        <div className="w-full max-w-lg space-y-8 text-center animate-fade-in">
+          {/* Celebration icon */}
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-yellow-50">
+            <PartyPopper className="h-12 w-12 text-yellow-500" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            ¡Encuesta publicada!
-          </h1>
-          <p className="text-gray-500">
-            Tu cuestionario ya está listo para recibir respuestas.
-          </p>
+
+          {/* Main text */}
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              ¡Encuesta finalizada!
+            </h1>
+            <p className="text-gray-500">
+              Usa este link para compartir con las personas que desees que respondan. ¡Suerte!
+            </p>
+          </div>
+
+          {/* Share link */}
+          {shareLink && (
+            <div className="mx-auto w-full max-w-md">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Enlace para compartir
+              </label>
+              <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
+                <input
+                  type="text"
+                  readOnly
+                  value={shareLink}
+                  className="flex-1 truncate border-0 bg-transparent px-3 py-2 text-sm text-gray-700 outline-none"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    copied
+                      ? 'bg-green-600 text-white'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      Copiar
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Go to dashboard */}
           <button
             type="button"
             onClick={() => router.push('/dashboard')}
             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Ir al dashboard
+            Ir a inicio
           </button>
         </div>
       </div>
@@ -136,8 +212,8 @@ export default function FinalizeStep() {
       <div className="w-full max-w-2xl space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-blue-600">
-            Paso 05 — Revisión final
+          <p className="text-lg font-bold uppercase tracking-widest text-blue-600">
+            Paso 06 — Revisión final
           </p>
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.25rem] sm:leading-tight">
             Revisa y <span className="font-bold">publica</span>

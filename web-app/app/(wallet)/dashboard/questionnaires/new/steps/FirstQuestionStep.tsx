@@ -12,7 +12,7 @@ import {
 } from '@/lib/newQuestionnaireDraft';
 
 const questionSchema = z.object({
-  firstQuestion: z.string().min(1, 'Escribe tu primera pregunta'),
+  firstQuestion: z.string().min(1, 'El título de la encuesta es obligatorio'),
 });
 
 type QuestionFormData = z.infer<typeof questionSchema>;
@@ -66,16 +66,16 @@ export default function FirstQuestionStep() {
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-2xl space-y-8">
         {/* Step label */}
-        <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Paso 02</p>
+        <p className="text-lg font-bold uppercase tracking-widest text-blue-600">Paso 02</p>
 
         {/* Headline */}
         <div className="space-y-3">
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.5rem] sm:leading-tight">
-            Escribe tu primera{' '}
-            <span className="font-bold">pregunta</span>
+            ¿De qué trata tu{' '}
+            <span className="font-bold">encuesta?</span>
           </h1>
           <p className="text-gray-400">
-            Esta será la primera pregunta de tu cuestionario.
+            Este será el título de tu encuesta.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function FirstQuestionStep() {
               <input
                 {...register('firstQuestion')}
                 type="text"
-                placeholder="Escribe tu pregunta…"
+                placeholder="Título de la encuesta"
                 onKeyDown={handleKeyDown}
                 className={`h-[56px] w-full rounded-2xl border bg-white py-4 pl-12 pr-14 text-base text-gray-900 placeholder-gray-400 shadow-sm outline-none transition-colors focus:border-blue-400 focus:ring-2 focus:ring-blue-100 ${
                   errors.firstQuestion ? 'border-red-300' : 'border-gray-200'

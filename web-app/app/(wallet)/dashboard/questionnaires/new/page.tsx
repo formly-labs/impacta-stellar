@@ -6,6 +6,7 @@ import NewQuestionnaireShell from './components/NewQuestionnaireShell';
 import ThemeStep from './steps/ThemeStep';
 import FirstQuestionStep from './steps/FirstQuestionStep';
 import QuestionsStep from './steps/QuestionsStep';
+import PreviewStep from './steps/PreviewStep';
 import RewardsStep from './steps/RewardsStep';
 import FinalizeStep from './steps/FinalizeStep';
 
@@ -21,6 +22,8 @@ function NewQuestionnaireContent() {
         return <FirstQuestionStep />;
       case 'questions':
         return <QuestionsStep />;
+      case 'preview':
+        return <PreviewStep />;
       case 'rewards':
         return <RewardsStep />;
       case 'finalize':

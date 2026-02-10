@@ -121,7 +121,7 @@ export default function QuestionsStep() {
     window.dispatchEvent(
       new CustomEvent('formly:toast', { detail: 'Guardado correctamente' }),
     );
-    router.push('/dashboard/questionnaires/new?step=rewards');
+    router.push('/dashboard/questionnaires/new?step=preview');
   }, [questions, router]);
 
   return (
@@ -129,7 +129,7 @@ export default function QuestionsStep() {
       <div className="mx-auto w-full max-w-3xl space-y-8">
         {/* Header */}
         <div className="space-y-1">
-          <p className="text-xs font-bold uppercase tracking-widest text-blue-600">
+          <p className="text-lg font-bold uppercase tracking-widest text-blue-600">
             Paso 03 — Editor de preguntas
           </p>
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.25rem] sm:leading-tight">
@@ -167,10 +167,10 @@ export default function QuestionsStep() {
           <button
             type="button"
             onClick={handleFinalize}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           >
-            Finalizar encuesta
-            <CheckCircle className="h-4 w-4 text-gray-400" />
+            Visualiza y finaliza la encuesta
+            <CheckCircle className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -204,22 +204,6 @@ function QuestionBlock({
   const titleRef = useRef<HTMLInputElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Preview-only state (not persisted)
-  const [selectedRadio, setSelectedRadio] = useState<number | null>(null);
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<number[]>([]);
-  const [previewText, setPreviewText] = useState('');
-
-  // Reset preview state when answer type changes
-  const prevTypeRef = useRef(question.type);
-  useEffect(() => {
-    if (prevTypeRef.current !== question.type) {
-      setSelectedRadio(null);
-      setSelectedCheckboxes([]);
-      setPreviewText('');
-      prevTypeRef.current = question.type;
-    }
-  }, [question.type]);
-
   // Auto-focus newest
   useEffect(() => {
     if (autoFocus && titleRef.current) {
@@ -244,22 +228,10 @@ function QuestionBlock({
     if (question.options.length <= 2) return;
     const newOpts = question.options.filter((_, i) => i !== optIdx);
     onUpdate({ options: newOpts });
-    // Clean up preview selections that reference removed index
-    if (selectedRadio === optIdx) setSelectedRadio(null);
-    else if (selectedRadio !== null && selectedRadio > optIdx) setSelectedRadio(selectedRadio - 1);
-    setSelectedCheckboxes((prev) =>
-      prev.filter((i) => i !== optIdx).map((i) => (i > optIdx ? i - 1 : i)),
-    );
   };
 
   const toggleAllowOther = () => {
     onUpdate({ allowOther: !question.allowOther });
-  };
-
-  const toggleCheckbox = (idx: number) => {
-    setSelectedCheckboxes((prev) =>
-      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx],
-    );
   };
 
   const currentTypeLabel =
@@ -408,104 +380,6 @@ function QuestionBlock({
         </div>
       )}
 
-      {/* ── Preview area ── */}
-      <div className="p-5 pt-3">
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-          Vista previa
-        </p>
-
-        {/* Radio preview */}
-        {question.type === 'radio' && (
-          <fieldset className="space-y-2">
-            {question.options.map((opt, optIdx) => {
-              const label = opt.trim() || `Opción ${optIdx + 1}`;
-              return (
-                <label
-                  key={optIdx}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50"
-                >
-                  <input
-                    type="radio"
-                    name={`q-${question.id}`}
-                    checked={selectedRadio === optIdx}
-                    onChange={() => setSelectedRadio(optIdx)}
-                    className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">{label}</span>
-                </label>
-              );
-            })}
-            {question.allowOther && (
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name={`q-${question.id}`}
-                  checked={selectedRadio === question.options.length}
-                  onChange={() => setSelectedRadio(question.options.length)}
-                  className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm italic text-gray-500">Otro...</span>
-              </label>
-            )}
-          </fieldset>
-        )}
-
-        {/* Checkbox preview */}
-        {question.type === 'checkbox' && (
-          <fieldset className="space-y-2">
-            {question.options.map((opt, optIdx) => {
-              const label = opt.trim() || `Opción ${optIdx + 1}`;
-              return (
-                <label
-                  key={optIdx}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedCheckboxes.includes(optIdx)}
-                    onChange={() => toggleCheckbox(optIdx)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">{label}</span>
-                </label>
-              );
-            })}
-            {question.allowOther && (
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  checked={selectedCheckboxes.includes(question.options.length)}
-                  onChange={() => toggleCheckbox(question.options.length)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm italic text-gray-500">Otro...</span>
-              </label>
-            )}
-          </fieldset>
-        )}
-
-        {/* Short text preview */}
-        {question.type === 'short_text' && (
-          <input
-            type="text"
-            value={previewText}
-            onChange={(e) => setPreviewText(e.target.value)}
-            placeholder="Respuesta corta..."
-            className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-          />
-        )}
-
-        {/* Long text preview */}
-        {question.type === 'long_text' && (
-          <textarea
-            value={previewText}
-            onChange={(e) => setPreviewText(e.target.value)}
-            placeholder="Respuesta larga..."
-            rows={4}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-          />
-        )}
-      </div>
     </div>
   );
 }

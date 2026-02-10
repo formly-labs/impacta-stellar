@@ -44,7 +44,7 @@ export default function ThemeStep() {
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-xl space-y-10 text-center">
         {/* Step label */}
-        <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Paso 01</p>
+        <p className="text-lg font-bold uppercase tracking-widest text-blue-600">Paso 01</p>
 
         {/* Headline */}
         <div className="space-y-3">

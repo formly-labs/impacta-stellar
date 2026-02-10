@@ -16,6 +16,7 @@ export interface QuestionnaireDraft {
   theme?: QuestionnaireTheme;
   firstQuestion?: string;
   questions?: QuestionDraft[];
+  wantsRewards?: boolean;
   rewardPerGoodAnswer?: number;
   rewardPreset?: RewardPreset;
 }
