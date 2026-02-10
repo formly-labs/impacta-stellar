@@ -75,10 +75,10 @@ export default function FinalizeStep() {
       }));
 
       const payload = {
-        title: draft.theme
-          ? `Encuesta: ${THEME_LABELS[draft.theme] || draft.theme}`
-          : 'Nueva encuesta',
-        description: `Cuestionario de ${THEME_LABELS[draft.theme || ''] || 'general'}`,
+        title: draft.firstQuestion?.trim() || 'Nueva encuesta',
+        description: draft.theme
+          ? `Cuestionario de ${THEME_LABELS[draft.theme] || draft.theme}`
+          : 'Cuestionario general',
         ownerAddress: account.address,
         fields,
         theme: draft.theme,
@@ -225,6 +225,28 @@ export default function FinalizeStep() {
 
         {/* Summary card */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+          {/* Survey title */}
+          <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
+              <FileText className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Título de la encuesta
+              </p>
+              <p className="text-sm font-medium text-gray-900">
+                {draft.firstQuestion?.trim() || <span className="italic text-gray-400">Sin título</span>}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard/questionnaires/new?step=question')}
+              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+            >
+              Editar
+            </button>
+          </div>
+
           {/* Theme */}
           <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
@@ -232,7 +254,7 @@ export default function FinalizeStep() {
             </div>
             <div className="flex-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Tema
+                Categoría
               </p>
               <p className="text-sm font-medium text-gray-900">{themeLabel}</p>
             </div>

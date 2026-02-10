@@ -130,9 +130,12 @@ export default function FormDetailsPage() {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-              Analiza las respuestas
-            </h1>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
+                {form.title}
+              </h1>
+              <p className="text-sm text-gray-400">Analiza las respuestas</p>
+            </div>
           </div>
           <button
             type="button"
