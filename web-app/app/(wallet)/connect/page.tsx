@@ -14,7 +14,7 @@ export default function ConnectPage() {
     if (isConnected) {
       const callbackUrl = searchParams.get('callbackUrl');
       
-      const destination = callbackUrl ? decodeURIComponent(callbackUrl) : '/dashboard/creator';
+      const destination = callbackUrl ? decodeURIComponent(callbackUrl) : '/dashboard';
       
       router.push(destination);
     }
