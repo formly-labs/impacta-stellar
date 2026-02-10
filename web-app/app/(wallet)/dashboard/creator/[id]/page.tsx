@@ -3,8 +3,11 @@
 import { FormResponse } from '@/types';
 import {
   ArrowLeft,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Copy,
+  Link2,
   Moon,
   Printer,
   ShieldOff,
@@ -63,6 +66,30 @@ export default function FormDetailsPage() {
   const [tab, setTab] = useState<Tab>('individual');
   const [currentResponse, setCurrentResponse] = useState(0);
   const [isDeactivating, setIsDeactivating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const shareLink =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/encuesta/${id}`
+      : '';
+
+  const handleCopyLink = async () => {
+    if (!shareLink) return;
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const input = document.createElement('input');
+      input.value = shareLink;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   // Tab underline animation
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -151,6 +178,42 @@ export default function FormDetailsPage() {
             {form.isActive ? 'Desactivar' : 'Activar'}
           </button>
         </header>
+
+        {/* ── Share link ── */}
+        <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50">
+              <Link2 className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                Enlace público
+              </p>
+              <p className="truncate text-sm text-gray-600">{shareLink}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                copied
+                  ? 'bg-green-600 text-white'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {copied ? (
+                <>
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Copiado
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" />
+                  Copiar
+                </>
+              )}
+            </button>
+          </div>
+        </div>
 
         {/* ── Tabs ── */}
         <div className="relative mt-8" ref={tabsRef}>

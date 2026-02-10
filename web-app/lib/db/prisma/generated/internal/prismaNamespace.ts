@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Form: 'Form',
+  Response: 'Response',
   Field: 'Field',
   UserProfile: 'UserProfile'
 } as const
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "form" | "field" | "userProfile"
+    modelProps: "form" | "response" | "field" | "userProfile"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -477,6 +478,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.FormCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.FormCountAggregateOutputType> | number
+        }
+      }
+    }
+    Response: {
+      payload: Prisma.$ResponsePayload<ExtArgs>
+      fields: Prisma.ResponseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ResponseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ResponseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        findFirst: {
+          args: Prisma.ResponseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ResponseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        findMany: {
+          args: Prisma.ResponseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>[]
+        }
+        create: {
+          args: Prisma.ResponseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        createMany: {
+          args: Prisma.ResponseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ResponseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>[]
+        }
+        delete: {
+          args: Prisma.ResponseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        update: {
+          args: Prisma.ResponseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        deleteMany: {
+          args: Prisma.ResponseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ResponseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ResponseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>[]
+        }
+        upsert: {
+          args: Prisma.ResponseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponsePayload>
+        }
+        aggregate: {
+          args: Prisma.ResponseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateResponse>
+        }
+        groupBy: {
+          args: Prisma.ResponseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ResponseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ResponseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ResponseCountAggregateOutputType> | number
         }
       }
     }
@@ -684,6 +759,16 @@ export const FormScalarFieldEnum = {
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
 
 
+export const ResponseScalarFieldEnum = {
+  id: 'id',
+  formId: 'formId',
+  answers: 'answers',
+  createdAt: 'createdAt'
+} as const
+
+export type ResponseScalarFieldEnum = (typeof ResponseScalarFieldEnum)[keyof typeof ResponseScalarFieldEnum]
+
+
 export const FieldScalarFieldEnum = {
   id: 'id',
   type: 'type',
@@ -720,6 +805,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -734,6 +826,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -788,6 +889,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -900,6 +1015,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   form?: Prisma.FormOmit
+  response?: Prisma.ResponseOmit
   field?: Prisma.FieldOmit
   userProfile?: Prisma.UserProfileOmit
 }

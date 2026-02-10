@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Form = Prisma.FormModel
 /**
+ * Model Response
+ * 
+ */
+export type Response = Prisma.ResponseModel
+/**
  * Model Field
  * 
  */

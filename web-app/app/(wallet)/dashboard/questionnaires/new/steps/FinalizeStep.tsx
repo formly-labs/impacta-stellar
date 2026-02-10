@@ -114,7 +114,7 @@ export default function FinalizeStep() {
 
   const shareLink =
     typeof window !== 'undefined' && formId
-      ? `${window.location.origin}/dashboard/creator/${formId}`
+      ? `${window.location.origin}/encuesta/${formId}`
       : '';
 
   const handleCopy = async () => {
