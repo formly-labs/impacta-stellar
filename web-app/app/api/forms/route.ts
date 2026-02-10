@@ -38,13 +38,17 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const address = searchParams.get('address');
+  const archived = searchParams.get('archived');
   
   if (!address) {
     return NextResponse.json({ error: 'Address requerida' }, { status: 400 });
   }
+
+  // archived=true → only archived; archived=false or absent → only non-archived
+  const isArchived = archived === 'true';
   
   const forms = await prisma.form.findMany({
-    where: { ownerAddress: address },
+    where: { ownerAddress: address, isArchived },
     include: { fields: true },
     orderBy: { createdAt: 'desc' },
   });

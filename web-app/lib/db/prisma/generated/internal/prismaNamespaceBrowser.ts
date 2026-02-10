@@ -79,6 +79,7 @@ export const FormScalarFieldEnum = {
   ownerAddress: 'ownerAddress',
   budget: 'budget',
   isActive: 'isActive',
+  isArchived: 'isArchived',
   theme: 'theme',
   rewardPerGoodAnswer: 'rewardPerGoodAnswer',
   createdAt: 'createdAt',

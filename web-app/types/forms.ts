@@ -29,5 +29,6 @@ export interface FormResponse extends FormCreateInput {
   id: string;
   createdAt: string;
   isActive: boolean;
+  isArchived: boolean;
   budget: number;
 }

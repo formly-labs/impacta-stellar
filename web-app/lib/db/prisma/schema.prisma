@@ -15,6 +15,7 @@ model Form {
   ownerAddress        String
   budget              Float    @default(0) // En XLM
   isActive            Boolean  @default(true)
+  isArchived          Boolean  @default(false)
   theme               String?  // "Product UX", "Segmentation", "Sales"
   rewardPerGoodAnswer Float?   // XLM por respuesta válida
   fields              Field[]
