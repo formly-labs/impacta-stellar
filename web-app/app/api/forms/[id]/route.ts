@@ -5,34 +5,52 @@ import { NextResponse } from 'next/server';
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const body: FormUpdateInput = await req.json();
-    const { id } = await params;
+    const { id: slugOrId } = await params;
     
     const { title, description, fields, theme, rewardPerGoodAnswer } = body;
     
     const updatedForm = await prisma.$transaction(async (tx) => {
+      const existingForm = await tx.form.findFirst({
+        where: {
+          OR: [
+            { slug: slugOrId },
+            { id: slugOrId },
+          ],
+        },
+      });
       
-      await tx.field.deleteMany({ where: { formId: id } });
+      if (!existingForm) {
+        throw new Error('Formulario no encontrado');
+      }
       
-      const fieldsToCreate = fields?.map((f) => ({
-        type: f.type,
-        label: f.label,
-        placeholder: f.placeholder || '',
-        required: f.required ?? false,
-        options: f.options || [],
-        allowOther: f.allowOther ?? false,
-      }));
-      
-      return await tx.form.update({
-        where: { id },
+      await tx.form.update({
+        where: { id: existingForm.id },
         data: {
           title,
           description,
           theme,
           rewardPerGoodAnswer,
-          fields: {
-            create: fieldsToCreate,
-          },
         },
+      });
+      
+      await tx.field.deleteMany({ where: { formId: existingForm.id } });
+      
+      if (fields && fields.length > 0) {
+        await tx.field.createMany({
+          data: fields.map((f) => ({
+            formId: existingForm.id,
+            type: f.type,
+            label: f.label,
+            placeholder: f.placeholder || '',
+            required: f.required ?? false,
+            options: f.options || [],
+            allowOther: f.allowOther ?? false,
+          })),
+        });
+      }
+      
+      return await tx.form.findUnique({
+        where: { id: existingForm.id },
         include: { fields: true },
       });
     });
@@ -46,10 +64,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
+    const { id: slugOrId } = await params;
     
-    const form = await prisma.form.findUnique({
-      where: { id: id },
+    const form = await prisma.form.findFirst({
+      where: {
+        OR: [
+          { slug: slugOrId },
+          { id: slugOrId },
+        ],
+      },
       include: {
         fields: {
           orderBy: {
@@ -77,7 +100,21 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  await prisma.form.delete({ where: { id } });
+  const { id: slugOrId } = await params;
+  
+  const form = await prisma.form.findFirst({
+    where: {
+      OR: [
+        { slug: slugOrId },
+        { id: slugOrId },
+      ],
+    },
+  });
+  
+  if (!form) {
+    return NextResponse.json({ error: 'Formulario no encontrado' }, { status: 404 });
+  }
+  
+  await prisma.form.delete({ where: { id: form.id } });
   return NextResponse.json({ message: 'Eliminado con éxito' });
 }
