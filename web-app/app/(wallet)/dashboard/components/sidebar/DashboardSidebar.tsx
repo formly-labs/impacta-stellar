@@ -1,6 +1,9 @@
-import Link from 'next/link';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Plus, Search } from 'lucide-react';
 import { WorkspaceNav } from './WorkspaceNav';
+import { useState } from 'react';
 
 interface DashboardSidebarProps {
   workspaceName: string;
@@ -8,6 +11,7 @@ interface DashboardSidebarProps {
   formsCount: number;
   archivedCount: number;
   onTabChange: (tab: 'active' | 'archived') => void;
+  ownerAddress: string;
 }
 
 export function DashboardSidebar({ 
@@ -15,19 +19,47 @@ export function DashboardSidebar({
   activeTab, 
   formsCount, 
   archivedCount, 
-  onTabChange 
+  onTabChange,
+  ownerAddress 
 }: DashboardSidebarProps) {
+  const router = useRouter();
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreateForm = async () => {
+    try {
+      setIsCreating(true);
+      const response = await fetch('/api/forms/init', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ownerAddress }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al inicializar el formulario');
+      }
+
+      const { id } = await response.json();
+      router.push(`/form/${id}/create`);
+    } catch (error) {
+      console.error('Error:', error);
+      setIsCreating(false);
+    }
+  };
+
   return (
     <aside className="hidden w-56 shrink-0 border-r border-gray-200 bg-white lg:block">
       <div className="flex h-full flex-col overflow-y-auto p-4">
         {/* Create button */}
-        <Link
-          href="/form/sd/create"
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+        <button
+          onClick={handleCreateForm}
+          disabled={isCreating}
+          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="h-4 w-4" />
-          Create a new form
-        </Link>
+          {isCreating ? 'Creating...' : 'Create a new form'}
+        </button>
 
         {/* Search */}
         <div className="relative mt-4">

@@ -93,6 +93,7 @@ export default function CreatorDashboard() {
         formsCount={forms.length}
         archivedCount={archivedForms.length}
         onTabChange={setTab}
+        ownerAddress={account?.address || ''}
       />
 
       {/* Main content */}
