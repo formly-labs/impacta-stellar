@@ -1,19 +1,46 @@
 import { prisma } from '@/lib/db';
 import { FormCreateInput } from '@/types';
+import { customAlphabet } from 'nanoid';
 import { NextResponse } from 'next/server';
+
+const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const generateSlug = customAlphabet(alphabet, 6);
 
 export async function POST(req: Request) {
   try {
-    const body: FormCreateInput = await req.json();
-    const { title, description, ownerAddress, fields, theme, rewardPerGoodAnswer } = body;
+    const body: Partial<FormCreateInput> = await req.json();
+    const {
+      title = 'Untitled Form',
+      description = '',
+      ownerAddress,
+      fields = [],
+      theme = null,
+      rewardPerGoodAnswer = null,
+    } = body;
+    
+    if (!ownerAddress) {
+      return NextResponse.json(
+        { error: 'ownerAddress es requerido' },
+        { status: 400 },
+      );
+    }
+    
+    let slug = generateSlug();
+    
+    while (await prisma.form.findFirst({ where: { slug } })) {
+      slug = generateSlug();
+    }
     
     const newForm = await prisma.form.create({
       data: {
+        slug,
         title,
         description,
         ownerAddress,
         theme,
         rewardPerGoodAnswer,
+        isActive: false,
+        budget: 0,
         fields: {
           create: fields.map((f) => ({
             type: f.type,
@@ -25,12 +52,11 @@ export async function POST(req: Request) {
           })),
         },
       },
-      include: { fields: true },
     });
     
-    return NextResponse.json(newForm, { status: 201 });
+    return NextResponse.json({ id: newForm.id, slug: newForm.slug }, { status: 201 });
   } catch (error) {
-    console.error(error);
+    console.error('Error al crear el formulario:', error);
     return NextResponse.json({ error: 'Error al crear el formulario' }, { status: 500 });
   }
 }
@@ -43,7 +69,7 @@ export async function GET(req: Request) {
   if (!address) {
     return NextResponse.json({ error: 'Address requerida' }, { status: 400 });
   }
-
+  
   // archived=true → only archived; archived=false or absent → only non-archived
   const isArchived = archived === 'true';
   

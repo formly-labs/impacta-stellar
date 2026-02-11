@@ -1,7 +1,8 @@
 'use client';
 
+import { AIAssistantForm } from '@/app/(wallet)/form/[id]/create/AIAssistant';
 import { FieldInput, FormResponse, FormUpdateInput } from '@/types';
-import { Plus, Save, Trash2, Sparkles } from 'lucide-react';
+import { Plus, Save, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -20,21 +21,38 @@ export default function CreateFormPage() {
   const params = useParams();
   const formId = params.id as string;
   
-  const [formData, setFormData] = useState<FormUpdateInput>({
+  const [ formData, setFormData ] = useState<FormUpdateInput>({
     title: '',
     description: '',
     fields: [],
   });
-  const [loading, setLoading] = useState(!!formId);
-  const [saving, setSaving] = useState(false);
-  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number | null>(null);
-  const [aiPrompt, setAiPrompt] = useState('');
+  const [ loading, setLoading ] = useState(!!formId);
+  const [ saving, setSaving ] = useState(false);
+  const [ selectedQuestionIndex, setSelectedQuestionIndex ] = useState<number | null>(null);
   
+  console.log('page', { formData });
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
     }
-  }, [formId, router]);
+  }, [ formId, router ]);
+  
+  // Validar que selectedQuestionIndex sea válido
+  useEffect(() => {
+    const hasFields = formData.fields && formData.fields.length > 0;
+    const isValidIndex = selectedQuestionIndex !== null &&
+      formData.fields &&
+      selectedQuestionIndex < formData.fields.length;
+    
+    // Si hay campos pero no hay selección válida, seleccionar el primero
+    if (hasFields && !isValidIndex) {
+      setSelectedQuestionIndex(0);
+    }
+    // Si no hay campos, limpiar la selección
+    else if (!hasFields && selectedQuestionIndex !== null) {
+      setSelectedQuestionIndex(null);
+    }
+  }, [ formData.fields, selectedQuestionIndex ]);
   
   useEffect(() => {
     if (formId) {
@@ -56,7 +74,7 @@ export default function CreateFormPage() {
           setLoading(false);
         });
     }
-  }, [formId]);
+  }, [ formId ]);
   
   const addField = () => {
     const newField: FieldInput = {
@@ -65,13 +83,13 @@ export default function CreateFormPage() {
       placeholder: '',
       required: false,
     };
-    const newFields = [...(formData.fields || []), newField];
+    const newFields = [ ...(formData.fields || []), newField ];
     setFormData(prev => ({ ...prev, fields: newFields }));
     setSelectedQuestionIndex(newFields.length - 1);
   };
   
   const updateField = (index: number, updatedField: Partial<FieldInput>) => {
-    const newFields = [...(formData.fields || [])];
+    const newFields = [ ...(formData.fields || []) ];
     newFields[index] = { ...newFields[index], ...updatedField };
     setFormData({ ...formData, fields: newFields });
   };
@@ -128,13 +146,16 @@ export default function CreateFormPage() {
     <div className="flex h-full bg-gray-50">
       {/* Sidebar - Lista de preguntas */}
       <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
-        <div className="flex h-14 items-center border-b border-gray-200 px-4">
+        <div className="flex h-14 items-center gap-3 border-b border-gray-200 px-4">
+          <label className="text-xs font-medium text-gray-500 whitespace-nowrap">
+            Nombre:
+          </label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             placeholder="Untitled Form"
-            className="w-full border-none bg-transparent text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0"
+            className="flex-1 border-none bg-transparent text-base font-semibold text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0"
           />
         </div>
         
@@ -149,9 +170,14 @@ export default function CreateFormPage() {
         </div>
         
         <div className="flex-1 overflow-y-auto p-3">
-          <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Preguntas
-          </h3>
+          <div className="mb-2 flex items-center justify-between px-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Preguntas
+            </h3>
+            <span className="text-xs font-medium text-gray-500">
+              {formData.fields?.length || 0}
+            </span>
+          </div>
           
           <div className="space-y-1">
             {formData.fields?.map((field, index) => (
@@ -184,10 +210,45 @@ export default function CreateFormPage() {
       {/* Área principal */}
       <main className="flex flex-1 flex-col overflow-hidden">
         {/* Header con botón guardar */}
-        <div className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
-          <div className="text-sm text-gray-500">
-            {formData.fields?.length || 0} {formData.fields?.length === 1 ? 'pregunta' : 'preguntas'}
-          </div>
+        <div className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6 gap-4">
+          {/* Propiedades a la izquierda */}
+          {selectedField ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                  Tipo:
+                </label>
+                <select
+                  value={selectedField.type}
+                  onChange={(e) => updateField(selectedQuestionIndex!, { type: e.target.value as FieldInput['type'] })}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  {FIELD_TYPES.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="required"
+                  checked={selectedField.required}
+                  onChange={(e) => updateField(selectedQuestionIndex!, { required: e.target.checked })}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary/20"
+                />
+                <label htmlFor="required" className="text-sm text-gray-700 whitespace-nowrap">
+                  Campo requerido
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div />
+          )}
+          
+          {/* Botón a la derecha */}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -203,24 +264,6 @@ export default function CreateFormPage() {
           <div className="flex-1 overflow-y-auto p-6">
             {selectedField ? (
               <div className="mx-auto max-w-3xl space-y-6">
-                {/* Selector de tipo */}
-                <div>
-                  <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Tipo de pregunta
-                  </label>
-                  <select
-                    value={selectedField.type}
-                    onChange={(e) => updateField(selectedQuestionIndex!, { type: e.target.value as FieldInput['type'] })}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    {FIELD_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
                 {/* Pregunta */}
                 <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                   <div className="space-y-4">
@@ -263,7 +306,7 @@ export default function CreateFormPage() {
                                 type="text"
                                 value={option}
                                 onChange={(e) => {
-                                  const newOptions = [...(selectedField.options || [])];
+                                  const newOptions = [ ...(selectedField.options || []) ];
                                   newOptions[optIndex] = e.target.value;
                                   updateField(selectedQuestionIndex!, { options: newOptions });
                                 }}
@@ -283,7 +326,7 @@ export default function CreateFormPage() {
                           ))}
                           <button
                             onClick={() => {
-                              const newOptions = [...(selectedField.options || []), ''];
+                              const newOptions = [ ...(selectedField.options || []), '' ];
                               updateField(selectedQuestionIndex!, { options: newOptions });
                             }}
                             className="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-primary hover:text-primary"
@@ -294,19 +337,6 @@ export default function CreateFormPage() {
                         </div>
                       </div>
                     )}
-                    
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="required"
-                        checked={selectedField.required}
-                        onChange={(e) => updateField(selectedQuestionIndex!, { required: e.target.checked })}
-                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary/20"
-                      />
-                      <label htmlFor="required" className="text-sm text-gray-700">
-                        Campo requerido
-                      </label>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -332,45 +362,7 @@ export default function CreateFormPage() {
               </div>
             )}
           </div>
-          
-          {/* Panel AI */}
-          <aside className="w-80 border-l border-gray-200 bg-white p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <h3 className="font-semibold text-gray-900">AI Assistant</h3>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  Describe tu pregunta
-                </label>
-                <textarea
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="Ej: Una pregunta sobre la satisfacción del usuario con el producto..."
-                  rows={4}
-                  className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              
-              <button
-                disabled
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2.5 text-sm font-medium text-white opacity-50 cursor-not-allowed"
-              >
-                <Sparkles className="h-4 w-4" />
-                Generar pregunta (Próximamente)
-              </button>
-              
-              <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
-                <p className="text-xs text-blue-900">
-                  💡 <strong>Tip:</strong> Describe qué información quieres obtener y la IA te ayudará a crear la pregunta perfecta.
-                </p>
-              </div>
-            </div>
-          </aside>
+          <AIAssistantForm formData={formData} setFormData={setFormData} />
         </div>
       </main>
     </div>

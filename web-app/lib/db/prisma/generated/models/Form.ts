@@ -38,6 +38,7 @@ export type FormSumAggregateOutputType = {
 
 export type FormMinAggregateOutputType = {
   id: string | null
+  slug: string | null
   title: string | null
   description: string | null
   ownerAddress: string | null
@@ -52,6 +53,7 @@ export type FormMinAggregateOutputType = {
 
 export type FormMaxAggregateOutputType = {
   id: string | null
+  slug: string | null
   title: string | null
   description: string | null
   ownerAddress: string | null
@@ -66,6 +68,7 @@ export type FormMaxAggregateOutputType = {
 
 export type FormCountAggregateOutputType = {
   id: number
+  slug: number
   title: number
   description: number
   ownerAddress: number
@@ -92,6 +95,7 @@ export type FormSumAggregateInputType = {
 
 export type FormMinAggregateInputType = {
   id?: true
+  slug?: true
   title?: true
   description?: true
   ownerAddress?: true
@@ -106,6 +110,7 @@ export type FormMinAggregateInputType = {
 
 export type FormMaxAggregateInputType = {
   id?: true
+  slug?: true
   title?: true
   description?: true
   ownerAddress?: true
@@ -120,6 +125,7 @@ export type FormMaxAggregateInputType = {
 
 export type FormCountAggregateInputType = {
   id?: true
+  slug?: true
   title?: true
   description?: true
   ownerAddress?: true
@@ -221,6 +227,7 @@ export type FormGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type FormGroupByOutputType = {
   id: string
+  slug: string
   title: string
   description: string | null
   ownerAddress: string
@@ -258,6 +265,7 @@ export type FormWhereInput = {
   OR?: Prisma.FormWhereInput[]
   NOT?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
   id?: Prisma.StringFilter<"Form"> | string
+  slug?: Prisma.StringFilter<"Form"> | string
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   ownerAddress?: Prisma.StringFilter<"Form"> | string
@@ -274,6 +282,7 @@ export type FormWhereInput = {
 
 export type FormOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerAddress?: Prisma.SortOrder
@@ -293,6 +302,7 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
   OR?: Prisma.FormWhereInput[]
   NOT?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
+  slug?: Prisma.StringFilter<"Form"> | string
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   ownerAddress?: Prisma.StringFilter<"Form"> | string
@@ -309,6 +319,7 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
 
 export type FormOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerAddress?: Prisma.SortOrder
@@ -331,6 +342,7 @@ export type FormScalarWhereWithAggregatesInput = {
   OR?: Prisma.FormScalarWhereWithAggregatesInput[]
   NOT?: Prisma.FormScalarWhereWithAggregatesInput | Prisma.FormScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Form"> | string
+  slug?: Prisma.StringWithAggregatesFilter<"Form"> | string
   title?: Prisma.StringWithAggregatesFilter<"Form"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   ownerAddress?: Prisma.StringWithAggregatesFilter<"Form"> | string
@@ -345,6 +357,7 @@ export type FormScalarWhereWithAggregatesInput = {
 
 export type FormCreateInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -361,6 +374,7 @@ export type FormCreateInput = {
 
 export type FormUncheckedCreateInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -377,6 +391,7 @@ export type FormUncheckedCreateInput = {
 
 export type FormUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -393,6 +408,7 @@ export type FormUpdateInput = {
 
 export type FormUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -409,6 +425,7 @@ export type FormUncheckedUpdateInput = {
 
 export type FormCreateManyInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -423,6 +440,7 @@ export type FormCreateManyInput = {
 
 export type FormUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -437,6 +455,7 @@ export type FormUpdateManyMutationInput = {
 
 export type FormUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -451,6 +470,7 @@ export type FormUncheckedUpdateManyInput = {
 
 export type FormCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   ownerAddress?: Prisma.SortOrder
@@ -470,6 +490,7 @@ export type FormAvgOrderByAggregateInput = {
 
 export type FormMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   ownerAddress?: Prisma.SortOrder
@@ -484,6 +505,7 @@ export type FormMaxOrderByAggregateInput = {
 
 export type FormMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   ownerAddress?: Prisma.SortOrder
@@ -568,6 +590,7 @@ export type FormUpdateOneRequiredWithoutFieldsNestedInput = {
 
 export type FormCreateWithoutResponsesInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -583,6 +606,7 @@ export type FormCreateWithoutResponsesInput = {
 
 export type FormUncheckedCreateWithoutResponsesInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -614,6 +638,7 @@ export type FormUpdateToOneWithWhereWithoutResponsesInput = {
 
 export type FormUpdateWithoutResponsesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -629,6 +654,7 @@ export type FormUpdateWithoutResponsesInput = {
 
 export type FormUncheckedUpdateWithoutResponsesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -644,6 +670,7 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
 
 export type FormCreateWithoutFieldsInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -659,6 +686,7 @@ export type FormCreateWithoutFieldsInput = {
 
 export type FormUncheckedCreateWithoutFieldsInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   ownerAddress: string
@@ -690,6 +718,7 @@ export type FormUpdateToOneWithWhereWithoutFieldsInput = {
 
 export type FormUpdateWithoutFieldsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -705,6 +734,7 @@ export type FormUpdateWithoutFieldsInput = {
 
 export type FormUncheckedUpdateWithoutFieldsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -760,6 +790,7 @@ export type FormCountOutputTypeCountResponsesArgs<ExtArgs extends runtime.Types.
 
 export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   ownerAddress?: boolean
@@ -777,6 +808,7 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   ownerAddress?: boolean
@@ -791,6 +823,7 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   ownerAddress?: boolean
@@ -805,6 +838,7 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type FormSelectScalar = {
   id?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   ownerAddress?: boolean
@@ -817,7 +851,7 @@ export type FormSelectScalar = {
   updatedAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
@@ -834,6 +868,7 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    slug: string
     title: string
     description: string | null
     ownerAddress: string
@@ -1270,6 +1305,7 @@ export interface Prisma__FormClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface FormFieldRefs {
   readonly id: Prisma.FieldRef<"Form", 'String'>
+  readonly slug: Prisma.FieldRef<"Form", 'String'>
   readonly title: Prisma.FieldRef<"Form", 'String'>
   readonly description: Prisma.FieldRef<"Form", 'String'>
   readonly ownerAddress: Prisma.FieldRef<"Form", 'String'>

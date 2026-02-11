@@ -10,14 +10,15 @@ generator client {
 
 model Form {
   id                  String     @id @default(cuid())
+  slug                String
   title               String
   description         String?
   ownerAddress        String
   budget              Float      @default(0) // En XLM
   isActive            Boolean    @default(true)
   isArchived          Boolean    @default(false)
-  theme               String?    // "Product UX", "Segmentation", "Sales"
-  rewardPerGoodAnswer Float?     // XLM por respuesta válida
+  theme               String? // "Product UX", "Segmentation", "Sales"
+  rewardPerGoodAnswer Float? // XLM por respuesta válida
   fields              Field[]
   responses           Response[]
   createdAt           DateTime   @default(now())
@@ -28,17 +29,17 @@ model Response {
   id        String   @id @default(cuid())
   formId    String
   form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
-  answers   Json     // { [fieldId: string]: string | string[] }
+  answers   Json // { [fieldId: string]: string | string[] }
   createdAt DateTime @default(now())
 }
 
 model Field {
   id          String   @id @default(cuid())
-  type        String   // "text", "email", "phone", "radio", "checkbox", "short_text", "long_text"
+  type        String // "text", "email", "phone", "radio", "checkbox", "short_text", "long_text"
   label       String
   placeholder String?
   required    Boolean  @default(false)
-  options     String[] @default([])  // Opciones para radio/checkbox
+  options     String[] @default([]) // Opciones para radio/checkbox
   allowOther  Boolean  @default(false)
   formId      String
   form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)

@@ -1,9 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Plus, Search } from 'lucide-react';
-import { WorkspaceNav } from './WorkspaceNav';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { WorkspaceNav } from './WorkspaceNav';
 
 interface DashboardSidebarProps {
   workspaceName: string;
@@ -14,40 +14,40 @@ interface DashboardSidebarProps {
   ownerAddress: string;
 }
 
-export function DashboardSidebar({ 
-  workspaceName, 
-  activeTab, 
-  formsCount, 
-  archivedCount, 
-  onTabChange,
-  ownerAddress 
-}: DashboardSidebarProps) {
+export function DashboardSidebar({
+                                   workspaceName,
+                                   activeTab,
+                                   formsCount,
+                                   archivedCount,
+                                   onTabChange,
+                                   ownerAddress,
+                                 }: DashboardSidebarProps) {
   const router = useRouter();
-  const [isCreating, setIsCreating] = useState(false);
-
+  const [ isCreating, setIsCreating ] = useState(false);
+  
   const handleCreateForm = async () => {
     try {
       setIsCreating(true);
-      const response = await fetch('/api/forms/init', {
+      const response = await fetch('/api/forms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ownerAddress }),
       });
-
+      
       if (!response.ok) {
-        throw new Error('Error al inicializar el formulario');
+        throw new Error('Error al crear el formulario');
       }
-
-      const { id } = await response.json();
-      router.push(`/form/${id}/create`);
+      
+      const { slug } = await response.json();
+      router.push(`/form/${slug}/create`);
     } catch (error) {
       console.error('Error:', error);
       setIsCreating(false);
     }
   };
-
+  
   return (
     <aside className="hidden w-56 shrink-0 border-r border-gray-200 bg-white lg:block">
       <div className="flex h-full flex-col overflow-y-auto p-4">
@@ -60,7 +60,7 @@ export function DashboardSidebar({
           <Plus className="h-4 w-4" />
           {isCreating ? 'Creating...' : 'Create a new form'}
         </button>
-
+        
         {/* Search */}
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -70,7 +70,7 @@ export function DashboardSidebar({
             className="h-9 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-gray-300 focus:ring-1 focus:ring-gray-300"
           />
         </div>
-
+        
         {/* Workspace */}
         <div className="mt-6">
           <div className="flex items-center justify-between px-2">
@@ -91,7 +91,7 @@ export function DashboardSidebar({
             onTabChange={onTabChange}
           />
         </div>
-
+        
         {/* Stats */}
         <div className="mt-auto space-y-3 border-t border-gray-200 pt-4">
           <div>
