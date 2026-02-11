@@ -11,6 +11,7 @@ import {
   Link2,
   Moon,
   Printer,
+  Search,
   ShieldOff,
   Trash2,
   User,
@@ -58,7 +59,7 @@ const DEMO_RESPONSES = [
   },
 ];
 
-type Tab = 'resumen' | 'individual';
+type Tab = 'resumen' | 'individual' | 'visualizar';
 
 export default function FormDetailsPage() {
   const { id } = useParams();
@@ -68,6 +69,7 @@ export default function FormDetailsPage() {
   const [currentResponse, setCurrentResponse] = useState(0);
   const [isDeactivating, setIsDeactivating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const shareLink =
     typeof window !== 'undefined'
@@ -116,8 +118,19 @@ export default function FormDetailsPage() {
     }
   }, [tab]);
 
-  const totalResponses = DEMO_RESPONSES.length;
-  const response = DEMO_RESPONSES[currentResponse];
+  // Filter responses based on search term
+  const filteredResponses = DEMO_RESPONSES.filter((response) =>
+    response.respondent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    response.respondent.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalResponses = filteredResponses.length;
+  const response = filteredResponses[currentResponse];
+
+  // Reset to first response when search changes
+  useEffect(() => {
+    setCurrentResponse(0);
+  }, [searchTerm]);
 
   const handleDeactivate = async () => {
     if (!form) return;
@@ -145,98 +158,100 @@ export default function FormDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb]">
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:py-12">
-        {/* ── Header ── */}
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700"
-              aria-label="Volver"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-                {form.title}
-              </h1>
-              <p className="text-sm text-gray-400">Analiza las respuestas</p>
+    <div className="h-full overflow-y-auto bg-[#fafafa]">
+      <div className="mx-auto max-w-5xl px-4 py-6 pb-24 sm:px-6">
+        {/* ── Compact Header ── */}
+        <header className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Volver"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold tracking-tight text-gray-900">
+                  {form.title}
+                </h1>
+                <p className="text-xs text-gray-500">Analiza las respuestas</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => router.push(`/form/${id}/create`)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50"
+              >
+                <Edit className="h-3.5 w-3.5" />
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeactivate}
+                disabled={isDeactivating}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all disabled:opacity-50 ${
+                  form.isActive
+                    ? 'bg-[#f87171] text-white hover:bg-[#ef4444]'
+                    : 'bg-success text-white hover:bg-[#059669]'
+                }`}
+              >
+                <ShieldOff className="h-3.5 w-3.5" />
+                {form.isActive ? 'Desactivar' : 'Activar'}
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.push(`/form/${id}/create`)}
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
-            >
-              <Edit className="h-4 w-4" />
-              Editar
-            </button>
-            <button
-              type="button"
-              onClick={handleDeactivate}
-              disabled={isDeactivating}
-              className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${
-                form.isActive
-                  ? 'bg-red-500 text-white hover:bg-red-600'
-                  : 'bg-green-500 text-white hover:bg-green-600'
-              }`}
-            >
-              <ShieldOff className="h-4 w-4" />
-              {form.isActive ? 'Desactivar' : 'Activar'}
-            </button>
+
+          {/* ── Integrated Share Link ── */}
+          <div className="border-t border-gray-100 bg-primary-50 px-5 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500">
+                <Link2 className="h-3.5 w-3.5 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
+                  Enlace público
+                </p>
+                <p className="truncate text-xs text-gray-700 font-medium">{shareLink}</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  copied
+                    ? 'bg-success text-white'
+                    : 'bg-primary-500 text-white hover:bg-primary-600'
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <CheckCircle className="h-3 w-3" />
+                    Copiado
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3" />
+                    Copiar
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* ── Share link ── */}
-        <div className="mt-6 rounded-2xl border border-gray-200 bg-white px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50">
-              <Link2 className="h-4 w-4 text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Enlace público
-              </p>
-              <p className="truncate text-sm text-gray-600">{shareLink}</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                copied
-                  ? 'bg-green-600 text-white'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              {copied ? (
-                <>
-                  <CheckCircle className="h-3.5 w-3.5" />
-                  Copiado
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5" />
-                  Copiar
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
         {/* ── Tabs ── */}
-        <div className="relative mt-8" ref={tabsRef}>
-          <div className="flex gap-1">
+        <div className="relative mt-4" ref={tabsRef}>
+          <div className="flex gap-1 rounded-xl border border-gray-200 bg-white p-1">
             <button
               type="button"
               data-tab="resumen"
               onClick={() => setTab('resumen')}
-              className={`rounded-t-lg px-5 py-3 text-sm font-medium transition-colors ${
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 tab === 'resumen'
-                  ? 'text-blue-600'
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-primary-500 text-white shadow-md'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               }`}
             >
               Resumen
@@ -245,88 +260,93 @@ export default function FormDetailsPage() {
               type="button"
               data-tab="individual"
               onClick={() => setTab('individual')}
-              className={`rounded-t-lg px-5 py-3 text-sm font-medium transition-colors ${
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 tab === 'individual'
-                  ? 'text-blue-600'
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-primary-500 text-white shadow-md'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               }`}
             >
               Individual
             </button>
-          </div>
-          {/* Animated underline */}
-          <div className="relative h-[2px] bg-gray-200">
-            <div
-              className="absolute top-0 h-[2px] bg-blue-600 transition-all duration-300 ease-in-out"
-              style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
-            />
+            <button
+              type="button"
+              data-tab="visualizar"
+              onClick={() => setTab('visualizar')}
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                tab === 'visualizar'
+                  ? 'bg-primary-500 text-white shadow-md'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+              }`}
+            >
+              Visualizar
+            </button>
           </div>
         </div>
 
         {/* ── Tab content ── */}
-        <div className="mt-6">
+        <div className="mt-4">
           {/* ── Resumen tab ── */}
           {tab === 'resumen' && (
-            <div className="animate-fade-in space-y-6">
+            <div className="animate-fade-in space-y-4">
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md hover:border-primary-300">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                     Total respuestas
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-gray-900">{totalResponses}</p>
+                  <p className="mt-1.5 text-2xl font-bold text-primary-500">{totalResponses}</p>
                 </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md hover:border-primary-300">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                     Preguntas
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                  <p className="mt-1.5 text-2xl font-bold text-primary-500">
                     {form.fields?.length ?? 0}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md hover:border-primary-300">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                     Reward / resp.
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-gray-900">
+                  <p className="mt-1.5 text-2xl font-bold text-gray-900">
                     {form.rewardPerGoodAnswer ?? 0}
-                    <span className="ml-1 text-sm font-medium text-gray-400">XLM</span>
+                    <span className="ml-1 text-xs font-medium text-warning">XLM</span>
                   </p>
                 </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <div className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md hover:border-primary-300">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                     Estado
                   </p>
-                  <p className={`mt-2 text-lg font-bold ${form.isActive ? 'text-green-500' : 'text-red-400'}`}>
+                  <p className={`mt-1.5 text-base font-bold ${form.isActive ? 'text-success' : 'text-destructive'}`}>
                     {form.isActive ? 'Activa' : 'Inactiva'}
                   </p>
                 </div>
               </div>
 
               {/* Questions list */}
-              <div className="rounded-2xl border border-gray-200 bg-white">
-                <div className="border-b border-gray-100 px-6 py-4">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
                     Preguntas de la encuesta
                   </p>
                 </div>
                 <div className="divide-y divide-gray-50">
                   {form.fields && form.fields.length > 0 ? (
                     form.fields.map((field, i) => (
-                      <div key={i} className="flex items-start gap-4 px-6 py-4">
-                        <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
+                      <div key={i} className="flex items-start gap-3 px-5 py-3 hover:bg-primary-50 transition-colors">
+                        <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500 text-xs font-bold text-white shadow-sm">
                           {i + 1}
                         </span>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{field.label}</p>
-                          <p className="mt-0.5 text-xs text-gray-400 capitalize">
+                          <p className="mt-0.5 text-xs text-gray-500 capitalize">
                             {field.type.replace('_', ' ')}
                           </p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="px-6 py-8 text-center text-sm text-gray-400">
+                    <div className="px-5 py-6 text-center text-sm text-gray-400">
                       No hay preguntas definidas.
                     </div>
                   )}
@@ -337,94 +357,116 @@ export default function FormDetailsPage() {
 
           {/* ── Individual tab ── */}
           {tab === 'individual' && (
-            <div className="animate-fade-in space-y-6">
-              {/* Pagination */}
-              <div className="rounded-2xl border border-gray-200 bg-white">
-                <div className="flex items-center justify-center gap-4 px-6 py-4">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentResponse((prev) => Math.max(0, prev - 1))}
-                    disabled={currentResponse === 0}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30"
-                    aria-label="Anterior"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <input
-                      type="text"
-                      value={currentResponse + 1}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        if (!isNaN(val) && val >= 1 && val <= totalResponses) {
-                          setCurrentResponse(val - 1);
-                        }
-                      }}
-                      className="h-9 w-12 rounded-lg border border-gray-200 text-center text-sm font-medium text-gray-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                    />
-                    <span>de {totalResponses}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCurrentResponse((prev) =>
-                        Math.min(totalResponses - 1, prev + 1),
-                      )
-                    }
-                    disabled={currentResponse === totalResponses - 1}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30"
-                    aria-label="Siguiente"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
+            <div className="animate-fade-in space-y-4">
+              {/* Search bar */}
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <Search className="h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar por nombre o email..."
+                    className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm('')}
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      Limpiar
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Response card */}
-              {response && (
+              {totalResponses === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-12">
+                  <div className="text-center">
+                    <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500">
+                      No se encontraron respuestas que coincidan con "{searchTerm}"
+                    </p>
+                  </div>
+                </div>
+              ) : response && (
                 <div
                   key={response.id}
-                  className="animate-fade-in rounded-2xl border border-gray-200 bg-white"
+                  className="animate-fade-in rounded-xl border border-gray-200 bg-white shadow-sm"
                 >
                   {/* Respondent header */}
-                  <div className="flex flex-col gap-4 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-blue-50">
-                        <User className="h-5 w-5 text-blue-600" />
+                  <div className="flex flex-col gap-3 border-b border-gray-100 bg-primary-50 px-5 py-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-500 shadow-md">
+                          <User className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
+                            Respondido por
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {response.respondent.name}{' '}
+                            <span className="font-normal text-gray-500">
+                              ({response.respondent.email})
+                            </span>
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                          Respondido por
-                        </p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {response.respondent.name}{' '}
-                          <span className="font-normal text-gray-400">
-                            ({response.respondent.email})
-                          </span>
-                        </p>
+                      
+                      {/* Pagination - compact version */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentResponse((prev) => Math.max(0, prev - 1))}
+                          disabled={currentResponse === 0}
+                          className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 bg-white text-gray-500 transition-all hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                          aria-label="Anterior"
+                        >
+                          <ChevronLeft className="h-3 w-3" />
+                        </button>
+                        <span className="text-xs text-gray-500 font-medium min-w-[60px] text-center">
+                          {currentResponse + 1} de {totalResponses}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCurrentResponse((prev) =>
+                              Math.min(totalResponses - 1, prev + 1),
+                            )
+                          }
+                          disabled={currentResponse === totalResponses - 1}
+                          className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 bg-white text-gray-500 transition-all hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                          aria-label="Siguiente"
+                        >
+                          <ChevronRight className="h-3 w-3" />
+                        </button>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    
+                    <div className="text-left">
+                      <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                         Fecha
                       </p>
-                      <p className="text-sm text-gray-600">{response.date}</p>
+                      <p className="text-sm font-medium text-gray-700">{response.date}</p>
                     </div>
                   </div>
 
                   {/* Answers */}
-                  <div className="divide-y divide-gray-50 px-6 py-2">
+                  <div className="divide-y divide-gray-50 px-5 py-2">
                     {response.answers.map((a, i) => (
-                      <div key={i} className="py-5">
+                      <div key={i} className="py-4">
                         <p className="text-sm font-semibold text-gray-900">
                           {i + 1}. {a.question}
                         </p>
-                        <div className="mt-3 rounded-xl bg-gray-50 px-5 py-3.5">
+                        <div className="mt-2 rounded-lg bg-gray-50 px-4 py-3 border border-gray-100">
                           <p
                             className={`text-sm leading-relaxed ${
                               a.answer.startsWith('"')
-                                ? 'italic text-gray-500'
-                                : 'text-gray-700'
+                                ? 'italic text-gray-600'
+                                : 'text-gray-800'
                             }`}
                           >
                             {a.answer}
@@ -435,25 +477,49 @@ export default function FormDetailsPage() {
                   </div>
 
                   {/* Footer actions */}
-                  <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
+                  <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50 px-5 py-3">
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-red-400 transition-colors hover:text-red-600"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-destructive transition-all hover:bg-red-50"
                     >
-                      <Trash2 className="h-4 w-4" />
-                      Eliminar respuesta
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Eliminar
                     </button>
                     <button
                       type="button"
                       onClick={() => window.print()}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 transition-all hover:bg-gray-100"
                     >
-                      <Printer className="h-4 w-4" />
+                      <Printer className="h-3.5 w-3.5" />
                       Imprimir
                     </button>
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── Visualizar tab ── */}
+          {tab === 'visualizar' && (
+            <div className="animate-fade-in">
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-12">
+                <div className="text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
+                    <svg className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">Visualización de datos</h3>
+                  <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                    Esta sección mostrará gráficos y visualizaciones interactivas de las respuestas de la encuesta.
+                  </p>
+                  <div className="mt-6">
+                    <span className="inline-flex items-center rounded-full bg-primary-100 px-4 py-2 text-xs font-medium text-primary-700">
+                      Próximamente
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -462,7 +528,7 @@ export default function FormDetailsPage() {
       {/* Moon icon */}
       <button
         type="button"
-        className="fixed bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md transition-colors hover:bg-gray-50 hover:text-gray-700"
+        className="fixed bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full bg-primary-500 text-white shadow-lg transition-all hover:bg-primary-600 hover:shadow-xl hover:scale-105"
         aria-label="Cambiar tema"
       >
         <Moon className="h-5 w-5" />
