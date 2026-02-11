@@ -2,11 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Sparkles, Zap, Shield, CheckCircle2 } from "lucide-react";
+import { Suspense, useEffect } from "react";
+import { Sparkles, Zap, Shield } from "lucide-react";
+import { ConnectButton, useWallet, WalletProvider, NetworkType } from "stellar-wallet-kit";
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-  const [isCreator, setIsCreator] = useState(true);
+function LoginContent() {
+  const { account, isConnected } = useWallet();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isConnected) {
+      router.push("/dashboard");
+    }
+  }, [isConnected, router]);
 
   return (
     <div className="flex min-h-screen">
@@ -94,110 +103,48 @@ export default function LoginPage() {
 
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
-              Connect your wallet
+              Iniciar sesión
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Choose your role to get started
+              Conecta tu wallet para continuar
             </p>
           </div>
 
-          {/* Role selector */}
-          <div className="mb-6 flex rounded-lg border border-gray-200 bg-gray-50 p-1">
-            <button
-              onClick={() => setIsCreator(true)}
-              className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
-                isCreator
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:bg-white hover:text-gray-900"
-              }`}
-            >
-              Creator
-            </button>
-            <button
-              onClick={() => setIsCreator(false)}
-              className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
-                !isCreator
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:bg-white hover:text-gray-900"
-              }`}
-            >
-              Contributor
-            </button>
-          </div>
-
-          {/* Role description */}
-          <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-5">
-            {isCreator ? (
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900">Creator</h3>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                  Create forms, collect verified responses, and access quality data. 
-                  Set your budget and pay only for verified submissions.
-                </p>
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Unlimited forms</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Real-time analytics</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Export data anytime</span>
-                  </div>
-                </div>
+          {/* Wallet connect button */}
+          <div className="w-full">
+            {!isConnected ? (
+              <div className="w-full [&>button]:w-full [&>button]:rounded-lg [&>button]:px-6 [&>button]:py-3 [&>button]:font-semibold [&>button]:transition-all">
+                <ConnectButton />
               </div>
             ) : (
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50">
-                    <Zap className="h-4 w-4 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900">Contributor</h3>
+              <div className="space-y-3">
+                <div className="text-center rounded-lg bg-green-50 border border-green-200 px-6 py-3">
+                  <p className="text-green-600 text-sm font-semibold">
+                    Conexión exitosa
+                  </p>
+                  <p className="text-gray-500 text-xs truncate mt-1">
+                    {account?.address}
+                  </p>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                  Browse available forms, submit responses, and receive instant payments. 
-                  Earn rewards for quality contributions.
-                </p>
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Instant payouts</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Browse all forms</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-700">
-                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Track your earnings</span>
-                  </div>
-                </div>
+                <Link 
+                  href="/dashboard"
+                  className="block w-full rounded-lg bg-primary px-6 py-3 text-center font-semibold text-white transition-all hover:bg-primary-600"
+                >
+                  Ir al Dashboard
+                </Link>
               </div>
             )}
           </div>
 
-          {/* Wallet connect button */}
-          <button className="w-full rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-all hover:bg-primary-600">
-            Connect Stellar wallet
-          </button>
-
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              By connecting, you agree to our{" "}
+              Al conectar, aceptas nuestros{" "}
               <Link href="#" className="font-medium text-primary underline-offset-2 hover:underline">
-                Terms
+                Términos
               </Link>{" "}
-              and{" "}
+              y{" "}
               <Link href="#" className="font-medium text-primary underline-offset-2 hover:underline">
-                Privacy Policy
+                Política de privacidad
               </Link>
             </p>
           </div>
@@ -205,11 +152,26 @@ export default function LoginPage() {
           {/* Back link */}
           <div className="mt-6 text-center">
             <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-primary">
-              ← Back to home
+              ← Volver al inicio
             </Link>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <WalletProvider
+        config={{
+          network: NetworkType.TESTNET,
+          autoConnect: true,
+        }}
+      >
+        <LoginContent />
+      </WalletProvider>
+    </Suspense>
   );
 }

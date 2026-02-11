@@ -11,7 +11,7 @@ export default function Home() {
           Crea y responde formularios con incentivos en Stellar. Conecta tu wallet para empezar.
         </p>
         <Link
-          href="/dashboard"
+          href="/login"
           className="rounded-2xl bg-blue-600 px-8 py-4 font-bold text-white transition-colors hover:bg-blue-500"
         >
           Entrar a Formly

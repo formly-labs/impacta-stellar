@@ -1,24 +1,10 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
-import { PropsWithChildren, Suspense, useEffect } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 
-import { NetworkType, useWallet, WalletProvider } from 'stellar-wallet-kit';
+import { NetworkType, WalletProvider } from 'stellar-wallet-kit';
 
-const Redirection = () => {
-  const { isConnected } = useWallet();
-  const pathname = usePathname();
-  const router = useRouter();
-  
-  useEffect(() => {
-    if (!isConnected && pathname !== '/connect') {
-      const callbackUrl = encodeURIComponent(pathname);
-      router.push(`/connect?callbackUrl=${callbackUrl}`);
-    }
-  }, [ isConnected, pathname, router ]);
-  
-  return null;
-};
+import { WalletHeader } from './components/WalletHeader';
 
 export default function WalletLayout({ children }: PropsWithChildren) {
   return (
@@ -29,8 +15,10 @@ export default function WalletLayout({ children }: PropsWithChildren) {
           autoConnect: true,
         }}
       >
-        <Redirection />
-        {children}
+        <div className="flex h-screen flex-col overflow-hidden">
+          <WalletHeader />
+          <main className="flex-1 overflow-hidden">{children}</main>
+        </div>
       </WalletProvider>
     </Suspense>
   );
