@@ -7,7 +7,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const body: FormUpdateInput = await req.json();
     const { id: slugOrId } = await params;
     
-    const { title, description, fields, theme, rewardPerGoodAnswer } = body;
+    const { title, description, fields, theme, rewardPerGoodAnswer, isActive } = body;
     
     const updatedForm = await prisma.$transaction(async (tx) => {
       const existingForm = await tx.form.findFirst({
@@ -30,6 +30,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           description,
           theme,
           rewardPerGoodAnswer,
+          isActive
         },
       });
       

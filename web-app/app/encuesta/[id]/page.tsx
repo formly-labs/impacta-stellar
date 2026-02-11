@@ -46,6 +46,8 @@ export default async function PublicSurveyPage({ params }: PageProps) {
     },
   });
 
+  console.log(form);
+
   // Not found
   if (!form) {
     return (
