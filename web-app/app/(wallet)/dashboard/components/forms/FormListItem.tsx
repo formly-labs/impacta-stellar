@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { Archive, ArchiveRestore, ChevronRight, FileText, Loader2 } from 'lucide-react';
 import { FormResponse } from '@/types';
+import { Archive, ArchiveRestore, ChevronRight, FileText, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface FormListItemProps {
   form: FormResponse;
@@ -11,7 +11,7 @@ interface FormListItemProps {
 
 export function FormListItem({ form, isArchived = false, archivingId, onArchive }: FormListItemProps) {
   const isLoading = archivingId === form.id;
-
+  
   return (
     <div
       className={`group flex items-center gap-4 rounded-lg border border-gray-200 bg-white px-4 py-3 transition-all hover:shadow-sm ${
@@ -19,7 +19,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
       }`}
     >
       <Link
-        href={`/dashboard/creator/${form.id}`}
+        href={`/dashboard/${form.id}`}
         className="flex min-w-0 flex-1 items-center gap-4"
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-100">
@@ -34,7 +34,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
           </p>
         </div>
       </Link>
-
+      
       <button
         type="button"
         onClick={() => onArchive(form.id, !isArchived)}
@@ -54,7 +54,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
           <Archive className="h-4 w-4" />
         )}
       </button>
-
+      
       {!isArchived && (
         <Link href={`/dashboard/creator/${form.id}`}>
           <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />

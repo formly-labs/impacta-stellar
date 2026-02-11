@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { Archive, ArchiveRestore, FileText, Loader2 } from 'lucide-react';
 import { FormResponse } from '@/types';
+import { Archive, ArchiveRestore, FileText, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface FormCardProps {
   form: FormResponse;
@@ -11,7 +11,7 @@ interface FormCardProps {
 
 export function FormCard({ form, isArchived = false, archivingId, onArchive }: FormCardProps) {
   const isLoading = archivingId === form.id;
-
+  
   return (
     <div
       className={`group rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md ${
@@ -42,7 +42,7 @@ export function FormCard({ form, isArchived = false, archivingId, onArchive }: F
           )}
         </button>
       </div>
-      <Link href={`/dashboard/creator/${form.id}`} className="mt-3 block">
+      <Link href={`/dashboard/${form.id}`} className="mt-3 block">
         <h3 className={`line-clamp-2 text-sm font-medium ${isArchived ? 'text-gray-600' : 'text-gray-900'}`}>
           {form.title}
         </h3>

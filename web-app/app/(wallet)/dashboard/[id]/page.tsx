@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Edit,
   Link2,
   Moon,
   Printer,
@@ -164,19 +165,29 @@ export default function FormDetailsPage() {
               <p className="text-sm text-gray-400">Analiza las respuestas</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleDeactivate}
-            disabled={isDeactivating}
-            className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${
-              form.isActive
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-green-500 text-white hover:bg-green-600'
-            }`}
-          >
-            <ShieldOff className="h-4 w-4" />
-            {form.isActive ? 'Desactivar' : 'Activar'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.push(`/form/${id}/create`)}
+              className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            >
+              <Edit className="h-4 w-4" />
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={handleDeactivate}
+              disabled={isDeactivating}
+              className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 ${
+                form.isActive
+                  ? 'bg-red-500 text-white hover:bg-red-600'
+                  : 'bg-green-500 text-white hover:bg-green-600'
+              }`}
+            >
+              <ShieldOff className="h-4 w-4" />
+              {form.isActive ? 'Desactivar' : 'Activar'}
+            </button>
+          </div>
         </header>
 
         {/* ── Share link ── */}
