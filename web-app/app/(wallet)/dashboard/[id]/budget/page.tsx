@@ -16,7 +16,7 @@ export default function BudgetPage() {
     <div className="min-h-screen bg-[#0f172a] text-white p-8">
       <div className="max-w-2xl mx-auto space-y-8">
         <header className="flex items-center gap-4">
-          <Link href={`/dashboard/creator/${id}`} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <Link href={`/form/${id}`} className="p-2 hover:bg-white/5 rounded-full transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-2xl font-bold">Presupuesto del Formulario</h1>

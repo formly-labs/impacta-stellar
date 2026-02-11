@@ -41,7 +41,7 @@ export function DashboardSidebar({
       }
       
       const { slug } = await response.json();
-      router.push(`/form/${slug}/create`);
+      router.push(`/form/${slug}/edit`);
     } catch (error) {
       console.error('Error:', error);
       setIsCreating(false);

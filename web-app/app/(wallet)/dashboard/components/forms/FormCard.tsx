@@ -42,10 +42,21 @@ export function FormCard({ form, isArchived = false, archivingId, onArchive }: F
           )}
         </button>
       </div>
-      <Link href={`/dashboard/${form.id}`} className="mt-3 block">
-        <h3 className={`line-clamp-2 text-sm font-medium ${isArchived ? 'text-gray-600' : 'text-gray-900'}`}>
-          {form.title}
-        </h3>
+      <Link href={`/form/${form.id}`} className="mt-3 block">
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className={`line-clamp-2 text-sm font-medium ${isArchived ? 'text-gray-600' : 'text-gray-900'}`}>
+            {form.title}
+          </h3>
+          {!isArchived && (
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              form.isActive 
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }`}>
+              {form.isActive ? 'Activo' : 'Inactivo'}
+            </span>
+          )}
+        </div>
         <p className={`mt-1 line-clamp-2 text-xs ${isArchived ? 'text-gray-400' : 'text-gray-500'}`}>
           {form.description}
         </p>

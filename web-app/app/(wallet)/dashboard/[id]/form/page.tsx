@@ -13,7 +13,7 @@ export default function EditFormPage() {
   
   useEffect(() => {
     if (!formId) {
-      router.push('/dashboard/creator');
+      router.push('/dashboard');
     }
   }, [ formId, router ]);
   
@@ -90,7 +90,7 @@ export default function EditFormPage() {
     <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
       <header className="border-b border-white/10 bg-slate-950/50 backdrop-blur-md p-4 flex justify-between items-center sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Link href={`/dashboard/creator/${formId}`} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <Link href={`/form/${formId}`} className="p-2 hover:bg-white/5 rounded-full transition-colors">
             <ArrowLeft className="w-5 h-5 text-slate-400" />
           </Link>
           <h1 className="text-lg font-semibold tracking-tight">{formId ? 'Editar' : 'Nuevo'} Formulario</h1>

@@ -57,7 +57,7 @@ export default function WelcomeDashboard() {
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
-        router.push(`/dashboard/creator/${response.id}`);
+        router.push(`/form/${response.id}/edit`);
         router.refresh(); // Para actualizar los datos en el servidor
       }, 1500);
     } catch (error) {

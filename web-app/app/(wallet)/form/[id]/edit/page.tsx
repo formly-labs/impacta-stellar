@@ -1,6 +1,6 @@
 'use client';
 
-import { AIAssistantForm } from '@/app/(wallet)/form/[id]/create/AIAssistant';
+import { AIAssistantForm } from '@/app/(wallet)/form/[id]/edit/AIAssistant';
 import { FieldInput, FormResponse, FormUpdateInput } from '@/types';
 import { Plus, Save, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
