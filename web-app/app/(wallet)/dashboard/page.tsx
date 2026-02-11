@@ -298,9 +298,20 @@ export default function CreatorDashboard() {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="p-6">
-          {/* Header bar */}
-          <div className="flex items-center justify-between mb-6">
+        <div className="p-4 sm:p-6">
+          {/* Mobile header */}
+          <div className="mb-4 flex items-center justify-between lg:hidden">
+            <h1 className="text-lg font-semibold text-gray-900">{workspaceName}</h1>
+            <Link
+              href="/dashboard/questionnaires/new?step=theme"
+              className="flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              <Plus className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Header bar - Desktop */}
+          <div className="hidden lg:flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="relative flex items-center gap-1">
                 <button
@@ -406,8 +417,51 @@ export default function CreatorDashboard() {
             </div>
           </div>
 
+          {/* Mobile controls */}
+          <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setTab('active')}
+              className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                tab === 'active'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-700 border border-gray-200'
+              }`}
+            >
+              Active
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('archived')}
+              className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                tab === 'archived'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-700 border border-gray-200'
+              }`}
+            >
+              Archived
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+              className="rounded-lg border border-gray-200 bg-white px-3 py-2"
+            >
+              {viewMode === 'list' ? <Grid3x3 className="h-4 w-4" /> : <List className="h-4 w-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setInviteModalOpen(true)}
+              className="rounded-lg border border-gray-200 bg-white px-3 py-2"
+              title="Invite"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </button>
+          </div>
+
           {/* Form list */}
-          <div className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-2'}`}>
+          <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-2'}`}>
             {/* ── Active tab ── */}
             {tab === 'active' && (
               <>
@@ -651,11 +705,11 @@ export default function CreatorDashboard() {
           }}
         >
           <div 
-            className="w-full max-w-md rounded-xl bg-white shadow-2xl"
+            className="w-full max-w-md rounded-xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 p-6">
+            <div className="flex items-center justify-between border-b border-gray-200 p-4 sm:p-6">
               <h2 className="text-lg font-semibold text-gray-900">Share &quot;{workspaceName}&quot;</h2>
               <div className="flex items-center gap-2">
                 <button
@@ -681,7 +735,7 @@ export default function CreatorDashboard() {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               {/* Add people input */}
               <div>
                 <div className="relative">
@@ -791,11 +845,11 @@ export default function CreatorDashboard() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between border-t border-gray-200 p-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-gray-200 p-4 sm:p-6">
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                   linkCopied
                     ? 'border-green-300 bg-green-50 text-green-700'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -824,7 +878,7 @@ export default function CreatorDashboard() {
                   setInviteEmail('');
                   setInvitedPeople([]);
                 }}
-                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:order-last"
               >
                 Done
               </button>
@@ -846,7 +900,7 @@ export default function CreatorDashboard() {
             className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Rename workspace</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Rename workspace</h2>
             <input
               type="text"
               value={newWorkspaceName}
@@ -860,14 +914,14 @@ export default function CreatorDashboard() {
               className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               autoFocus
             />
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-3">
               <button
                 type="button"
                 onClick={() => {
                   setRenameModalOpen(false);
                   setNewWorkspaceName('');
                 }}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full sm:w-auto rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
@@ -875,7 +929,7 @@ export default function CreatorDashboard() {
                 type="button"
                 onClick={handleRename}
                 disabled={!newWorkspaceName.trim()}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Rename
               </button>
@@ -894,22 +948,22 @@ export default function CreatorDashboard() {
             className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Leave workspace</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Leave workspace</h2>
             <p className="text-sm text-gray-600 mb-6">
               Are you sure you want to leave &quot;{workspaceName}&quot;? You will no longer have access to this workspace.
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setLeaveModalOpen(false)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full sm:w-auto rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleLeaveConfirm}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="w-full sm:w-auto rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
                 Leave
               </button>
