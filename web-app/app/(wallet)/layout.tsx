@@ -17,7 +17,7 @@ export default function WalletLayout({ children }: PropsWithChildren) {
         <WalletGuard>
           <div className="flex h-screen flex-col overflow-hidden">
             <WalletHeader />
-            <main className="flex-1 overflow-hidden">{children}</main>
+            <main className="flex-1 overflow-auto">{children}</main>
           </div>
         </WalletGuard>
       </WalletProvider>

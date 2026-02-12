@@ -24,7 +24,7 @@ type Tab = 'insight' | 'resumen' | 'individual';
 interface SurveyResponse {
   id: string;
   respondentName?: string;
-  respondentEmail?: string;
+  respondentWallet?: string;
   responses: Record<string, string | number | boolean>;
   createdAt: string;
 }
@@ -33,7 +33,7 @@ interface ResponseData {
   id: string;
   respondent: {
     name: string;
-    email: string;
+    wallet: string;
   };
   date: string;
   answers: Array<{
@@ -94,7 +94,7 @@ export default function FormAnswersPage() {
                 id: r.id,
                 respondent: {
                   name: r.respondentName || 'Anónimo',
-                  email: r.respondentEmail || 'sin-email@example.com',
+                  wallet: r.respondentWallet || 'Sin wallet',
                 },
                 date: new Date(r.createdAt).toLocaleString('es-ES', {
                   day: 'numeric',
@@ -126,7 +126,7 @@ export default function FormAnswersPage() {
   
   const filteredResponses = responses.filter((response) =>
     response.respondent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    response.respondent.email.toLowerCase().includes(searchTerm.toLowerCase()),
+    response.respondent.wallet.toLowerCase().includes(searchTerm.toLowerCase()),
   );
   
   const totalResponses = filteredResponses.length;
@@ -251,8 +251,8 @@ export default function FormAnswersPage() {
                       </div>
                       <div className="p-5 space-y-2">
                         {responses.map((response, idx) => (
-                          <div key={idx} className="text-sm text-gray-700 py-1">
-                            {response.respondent.email}
+                          <div key={idx} className="text-sm text-gray-700 py-1 font-mono">
+                            {response.respondent.wallet}
                           </div>
                         ))}
                       </div>
@@ -430,7 +430,7 @@ export default function FormAnswersPage() {
                           type="text"
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          placeholder="Buscar por nombre o email..."
+                          placeholder="Buscar por nombre o wallet..."
                           className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
                         />
                         {searchTerm && (
@@ -472,10 +472,10 @@ export default function FormAnswersPage() {
                                   Respondido por
                                 </p>
                                 <p className="text-sm font-semibold text-gray-900">
-                                  {response.respondent.name}{' '}
-                                  <span className="font-normal text-gray-500">
-                                    ({response.respondent.email})
-                                  </span>
+                                  {response.respondent.name}
+                                </p>
+                                <p className="text-xs font-mono text-gray-500 mt-0.5">
+                                  {response.respondent.wallet}
                                 </p>
                               </div>
                             </div>
@@ -683,7 +683,7 @@ export default function FormAnswersPage() {
                                 <p className="text-sm font-medium text-gray-900 truncate">
                                   {resp.respondent.name}
                                 </p>
-                                <p className="text-xs text-gray-500">{resp.respondent.email}</p>
+                                <p className="text-xs text-gray-500 font-mono truncate">{resp.respondent.wallet}</p>
                               </div>
                               <div className="text-right">
                                 <p className="text-xs text-gray-600">{resp.date}</p>

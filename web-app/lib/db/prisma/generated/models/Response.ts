@@ -27,12 +27,14 @@ export type AggregateResponse = {
 export type ResponseMinAggregateOutputType = {
   id: string | null
   formId: string | null
+  walletAddress: string | null
   createdAt: Date | null
 }
 
 export type ResponseMaxAggregateOutputType = {
   id: string | null
   formId: string | null
+  walletAddress: string | null
   createdAt: Date | null
 }
 
@@ -40,6 +42,7 @@ export type ResponseCountAggregateOutputType = {
   id: number
   formId: number
   answers: number
+  walletAddress: number
   createdAt: number
   _all: number
 }
@@ -48,12 +51,14 @@ export type ResponseCountAggregateOutputType = {
 export type ResponseMinAggregateInputType = {
   id?: true
   formId?: true
+  walletAddress?: true
   createdAt?: true
 }
 
 export type ResponseMaxAggregateInputType = {
   id?: true
   formId?: true
+  walletAddress?: true
   createdAt?: true
 }
 
@@ -61,6 +66,7 @@ export type ResponseCountAggregateInputType = {
   id?: true
   formId?: true
   answers?: true
+  walletAddress?: true
   createdAt?: true
   _all?: true
 }
@@ -141,6 +147,7 @@ export type ResponseGroupByOutputType = {
   id: string
   formId: string
   answers: runtime.JsonValue
+  walletAddress: string | null
   createdAt: Date
   _count: ResponseCountAggregateOutputType | null
   _min: ResponseMinAggregateOutputType | null
@@ -169,6 +176,7 @@ export type ResponseWhereInput = {
   id?: Prisma.StringFilter<"Response"> | string
   formId?: Prisma.StringFilter<"Response"> | string
   answers?: Prisma.JsonFilter<"Response">
+  walletAddress?: Prisma.StringNullableFilter<"Response"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Response"> | Date | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
 }
@@ -177,6 +185,7 @@ export type ResponseOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   answers?: Prisma.SortOrder
+  walletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   form?: Prisma.FormOrderByWithRelationInput
 }
@@ -188,6 +197,7 @@ export type ResponseWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ResponseWhereInput | Prisma.ResponseWhereInput[]
   formId?: Prisma.StringFilter<"Response"> | string
   answers?: Prisma.JsonFilter<"Response">
+  walletAddress?: Prisma.StringNullableFilter<"Response"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Response"> | Date | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
 }, "id">
@@ -196,6 +206,7 @@ export type ResponseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   answers?: Prisma.SortOrder
+  walletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ResponseCountOrderByAggregateInput
   _max?: Prisma.ResponseMaxOrderByAggregateInput
@@ -209,12 +220,14 @@ export type ResponseScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Response"> | string
   formId?: Prisma.StringWithAggregatesFilter<"Response"> | string
   answers?: Prisma.JsonWithAggregatesFilter<"Response">
+  walletAddress?: Prisma.StringNullableWithAggregatesFilter<"Response"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Response"> | Date | string
 }
 
 export type ResponseCreateInput = {
   id?: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
 }
@@ -223,12 +236,14 @@ export type ResponseUncheckedCreateInput = {
   id?: string
   formId: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
 }
 
 export type ResponseUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
 }
@@ -237,6 +252,7 @@ export type ResponseUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -244,12 +260,14 @@ export type ResponseCreateManyInput = {
   id?: string
   formId: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
 }
 
 export type ResponseUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -257,6 +275,7 @@ export type ResponseUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -274,18 +293,21 @@ export type ResponseCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   answers?: Prisma.SortOrder
+  walletAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type ResponseMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
+  walletAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type ResponseMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
+  walletAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -334,12 +356,14 @@ export type ResponseUncheckedUpdateManyWithoutFormNestedInput = {
 export type ResponseCreateWithoutFormInput = {
   id?: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
 }
 
 export type ResponseUncheckedCreateWithoutFormInput = {
   id?: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
 }
 
@@ -376,30 +400,35 @@ export type ResponseScalarWhereInput = {
   id?: Prisma.StringFilter<"Response"> | string
   formId?: Prisma.StringFilter<"Response"> | string
   answers?: Prisma.JsonFilter<"Response">
+  walletAddress?: Prisma.StringNullableFilter<"Response"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Response"> | Date | string
 }
 
 export type ResponseCreateManyFormInput = {
   id?: string
   answers: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: string | null
   createdAt?: Date | string
 }
 
 export type ResponseUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResponseUncheckedUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResponseUncheckedUpdateManyWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   answers?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -409,6 +438,7 @@ export type ResponseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   formId?: boolean
   answers?: boolean
+  walletAddress?: boolean
   createdAt?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
@@ -417,6 +447,7 @@ export type ResponseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   formId?: boolean
   answers?: boolean
+  walletAddress?: boolean
   createdAt?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
@@ -425,6 +456,7 @@ export type ResponseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   formId?: boolean
   answers?: boolean
+  walletAddress?: boolean
   createdAt?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
@@ -433,10 +465,11 @@ export type ResponseSelectScalar = {
   id?: boolean
   formId?: boolean
   answers?: boolean
+  walletAddress?: boolean
   createdAt?: boolean
 }
 
-export type ResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formId" | "answers" | "createdAt", ExtArgs["result"]["response"]>
+export type ResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formId" | "answers" | "walletAddress" | "createdAt", ExtArgs["result"]["response"]>
 export type ResponseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
 }
@@ -456,6 +489,7 @@ export type $ResponsePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     formId: string
     answers: runtime.JsonValue
+    walletAddress: string | null
     createdAt: Date
   }, ExtArgs["result"]["response"]>
   composites: {}
@@ -884,6 +918,7 @@ export interface ResponseFieldRefs {
   readonly id: Prisma.FieldRef<"Response", 'String'>
   readonly formId: Prisma.FieldRef<"Response", 'String'>
   readonly answers: Prisma.FieldRef<"Response", 'Json'>
+  readonly walletAddress: Prisma.FieldRef<"Response", 'String'>
   readonly createdAt: Prisma.FieldRef<"Response", 'DateTime'>
 }
     

@@ -1,13 +1,8 @@
 'use client';
 
+import { ArrowLeft, ArrowRight, CheckCircle, Loader2, Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle,
-  Loader2,
-  Send,
-} from 'lucide-react';
+import { useWallet } from 'stellar-wallet-kit';
 import QuestionRenderer, { type PublicField } from './QuestionRenderer';
 
 interface SurveyData {
@@ -24,22 +19,23 @@ interface PublicSurveyWizardProps {
 export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) {
   const { fields } = survey;
   const total = fields.length;
-
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
+  const { account } = useWallet();
+  
+  const [ step, setStep ] = useState(0);
+  const [ answers, setAnswers ] = useState<Record<string, string | string[]>>({});
+  const [ error, setError ] = useState<string | null>(null);
+  const [ submitting, setSubmitting ] = useState(false);
+  const [ submitted, setSubmitted ] = useState(false);
+  
   const currentField = fields[step];
   const isFirst = step === 0;
   const isLast = step === total - 1;
   const progress = Math.round(((step + 1) / total) * 100);
-
+  
   // Validate current question
   const validateCurrent = useCallback((): boolean => {
     if (!currentField) return true;
-
+    
     if (currentField.required) {
       const val = answers[currentField.id];
       const isEmpty =
@@ -47,17 +43,17 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         val === null ||
         val === '' ||
         (Array.isArray(val) && val.length === 0);
-
+      
       if (isEmpty) {
         setError('Esta pregunta es obligatoria');
         return false;
       }
     }
-
+    
     setError(null);
     return true;
-  }, [currentField, answers]);
-
+  }, [ currentField, answers ]);
+  
   // Handle next
   const handleNext = useCallback(() => {
     if (!validateCurrent()) return;
@@ -65,35 +61,35 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       setStep((s) => s + 1);
       setError(null);
     }
-  }, [validateCurrent, isLast]);
-
+  }, [ validateCurrent, isLast ]);
+  
   // Handle back
   const handleBack = useCallback(() => {
     if (!isFirst) {
       setStep((s) => s - 1);
       setError(null);
     }
-  }, [isFirst]);
-
+  }, [ isFirst ]);
+  
   // Handle submit
   const handleSubmit = useCallback(async () => {
     if (!validateCurrent()) return;
-
+    
     setSubmitting(true);
     setError(null);
-
+    
     try {
       const res = await fetch(`/api/public/surveys/${survey.id}/responses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, walletAddress: account?.address || '' }),
       });
-
+      
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || 'Error al enviar la respuesta');
       }
-
+      
       setSubmitted(true);
     } catch (err) {
       setError(
@@ -102,15 +98,15 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
     } finally {
       setSubmitting(false);
     }
-  }, [validateCurrent, survey.id, answers]);
-
+  }, [ validateCurrent, survey.id, answers ]);
+  
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't capture if user is typing in an input/textarea
       const tag = (e.target as HTMLElement)?.tagName;
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
-
+      
       if (e.key === 'Enter' && !isTyping) {
         e.preventDefault();
         if (isLast) {
@@ -119,7 +115,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
           handleNext();
         }
       }
-
+      
       // Keyboard shortcut for radio options (A, B, C...)
       if (
         currentField?.type === 'radio' &&
@@ -137,12 +133,11 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         }
       }
     };
-
+    
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handleSubmit, isLast, currentField]);
-
-  // ─── Thank you screen ───────────────────────────────────────────────
+  }, [ handleNext, handleSubmit, isLast, currentField ]);
+  
   if (submitted) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -162,32 +157,10 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       </div>
     );
   }
-
-  // ─── Wizard ────────────────────────────────────────────────────────
+  
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-xs font-bold text-white">
-            f
-          </div>
-          <span className="text-sm font-semibold text-gray-900">Formly</span>
-        </div>
-        <button
-          type="button"
-          className="text-gray-400 transition-colors hover:text-gray-600"
-          aria-label="Cerrar"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </header>
-
-      {/* Main content */}
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-2xl animate-fade-in" key={step}>
           {/* Step indicator */}
           <div className="mb-8">
@@ -196,8 +169,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               <span className="text-gray-300">&gt;</span>
             </p>
           </div>
-
-          {/* Question */}
+          
           <QuestionRenderer
             question={currentField}
             value={answers[currentField.id] ?? (currentField.type === 'checkbox' ? [] : '')}
@@ -208,10 +180,9 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
             error={error ?? undefined}
           />
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-100 px-6 py-4">
+      </div>
+      
+      <footer className="border-t border-gray-100 bg-white px-6 py-4">
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           {/* Progress */}
           <div className="flex items-center gap-3">
@@ -228,8 +199,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               <span className="text-xs font-semibold text-blue-500">{progress}%</span>
             </div>
           </div>
-
-          {/* Navigation buttons */}
+          
           <div className="flex items-center gap-3">
             {!isFirst && (
               <button
@@ -241,7 +211,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
                 Atrás
               </button>
             )}
-
+            
             {isLast ? (
               <button
                 type="button"

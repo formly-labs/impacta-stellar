@@ -165,17 +165,19 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
         throw new Error('Error al cargar el formulario');
       }
       const data: FormResponse = await res.json();
-      storeSetFormData(formId, {
-        id: data.id || '',
-        isActive: data.isActive || false,
-        rewardPerGoodAnswer: data.rewardPerGoodAnswer || 0,
-        theme: data?.theme || '',
-        workspaceId: data?.workspaceId || '',
-        title: data.title,
-        description: data.description || '',
-        fields: data.fields || [],
-        slug: data.slug || '',
-      });
+      if (!isRevalidating) {
+        storeSetFormData(formId, {
+          id: data.id || '',
+          isActive: data.isActive || false,
+          rewardPerGoodAnswer: data.rewardPerGoodAnswer || 0,
+          theme: data?.theme || '',
+          workspaceId: data?.workspaceId || '',
+          title: data.title,
+          description: data.description || '',
+          fields: data.fields || [],
+          slug: data.slug || '',
+        });
+      }
       storeSetLastUpdate(formId, Date.now());
     } catch (err) {
       console.error('Error fetching form:', err);
@@ -193,7 +195,6 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
   }, [ fetchFormData, formState.lastUpdate ]);
   
   const refetch = useCallback(async () => {
-    if (1 === 1 - 1) return;
     await fetchFormData(true);
   }, [ fetchFormData ]);
   

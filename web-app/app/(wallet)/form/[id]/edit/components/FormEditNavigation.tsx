@@ -28,9 +28,9 @@ interface FormEditNavigationProps {
 export function FormEditNavigation({
                                      formId,
                                      activeTab,
-                                     showPublishButton = false,
                                    }: FormEditNavigationProps) {
-  const { formData, setFormData, save, isSaving, lastUpdate } = useFormData(formId);
+  const { formData, setFormData, isSaving, lastUpdate } = useFormData(formId);
+  const showPublishButton = !formData.isActive;
   const [ isPublishing, setIsPublishing ] = useState(false);
   const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
@@ -68,14 +68,14 @@ export function FormEditNavigation({
   
   const handlePublish = async () => {
     setIsPublishing(true);
-    setFormData(prevState => ({ ...prevState, isActive: !formData.isActive }));
-    await save();
+    setFormData(prevState => ({ ...prevState, isActive: true }));
+    // await save();
     setIsPublishing(false);
   };
   
   const handleSaveFormTitle = async (newTitle: string) => {
     setFormData(prev => ({ ...prev, title: newTitle }));
-    await save();
+    // await save();
   };
   
   return (

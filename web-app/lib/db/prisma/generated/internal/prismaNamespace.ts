@@ -940,6 +940,7 @@ export const ResponseScalarFieldEnum = {
   id: 'id',
   formId: 'formId',
   answers: 'answers',
+  walletAddress: 'walletAddress',
   createdAt: 'createdAt'
 } as const
 

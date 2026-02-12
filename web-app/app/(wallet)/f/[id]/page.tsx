@@ -57,7 +57,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
   
   console.log(form);
   
-  // Not found
   if (!form) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -88,7 +87,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
     );
   }
   
-  // Not available (inactive or archived)
   if (!form.isActive || form.isArchived) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -120,7 +118,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
     );
   }
   
-  // No fields
   if (form.fields.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">

@@ -52,11 +52,12 @@ model Form {
 }
 
 model Response {
-  id        String   @id @default(cuid())
-  formId    String
-  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
-  answers   Json // { [fieldId: string]: string | string[] }
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  formId        String
+  form          Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers       Json // { [fieldId: string]: string | string[] }
+  walletAddress String?
+  createdAt     DateTime @default(now())
 }
 
 model Field {
