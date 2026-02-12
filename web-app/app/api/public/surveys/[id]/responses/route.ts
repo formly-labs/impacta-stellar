@@ -7,7 +7,28 @@ export async function GET(
 ) {
   try {
     const { id: slugOrId } = await params;
-    
+    const { searchParams } = new URL(req.url);
+    const wallet = searchParams.get('wallet');
+
+    // If wallet query param is provided, check if that wallet already responded
+    if (wallet) {
+      const form = await prisma.form.findFirst({
+        where: { OR: [{ slug: slugOrId }, { id: slugOrId }] },
+        select: { id: true },
+      });
+
+      if (!form) {
+        return NextResponse.json({ id: null });
+      }
+
+      const existing = await prisma.response.findFirst({
+        where: { formId: form.id, walletAddress: wallet },
+        select: { id: true },
+      });
+
+      return NextResponse.json({ id: existing?.id ?? null });
+    }
+
     // Find form by ID or slug
     const form = await prisma.form.findFirst({
       where: {
@@ -29,14 +50,14 @@ export async function GET(
         },
       },
     });
-    
+
     if (!form) {
       return NextResponse.json(
         { error: 'Formulario no encontrado' },
         { status: 404 },
       );
     }
-    
+
     // Format responses to match expected structure
     const formattedResponses = form.responses.map((response) => ({
       id: response.id,
@@ -45,7 +66,7 @@ export async function GET(
       responses: response.answers as Record<string, string | number | boolean>,
       createdAt: response.createdAt.toISOString(),
     }));
-    
+
     return NextResponse.json(formattedResponses);
   } catch (error) {
     console.error('Error fetching responses:', error);

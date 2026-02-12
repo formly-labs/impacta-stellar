@@ -1,12 +1,14 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, CheckCircle, Loader2, Send } from 'lucide-react';
+import { Loader } from '@/components/Loader';
+import { ArrowLeft, ArrowRight, Check, CheckCircle, Copy, Loader2, Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useWallet } from 'stellar-wallet-kit';
 import QuestionRenderer, { type PublicField } from './QuestionRenderer';
 
 interface SurveyData {
   id: string;
+  slug: string;
   title: string;
   description?: string | null;
   fields: PublicField[];
@@ -25,7 +27,25 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   const [ answers, setAnswers ] = useState<Record<string, string | string[]>>({});
   const [ error, setError ] = useState<string | null>(null);
   const [ submitting, setSubmitting ] = useState(false);
-  const [ submitted, setSubmitted ] = useState(false);
+  const [ submittedId, setSubmittedId ] = useState('');
+  const [ copiedAnswer, setCopiedAnswer ] = useState(false);
+  const [ checkingPrevious, setCheckingPrevious ] = useState(true);
+  
+  useEffect(() => {
+    if (!account?.address) {
+      setCheckingPrevious(false);
+      return;
+    }
+    setCheckingPrevious(true);
+    fetch(`/api/public/surveys/${survey.id}/responses?wallet=${account.address}`)
+      .then((res) => res.json())
+      .then((data: { id: string | null }) => {
+        if (data.id) setSubmittedId(data.id);
+      })
+      .catch(() => {
+      })
+      .finally(() => setCheckingPrevious(false));
+  }, [ survey.id, account?.address ]);
   
   const currentField = fields[step];
   const isFirst = step === 0;
@@ -89,8 +109,9 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || 'Error al enviar la respuesta');
       }
+      const data = await res.json();
       
-      setSubmitted(true);
+      setSubmittedId(data.id);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Error al enviar la respuesta',
@@ -100,10 +121,8 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
     }
   }, [ validateCurrent, survey.id, answers ]);
   
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't capture if user is typing in an input/textarea
       const tag = (e.target as HTMLElement)?.tagName;
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
       
@@ -116,7 +135,6 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         }
       }
       
-      // Keyboard shortcut for radio options (A, B, C...)
       if (
         currentField?.type === 'radio' &&
         !isTyping &&
@@ -138,7 +156,18 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [ handleNext, handleSubmit, isLast, currentField ]);
   
-  if (submitted) {
+  const handleCopyAnswerLink = async () => {
+    const link = `${window.location.origin}/f/${survey.slug}/answer?answerId=${submittedId}`;
+    await navigator.clipboard.writeText(link);
+    setCopiedAnswer(true);
+    setTimeout(() => setCopiedAnswer(false), 2000);
+  };
+  
+  if (checkingPrevious) {
+    return <Loader />;
+  }
+  
+  if (submittedId) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-lg space-y-8 text-center animate-fade-in">
@@ -153,14 +182,31 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               Tu respuesta fue registrada correctamente.
             </p>
           </div>
+          <button
+            type="button"
+            onClick={handleCopyAnswerLink}
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          >
+            {copiedAnswer ? (
+              <>
+                <Check className="h-4 w-4 text-green-500" />
+                Link copiado
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                Copiar link de respuesta
+              </>
+            )}
+          </button>
         </div>
       </div>
     );
   }
   
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 overflow-hidden">
         <div className="w-full max-w-2xl animate-fade-in" key={step}>
           {/* Step indicator */}
           <div className="mb-8">

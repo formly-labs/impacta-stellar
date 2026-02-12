@@ -41,6 +41,7 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       description: true,
       isActive: true,
       isArchived: true,
+      slug: true,
       fields: {
         orderBy: { id: 'asc' },
         select: {
