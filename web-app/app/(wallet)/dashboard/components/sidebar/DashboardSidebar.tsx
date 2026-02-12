@@ -101,12 +101,12 @@ export function DashboardSidebar({
               <span className="text-gray-500"> / 100</span>
             </p>
           </div>
-          <button
+          {/* <button
             type="button"
             className="text-xs text-gray-600 hover:text-gray-900 hover:underline"
           >
             Increase response limit
-          </button>
+          </button> */}
         </div>
       </div>
     </aside>

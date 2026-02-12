@@ -39,11 +39,9 @@ export default function CreatorDashboard() {
 
   const {
     workspaceName,
-    workspaceMenuOpen,
     renameModalOpen,
     leaveModalOpen,
     deleteModalOpen,
-    setWorkspaceMenuOpen,
     setRenameModalOpen,
     setLeaveModalOpen,
     setDeleteModalOpen,
@@ -74,13 +72,11 @@ export default function CreatorDashboard() {
   // Handlers
   const handleLeaveConfirm = () => {
     setLeaveModalOpen(false);
-    setWorkspaceMenuOpen(false);
     router.push('/dashboard');
   };
 
   const handleDeleteConfirm = () => {
     setDeleteModalOpen(false);
-    setWorkspaceMenuOpen(false);
     router.push('/dashboard');
   };
 
@@ -114,21 +110,10 @@ export default function CreatorDashboard() {
             workspaceName={workspaceName}
             viewMode={viewMode}
             sortBy={sortBy}
-            workspaceMenuOpen={workspaceMenuOpen}
             onViewModeChange={setViewMode}
             onSortChange={setSortBy}
             onInviteClick={() => setInviteModalOpen(true)}
-            onWorkspaceMenuToggle={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
             onRenameClick={openRenameModal}
-            onLeaveClick={() => {
-              setLeaveModalOpen(true);
-              setWorkspaceMenuOpen(false);
-            }}
-            onDeleteClick={() => {
-              setDeleteModalOpen(true);
-              setWorkspaceMenuOpen(false);
-            }}
-            setWorkspaceMenuOpen={setWorkspaceMenuOpen}
           />
 
           {/* Form List */}
