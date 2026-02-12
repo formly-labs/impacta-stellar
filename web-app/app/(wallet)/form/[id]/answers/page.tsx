@@ -252,11 +252,16 @@ export default function FormAnswersPage() {
 
   useEffect(() => {
     if (id) {
-      // Primero cargar datos del formulario
+      // Cargar datos del formulario y respuestas
       let fieldsData: FieldInput[] = [];
-      
+
       fetch(`/api/forms/${id}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Error al cargar el formulario');
+          }
+          return res.json();
+        })
         .then((data: FormResponse) => {
           fieldsData = data.fields || [];
           setFormData({
@@ -266,36 +271,29 @@ export default function FormAnswersPage() {
           });
           setIsActive(data.isActive || false);
           setLoading(false);
-          
-          // Después de cargar el formulario, cargar las respuestas
+
+          // Cargar las respuestas usando el nuevo endpoint
           return fetch(`/api/public/surveys/${id}/responses`);
         })
         .then((res) => {
-          if (!res) return Promise.reject('No response');
           if (!res.ok) {
-            // Si no hay respuestas, no es un error fatal
-            return Promise.resolve([]);
+            // Si hay un error al obtener respuestas, devolver array vacío
+            console.log('No se pudieron cargar las respuestas');
+            return [];
           }
           return res.json();
         })
         .then((data) => {
-          console.log('Respuestas del backend:', data);
-          
           if (Array.isArray(data) && data.length > 0) {
             // Mapear las respuestas al formato esperado
             const formattedResponses: ResponseData[] = data.map((r: SurveyResponse) => {
-              // Usar r.answers o r.responses dependiendo de lo que devuelva el backend
-              const responseData = r.responses || (r as unknown as { answers: Record<string, string | number | boolean> }).answers || {};
-              
-              console.log('Response data:', responseData);
-              console.log('Fields data:', fieldsData);
-              
-              // Mapear las respuestas usando los IDs de las preguntas del formulario
-              const answersArray = fieldsData.map((field, index) => {
-                // Los fields del backend tienen un ID, aunque no esté en el tipo
+              const responseData = r.responses || {};
+
+              // Mapear las respuestas usando los IDs de los campos del formulario
+              const answersArray = fieldsData.map((field) => {
                 const fieldId = (field as FieldInput & { id?: string }).id || field.label;
-                const answer = responseData[fieldId] || responseData[String(index)] || '';
-                
+                const answer = responseData[fieldId] || '';
+
                 return {
                   question: field.label,
                   answer: String(answer),
@@ -303,10 +301,10 @@ export default function FormAnswersPage() {
               });
 
               return {
-                id: r.id || '',
+                id: r.id,
                 respondent: {
                   name: r.respondentName || 'Anónimo',
-                  email: r.respondentEmail || '',
+                  email: r.respondentEmail || 'sin-email@example.com',
                 },
                 date: new Date(r.createdAt).toLocaleString('es-ES', {
                   day: 'numeric',
@@ -318,18 +316,14 @@ export default function FormAnswersPage() {
                 answers: answersArray,
               };
             });
-            
-            console.log('Respuestas formateadas:', formattedResponses);
+
             setResponses(formattedResponses);
           } else {
-            // Si no hay respuestas, usar array vacío
-            console.log('No hay respuestas o formato incorrecto');
             setResponses([]);
           }
           setLoadingResponses(false);
         })
         .catch((error) => {
-          // En caso de error, usar array vacío
           console.error('Error al cargar datos:', error);
           setLoading(false);
           setResponses([]);

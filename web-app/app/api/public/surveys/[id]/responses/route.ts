@@ -1,6 +1,61 @@
 import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id: slugOrId } = await params;
+
+    // Find form by ID or slug
+    const form = await prisma.form.findFirst({
+      where: {
+        OR: [
+          { slug: slugOrId },
+          { id: slugOrId },
+        ],
+      },
+      include: {
+        fields: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
+        responses: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    if (!form) {
+      return NextResponse.json(
+        { error: 'Formulario no encontrado' },
+        { status: 404 },
+      );
+    }
+
+    // Format responses to match expected structure
+    const formattedResponses = form.responses.map((response) => ({
+      id: response.id,
+      respondentName: undefined, // Could be added later from UserProfile
+      respondentEmail: undefined, // Could be added later from UserProfile
+      responses: response.answers as Record<string, string | number | boolean>,
+      createdAt: response.createdAt.toISOString(),
+    }));
+
+    return NextResponse.json(formattedResponses);
+  } catch (error) {
+    console.error('Error fetching responses:', error);
+    return NextResponse.json(
+      { error: 'Error al obtener las respuestas' },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
