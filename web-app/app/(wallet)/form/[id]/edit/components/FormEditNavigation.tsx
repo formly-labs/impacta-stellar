@@ -2,7 +2,7 @@
 
 import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { useFormData } from '@/hooks';
-import { ChevronDown, ChevronRight, LogOut, Send, Wallet } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Copy, LogOut, Send, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useWallet } from 'stellar-wallet-kit';
@@ -29,10 +29,10 @@ export function FormEditNavigation({
                                      formId,
                                      activeTab,
                                    }: FormEditNavigationProps) {
-  const { formData, setFormData, isSaving, lastUpdate } = useFormData(formId);
-  const showPublishButton = !formData.isActive;
+  const { formData, setFormData, isSaving, lastUpdate, refetch } = useFormData(formId);
   const [ isPublishing, setIsPublishing ] = useState(false);
   const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
+  const [ copied, setCopied ] = useState(false);
   const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
     if (tab === 'content') {
       router.push(`/form/${formId}/edit`);
@@ -70,12 +70,19 @@ export function FormEditNavigation({
     setIsPublishing(true);
     setFormData(prevState => ({ ...prevState, isActive: true }));
     // await save();
+    await refetch();
     setIsPublishing(false);
   };
-  
+
+  const handleCopyLink = async () => {
+    const link = `${window.location.origin}/f/${formId}`;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleSaveFormTitle = async (newTitle: string) => {
     setFormData(prev => ({ ...prev, title: newTitle }));
-    // await save();
   };
   
   return (
@@ -164,16 +171,33 @@ export function FormEditNavigation({
         </div>
         
         <div className="flex items-center gap-3">
-          <div className={showPublishButton ? '' : 'invisible'}>
+          {formData.isActive ? (
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Copiado
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copy Link
+                </>
+              )}
+            </button>
+          ) : (
             <button
               onClick={handlePublish}
-              disabled={isPublishing || !showPublishButton}
+              disabled={isPublishing}
               className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               {isPublishing ? 'Publicando...' : 'Publicar'}
             </button>
-          </div>
+          )}
           
           {!isConnected ? (
             <button

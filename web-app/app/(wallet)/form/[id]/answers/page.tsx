@@ -81,6 +81,7 @@ export default function FormAnswersPage() {
           if (Array.isArray(data) && data.length > 0) {
             const formattedResponses: ResponseData[] = data.map((r: SurveyResponse) => {
               const responseData = r.responses || {};
+              console.log({ responseData, formData });
               const answersArray = formData.fields!.map((field) => {
                 const fieldId = (field as FieldInput & { id?: string }).id || field.label;
                 const answer = responseData[fieldId] || '';
@@ -120,10 +121,6 @@ export default function FormAnswersPage() {
     }
   }, [ formId, isLoading, formData.fields ]);
   
-  const handleSaveFormTitle = (newTitle: string) => {
-    setFormData(prev => ({ ...prev, title: newTitle }));
-  };
-  
   const filteredResponses = responses.filter((response) =>
     response.respondent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     response.respondent.wallet.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -131,8 +128,6 @@ export default function FormAnswersPage() {
   
   const totalResponses = filteredResponses.length;
   const response = filteredResponses[currentResponse];
-  
-  // Reset to first response when search changes - handled in component render
   
   if (isLoading) {
     return (
@@ -152,6 +147,7 @@ export default function FormAnswersPage() {
     );
   }
   
+  console.log({ response });
   return (
     <div className="flex h-full flex-col bg-white">
       <FormEditNavigation
@@ -480,7 +476,6 @@ export default function FormAnswersPage() {
                               </div>
                             </div>
                             
-                            {/* Pagination */}
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
@@ -518,7 +513,6 @@ export default function FormAnswersPage() {
                           </div>
                         </div>
                         
-                        {/* Answers */}
                         <div className="divide-y divide-gray-50 px-5 py-2">
                           {response.answers.map((a, i) => (
                             <div key={i} className="py-4">
