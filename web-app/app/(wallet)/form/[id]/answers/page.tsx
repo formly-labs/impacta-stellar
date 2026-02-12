@@ -1,16 +1,16 @@
 'use client';
 
-import { FormResponse } from '@/types';
+import { FormResponse, FormUpdateInput } from '@/types';
+import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
+import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import {
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Copy,
-  Moon,
-  Printer,
   Search,
-  Trash2,
   User,
+  Copy,
+  Trash2,
+  Printer
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -207,16 +207,56 @@ type Tab = 'resumen' | 'individual' | 'analisis';
 export default function FormAnswersPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [form, setForm] = useState<FormResponse | null>(null);
+  const [formData, setFormData] = useState<FormUpdateInput>({
+    title: '',
+    description: '',
+    fields: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [tab, setTab] = useState<Tab>('individual');
   const [currentResponse, setCurrentResponse] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetch(`/api/forms/${id}`)
-      .then((res) => res.json())
-      .then(setForm);
+    if (!id) {
+      router.push('/dashboard');
+    }
+  }, [id, router]);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/forms/${id}`)
+        .then((res) => res.json())
+        .then((data: FormResponse) => {
+          setFormData({
+            title: data.title,
+            description: data.description || '',
+            fields: data.fields,
+          });
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    }
   }, [id]);
+
+  const handleSaveFormTitle = (newTitle: string) => {
+    setFormData(prev => ({ ...prev, title: newTitle }));
+  };
+
+  const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
+    if (tab === 'content') {
+      router.push(`/form/${id}/edit`);
+    } else if (tab === 'responses') {
+      router.push(`/form/${id}/answers`);
+    } else if (tab === 'rewards') {
+      router.push(`/form/${id}/rewards`);
+    } else {
+      router.push(`/form/${id}/share`);
+    }
+  };
 
   // Filter responses based on search term
   const filteredResponses = DEMO_RESPONSES.filter((response) =>
@@ -232,80 +272,88 @@ export default function FormAnswersPage() {
     setCurrentResponse(0);
   }, [searchTerm]);
 
-  if (!form) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f9fb]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+      <div className="flex h-full flex-col bg-white">
+      <FormEditNavigation
+        formTitle={formData.title || ''}
+        activeTab="responses"
+        onTabChange={handleTabChange}
+        onFormTitleClick={() => setIsEditModalOpen(true)}
+        showPublishButton={false}
+      />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary" />
+            <p className="text-sm text-gray-500">Cargando...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-[#fafafa]">
-      <div className="mx-auto max-w-5xl px-4 py-6 pb-24 sm:px-6">
-        {/* ── Simple Header ── */}
-        <header className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4">
-            <div className="flex items-center gap-3">
+    <div className="flex h-full flex-col bg-white">
+      {/* Navegación */}
+      <FormEditNavigation
+        formTitle={formData.title || ''}
+        activeTab="responses"
+        onTabChange={handleTabChange}
+        onFormTitleClick={() => setIsEditModalOpen(true)}
+        showPublishButton={false}
+      />
+
+      {/* Modal para editar nombre */}
+      <EditFormNameModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentTitle={formData.title || ''}
+        onSave={handleSaveFormTitle}
+      />
+
+      {/* Contenido con el mismo layout */}
+      <div className="flex flex-1 gap-4 overflow-hidden p-4">
+        <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+          {/* Tabs internos */}
+          <div className="shrink-0 border-b border-gray-200 px-6 py-3 bg-gray-50">
+            <div className="flex gap-1">
               <button
                 type="button"
-                onClick={() => router.push(`/form/${id}`)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Volver"
+                onClick={() => setTab('resumen')}
+                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  tab === 'resumen'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                <ArrowLeft className="h-4 w-4" />
+                Resumen
               </button>
-              <div>
-                <h1 className="text-lg font-bold tracking-tight text-gray-900">
-                  {form.title}
-                </h1>
-                <p className="text-xs text-gray-500">Respuestas individuales</p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setTab('individual')}
+                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  tab === 'individual'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Individual
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab('analisis')}
+                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  tab === 'analisis'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Análisis
+              </button>
             </div>
           </div>
-        </header>
 
-        {/* ── Tabs ── */}
-        <div className="mt-4">
-          <div className="flex gap-1 rounded-xl border border-gray-200 bg-white p-1">
-            <button
-              type="button"
-              onClick={() => setTab('resumen')}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                tab === 'resumen'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
-            >
-              Resumen
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab('individual')}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                tab === 'individual'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
-            >
-              Individual
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab('analisis')}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                tab === 'analisis'
-                  ? 'bg-primary-500 text-white shadow-md'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
-            >
-              Análisis de datos
-            </button>
-          </div>
-        </div>
-
-        {/* ── Tab content ── */}
-        <div className="mt-4">
+          <div className="flex-1 overflow-y-auto p-6">
           {/* ── Resumen tab ── */}
           {tab === 'resumen' && (
             <div className="animate-fade-in space-y-4">
@@ -326,7 +374,7 @@ export default function FormAnswersPage() {
               </div>
 
               {/* Charts for each question */}
-              {form.fields && form.fields.map((field, fieldIndex) => {
+              {formData.fields && formData.fields.map((field, fieldIndex) => {
                 const responses = DEMO_RESPONSES.map(r => r.answers[fieldIndex]?.answer).filter(Boolean);
                 const responseCounts: Record<string, number> = {};
                 responses.forEach(answer => {
@@ -781,17 +829,9 @@ export default function FormAnswersPage() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
-
-      {/* Moon icon */}
-      <button
-        type="button"
-        className="fixed bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full bg-primary-500 text-white shadow-lg transition-all hover:bg-primary-600 hover:shadow-xl hover:scale-105"
-        aria-label="Cambiar tema"
-      >
-        <Moon className="h-5 w-5" />
-      </button>
     </div>
   );
 }

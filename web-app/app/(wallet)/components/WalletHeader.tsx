@@ -42,6 +42,9 @@ export function WalletHeader() {
 
   // No mostrar header en login (login está fuera de (wallet), pero por si acaso)
   if (pathname === '/login') return null;
+  
+  // No mostrar header en las páginas de formulario con navegación propia
+  if (pathname?.includes('/form/') && (pathname?.includes('/edit') || pathname?.includes('/rewards') || pathname?.includes('/share') || pathname?.includes('/answers'))) return null;
 
   return (
     <header className="shrink-0 border-b border-gray-200 bg-white">
