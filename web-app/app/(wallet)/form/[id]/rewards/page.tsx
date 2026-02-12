@@ -5,6 +5,8 @@ import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/For
 import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { useEffect, useState } from 'react';
 import { FormResponse, FormUpdateInput } from '@/types';
+import { Rocket, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 export default function RewardsPage() {
   const router = useRouter();
@@ -98,11 +100,33 @@ export default function RewardsPage() {
       />
 
       {/* Contenido de Rewards con mismo layout */}
-      <div className="flex flex-1 gap-4 overflow-hidden p-4">
+      <div className="flex flex-1 gap-4 overflow-hidden bg-gray-50 p-4">
         <div className="flex flex-1 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900">rewards</h1>
-            <p className="mt-2 text-gray-500">Configuración de recompensas próximamente</p>
+          <div className="max-w-md text-center px-6 py-12">
+            {/* Logo o icono */}
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+              <Rocket className="h-10 w-10 text-primary" />
+            </div>
+            
+            {/* Título */}
+            <h2 className="mb-3 text-3xl font-bold text-gray-900">
+              ¡Próximamente!
+            </h2>
+            
+            {/* Descripción */}
+            <p className="mb-8 text-base text-gray-600 leading-relaxed">
+              Aún estamos trabajando en la funcionalidad de recompensas. 
+              Pronto podrás configurar incentivos increíbles para tus usuarios.
+            </p>
+            
+            {/* Botón continuar */}
+            <button
+              onClick={() => router.push(`/form/${formId}/share`)}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              Continuar
+              <ArrowRight className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>

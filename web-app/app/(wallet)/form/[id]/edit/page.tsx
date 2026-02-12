@@ -83,9 +83,9 @@ export default function CreateFormPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [selectedScreen, setSelectedScreen] = useState<'question' | 'welcome' | 'ending'>('question');
   const [welcomeScreen, setWelcomeScreen] = useState({
-    title: 'Bienvenido',
-    description: 'Gracias por tomarte el tiempo de completar este formulario.',
-    buttonText: 'Comenzar'
+    title: '',
+    description: '',
+    buttonText: 'Start'
   });
   const [endingScreen, setEndingScreen] = useState({
     title: '¡Gracias!',
@@ -304,7 +304,7 @@ export default function CreateFormPage() {
 
                   return (
                     <div key={index} className="relative">
-                      <div className={`flex w-full items-center gap-3 rounded-lg p-3 transition-all ${
+                      <div className={`flex w-full items-center gap-3 rounded-lg p-3 transition-all overflow-hidden ${
                         selectedQuestionIndex === index
                           ? 'bg-gray-100'
                           : 'bg-white hover:bg-gray-50'
@@ -315,10 +315,10 @@ export default function CreateFormPage() {
                             setSelectedScreen('question');
                             setShowActionsMenu(false);
                           }}
-                          className="flex flex-1 items-center gap-3 text-left"
+                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
                         >
                           {/* Icono + Número juntos en el mismo contenedor */}
-                          <div className={`flex items-center gap-1.5 rounded-md px-2 py-1 ${fieldType?.bgColor || 'bg-gray-100'}`}>
+                          <div className={`flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 ${fieldType?.bgColor || 'bg-gray-100'}`}>
                             <FieldIcon className="h-3.5 w-3.5 text-gray-600" />
                             <span className="text-xs font-semibold text-gray-600">
                               {index + 1}
@@ -518,46 +518,50 @@ export default function CreateFormPage() {
                 }`}>
                   <div className={`h-full flex flex-col justify-center ${viewMode === 'mobile' ? 'p-8' : 'p-16'}`}>
                     <div className="max-w-2xl w-full">
-                      {/* Título editable */}
+                      {/* Título editable - estilo typeform */}
                       <input
                         type="text"
                         value={welcomeScreen.title}
                         onChange={(e) => setWelcomeScreen({ ...welcomeScreen, title: e.target.value })}
-                        placeholder="Título del welcome screen"
-                        className={`w-full mb-6 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-bold text-gray-900 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none ${
-                          viewMode === 'mobile' ? 'text-2xl' : 'text-4xl'
+                        placeholder="Say hi! Recall information with @"
+                        className={`w-full mb-4 border-none bg-transparent px-0 py-0 font-normal italic text-gray-900 placeholder-gray-400 focus:outline-none focus:not-italic ${
+                          viewMode === 'mobile' ? 'text-xl' : 'text-3xl'
                         }`}
                       />
                       
                       {/* Descripción editable */}
-                      <textarea
+                      <input
+                        type="text"
                         value={welcomeScreen.description}
                         onChange={(e) => setWelcomeScreen({ ...welcomeScreen, description: e.target.value })}
-                        placeholder="Descripción del welcome screen"
-                        rows={3}
-                        className={`w-full mb-8 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-normal text-gray-600 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none resize-none ${
-                          viewMode === 'mobile' ? 'text-base' : 'text-xl'
+                        placeholder="Description (optional)"
+                        className={`w-full mb-12 border-none bg-transparent px-0 py-0 font-normal italic text-gray-500 placeholder-gray-400 focus:outline-none ${
+                          viewMode === 'mobile' ? 'text-sm' : 'text-base'
                         }`}
                       />
                       
-                      {/* Texto del botón editable */}
-                      <div className="mb-4">
-                        <label className="mb-2 block text-sm font-medium text-gray-700">Texto del botón:</label>
-                        <input
-                          type="text"
-                          value={welcomeScreen.buttonText}
-                          onChange={(e) => setWelcomeScreen({ ...welcomeScreen, buttonText: e.target.value })}
-                          placeholder="Texto del botón"
-                          className="w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors hover:border-gray-300 focus:border-primary focus:outline-none"
-                        />
+                      {/* Botón Start */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <button className={`rounded-lg bg-primary px-6 py-3 font-medium text-white ${
+                          viewMode === 'mobile' ? 'text-sm' : 'text-base'
+                        }`}>
+                          Start
+                        </button>
+                        <span className="text-sm text-gray-400">
+                          press <span className="font-semibold">Enter ↵</span>
+                        </span>
                       </div>
                       
-                      {/* Preview del botón */}
-                      <button className={`rounded-lg bg-primary px-6 py-3 font-medium text-white ${
-                        viewMode === 'mobile' ? 'text-sm' : 'text-base'
-                      }`}>
-                        {welcomeScreen.buttonText}
-                      </button>
+                      {/* Tiempo estimado */}
+                      <p className="text-xs text-gray-400">
+                        <span className="inline-flex items-center gap-1">
+                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                            <path strokeWidth="2" d="M12 6v6l4 2"/>
+                          </svg>
+                          Takes {formData.fields?.length || 0} minutes
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
