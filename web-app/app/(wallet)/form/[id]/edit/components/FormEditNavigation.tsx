@@ -73,14 +73,14 @@ export function FormEditNavigation({
     await refetch();
     setIsPublishing(false);
   };
-
+  
   const handleCopyLink = async () => {
-    const link = `${window.location.origin}/f/${formId}`;
+    const link = `${window.location.origin}/f/${formData.slug}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+  
   const handleSaveFormTitle = async (newTitle: string) => {
     setFormData(prev => ({ ...prev, title: newTitle }));
   };
