@@ -113,7 +113,6 @@ interface UseFormDataReturn {
   error: string | null;
   refetch: () => Promise<void>;
   isSaving: boolean;
-  // save: () => Promise<void>;
   lastUpdate: number;
 }
 
@@ -126,6 +125,9 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
   const storeSetError = useFormStore((state) => state.setError);
   const storeSetLastUpdate = useFormStore((state) => state.setLastUpdate);
   const storeSetSaving = useFormStore((state) => state.setSaving);
+  
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const saveDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const formState = useMemo(() => {
     if (!formId) {
@@ -188,19 +190,44 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
     }
   }, [ formId, storeSetFormData, storeSetLoading, storeSetValidating, storeSetError, storeSetLastUpdate ]);
   
+  const debouncedFetchFormData = useCallback((isRevalidating = false) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      void fetchFormData(isRevalidating);
+    }, 800);
+  }, [ fetchFormData ]);
+  
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (saveDebounceTimerRef.current) {
+        clearTimeout(saveDebounceTimerRef.current);
+      }
+    };
+  }, []);
+  
   useEffect(() => {
     if (formState.lastUpdate === -1) {
-      void fetchFormData();
+      debouncedFetchFormData();
     }
-  }, [ fetchFormData, formState.lastUpdate ]);
+  }, [ debouncedFetchFormData, formState.lastUpdate ]);
   
   const refetch = useCallback(async () => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
     await fetchFormData(true);
   }, [ fetchFormData ]);
   
   const formDataRef = useRef(formState.formData);
   formDataRef.current = formState.formData;
-  const save = useCallback(async (data: FormUpdateInput) => {
+  
+  const performSave = useCallback(async (data: FormUpdateInput) => {
     if (!formId) return;
     
     storeSetSaving(formId, true);
@@ -217,6 +244,16 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
       storeSetSaving(formId, false);
     }
   }, [ formId, storeSetSaving, refetch ]);
+  
+  const save = useCallback((data: FormUpdateInput) => {
+    if (saveDebounceTimerRef.current) {
+      clearTimeout(saveDebounceTimerRef.current);
+    }
+    
+    saveDebounceTimerRef.current = setTimeout(() => {
+      void performSave(data);
+    }, 400);
+  }, [ performSave ]);
   
   const setFormData = useCallback(
     (data: FormUpdateInput | ((prev: FormUpdateInput) => FormUpdateInput)) => {
