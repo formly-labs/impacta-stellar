@@ -64,6 +64,11 @@ export interface FormCreateInput {
   workspaceId?: string;
 }
 
+export interface ScreenContent {
+  title: string;
+  description: string;
+}
+
 export interface FormUpdateInput {
   id: string,
   title: string;
@@ -74,6 +79,8 @@ export interface FormUpdateInput {
   rewardPerGoodAnswer: number;
   workspaceId: string;
   slug: string,
+  welcome?: ScreenContent;
+  ending?: ScreenContent;
 }
 
 export interface FormResponse extends FormCreateInput {
@@ -82,5 +89,9 @@ export interface FormResponse extends FormCreateInput {
   isActive: boolean;
   isArchived: boolean;
   budget: number;
-  slug: string,
+  slug: string;
+  welcomeTitle?: string | null;
+  welcomeDescription?: string | null;
+  endingTitle?: string | null;
+  endingDescription?: string | null;
 }

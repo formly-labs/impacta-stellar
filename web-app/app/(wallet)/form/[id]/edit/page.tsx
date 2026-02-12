@@ -90,16 +90,6 @@ export default function CreateFormPage() {
   const [ showRewardsModal, setShowRewardsModal ] = useState(false);
   const [ showSuccessModal, setShowSuccessModal ] = useState(false);
   const [ selectedScreen, setSelectedScreen ] = useState<'question' | 'welcome' | 'ending'>('question');
-  const [ welcomeScreen, setWelcomeScreen ] = useState({
-    title: '',
-    description: '',
-    buttonText: 'Start',
-  });
-  const [ endingScreen, setEndingScreen ] = useState({
-    title: '¡Gracias!',
-    description: 'Tus respuestas han sido registradas exitosamente.',
-    buttonText: 'Cerrar',
-  });
   
   useEffect(() => {
     if (!formId) {
@@ -455,19 +445,19 @@ export default function CreateFormPage() {
                       {/* Título editable - estilo typeform */}
                       <input
                         type="text"
-                        value={welcomeScreen.title}
-                        onChange={(e) => setWelcomeScreen({ ...welcomeScreen, title: e.target.value })}
+                        value={formData.welcome?.title || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, welcome: { ...prev.welcome, title: e.target.value, description: prev.welcome?.description || '' } }))}
                         placeholder="Say hi! Recall information with @"
                         className={`w-full mb-4 border-none bg-transparent px-0 py-0 font-normal italic text-gray-900 placeholder-gray-400 focus:outline-none focus:not-italic ${
                           viewMode === 'mobile' ? 'text-xl' : 'text-3xl'
                         }`}
                       />
-                      
+
                       {/* Descripción editable */}
                       <input
                         type="text"
-                        value={welcomeScreen.description}
-                        onChange={(e) => setWelcomeScreen({ ...welcomeScreen, description: e.target.value })}
+                        value={formData.welcome?.description || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, welcome: { title: prev.welcome?.title || '', description: e.target.value } }))}
                         placeholder="Description (optional)"
                         className={`w-full mb-12 border-none bg-transparent px-0 py-0 font-normal italic text-gray-500 placeholder-gray-400 focus:outline-none ${
                           viewMode === 'mobile' ? 'text-sm' : 'text-base'
@@ -528,19 +518,19 @@ export default function CreateFormPage() {
                       {/* Título editable */}
                       <input
                         type="text"
-                        value={endingScreen.title}
-                        onChange={(e) => setEndingScreen({ ...endingScreen, title: e.target.value })}
-                        placeholder="Título del ending screen"
+                        value={formData.ending?.title || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, ending: { title: e.target.value, description: prev.ending?.description || '' } }))}
+                        placeholder="¡Gracias!"
                         className={`w-full mb-6 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-bold text-gray-900 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none text-center ${
                           viewMode === 'mobile' ? 'text-2xl' : 'text-4xl'
                         }`}
                       />
-                      
+
                       {/* Descripción editable */}
                       <textarea
-                        value={endingScreen.description}
-                        onChange={(e) => setEndingScreen({ ...endingScreen, description: e.target.value })}
-                        placeholder="Descripción del ending screen"
+                        value={formData.ending?.description || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, ending: { title: prev.ending?.title || '', description: e.target.value } }))}
+                        placeholder="Tus respuestas han sido registradas exitosamente."
                         rows={2}
                         className={`w-full mb-8 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-normal text-gray-600 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none resize-none text-center ${
                           viewMode === 'mobile' ? 'text-base' : 'text-xl'

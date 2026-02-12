@@ -12,6 +12,10 @@ interface SurveyData {
   title: string;
   description?: string | null;
   fields: PublicField[];
+  welcomeTitle?: string | null;
+  welcomeDescription?: string | null;
+  endingTitle?: string | null;
+  endingDescription?: string | null;
 }
 
 interface PublicSurveyWizardProps {
@@ -30,6 +34,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   const [ submittedId, setSubmittedId ] = useState('');
   const [ copiedAnswer, setCopiedAnswer ] = useState(false);
   const [ checkingPrevious, setCheckingPrevious ] = useState(true);
+  const [ started, setStarted ] = useState(false);
   
   useEffect(() => {
     if (!account?.address) {
@@ -125,7 +130,13 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
-      
+
+      if (e.key === 'Enter' && !isTyping && survey.welcomeTitle && !started) {
+        e.preventDefault();
+        setStarted(true);
+        return;
+      }
+
       if (e.key === 'Enter' && !isTyping) {
         e.preventDefault();
         if (isLast) {
@@ -169,18 +180,20 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   
   if (submittedId) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <div className="flex h-full flex-col items-center justify-center px-4">
         <div className="w-full max-w-lg space-y-8 text-center animate-fade-in">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-50">
             <CheckCircle className="h-12 w-12 text-green-500" />
           </div>
           <div className="space-y-3">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              ¡Gracias por responder!
+              {survey.endingTitle || '¡Gracias por responder!'}
             </h1>
-            <p className="text-gray-500">
-              Tu respuesta fue registrada correctamente.
-            </p>
+            {(survey.endingDescription || !survey.endingTitle) && (
+              <p className="text-gray-500">
+                {survey.endingDescription || 'Tu respuesta fue registrada correctamente.'}
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -199,6 +212,35 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               </>
             )}
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (survey.welcomeTitle && !started) {
+    return (
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col justify-center px-6 py-12 max-w-2xl w-full mx-auto animate-fade-in">
+          <h1 className="text-3xl font-normal italic text-gray-900 mb-4">
+            {survey.welcomeTitle}
+          </h1>
+          {survey.welcomeDescription && (
+            <p className="text-base text-gray-500 mb-12">
+              {survey.welcomeDescription}
+            </p>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setStarted(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              Start
+            </button>
+            <span className="text-sm text-gray-400">
+              presiona <kbd className="rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-semibold text-gray-500">ENTER</kbd>
+            </span>
+          </div>
         </div>
       </div>
     );

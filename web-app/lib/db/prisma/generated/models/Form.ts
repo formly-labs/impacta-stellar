@@ -48,6 +48,10 @@ export type FormMinAggregateOutputType = {
   theme: string | null
   rewardPerGoodAnswer: number | null
   workspaceId: string | null
+  welcomeTitle: string | null
+  welcomeDescription: string | null
+  endingTitle: string | null
+  endingDescription: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +68,10 @@ export type FormMaxAggregateOutputType = {
   theme: string | null
   rewardPerGoodAnswer: number | null
   workspaceId: string | null
+  welcomeTitle: string | null
+  welcomeDescription: string | null
+  endingTitle: string | null
+  endingDescription: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -80,6 +88,10 @@ export type FormCountAggregateOutputType = {
   theme: number
   rewardPerGoodAnswer: number
   workspaceId: number
+  welcomeTitle: number
+  welcomeDescription: number
+  endingTitle: number
+  endingDescription: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -108,6 +120,10 @@ export type FormMinAggregateInputType = {
   theme?: true
   rewardPerGoodAnswer?: true
   workspaceId?: true
+  welcomeTitle?: true
+  welcomeDescription?: true
+  endingTitle?: true
+  endingDescription?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +140,10 @@ export type FormMaxAggregateInputType = {
   theme?: true
   rewardPerGoodAnswer?: true
   workspaceId?: true
+  welcomeTitle?: true
+  welcomeDescription?: true
+  endingTitle?: true
+  endingDescription?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -140,6 +160,10 @@ export type FormCountAggregateInputType = {
   theme?: true
   rewardPerGoodAnswer?: true
   workspaceId?: true
+  welcomeTitle?: true
+  welcomeDescription?: true
+  endingTitle?: true
+  endingDescription?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -243,6 +267,10 @@ export type FormGroupByOutputType = {
   theme: string | null
   rewardPerGoodAnswer: number | null
   workspaceId: string | null
+  welcomeTitle: string | null
+  welcomeDescription: string | null
+  endingTitle: string | null
+  endingDescription: string | null
   createdAt: Date
   updatedAt: Date
   _count: FormCountAggregateOutputType | null
@@ -282,6 +310,10 @@ export type FormWhereInput = {
   theme?: Prisma.StringNullableFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
   workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeDescription?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingDescription?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
@@ -301,6 +333,10 @@ export type FormOrderByWithRelationInput = {
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
   workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  welcomeTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  welcomeDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  endingTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  endingDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   workspace?: Prisma.WorkspaceOrderByWithRelationInput
@@ -323,6 +359,10 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   theme?: Prisma.StringNullableFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
   workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeDescription?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingDescription?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
@@ -342,6 +382,10 @@ export type FormOrderByWithAggregationInput = {
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
   workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  welcomeTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  welcomeDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  endingTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  endingDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
@@ -366,6 +410,10 @@ export type FormScalarWhereWithAggregatesInput = {
   theme?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableWithAggregatesFilter<"Form"> | number | null
   workspaceId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  welcomeTitle?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  welcomeDescription?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  endingTitle?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  endingDescription?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
 }
@@ -381,6 +429,10 @@ export type FormCreateInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
@@ -400,6 +452,10 @@ export type FormUncheckedCreateInput = {
   theme?: string | null
   rewardPerGoodAnswer?: number | null
   workspaceId?: string | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -417,6 +473,10 @@ export type FormUpdateInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
@@ -436,6 +496,10 @@ export type FormUncheckedUpdateInput = {
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -454,6 +518,10 @@ export type FormCreateManyInput = {
   theme?: string | null
   rewardPerGoodAnswer?: number | null
   workspaceId?: string | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -469,6 +537,10 @@ export type FormUpdateManyMutationInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -485,6 +557,10 @@ export type FormUncheckedUpdateManyInput = {
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -511,6 +587,10 @@ export type FormCountOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
   workspaceId?: Prisma.SortOrder
+  welcomeTitle?: Prisma.SortOrder
+  welcomeDescription?: Prisma.SortOrder
+  endingTitle?: Prisma.SortOrder
+  endingDescription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -532,6 +612,10 @@ export type FormMaxOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
   workspaceId?: Prisma.SortOrder
+  welcomeTitle?: Prisma.SortOrder
+  welcomeDescription?: Prisma.SortOrder
+  endingTitle?: Prisma.SortOrder
+  endingDescription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -548,6 +632,10 @@ export type FormMinOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
   workspaceId?: Prisma.SortOrder
+  welcomeTitle?: Prisma.SortOrder
+  welcomeDescription?: Prisma.SortOrder
+  endingTitle?: Prisma.SortOrder
+  endingDescription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -663,6 +751,10 @@ export type FormCreateWithoutWorkspaceInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldCreateNestedManyWithoutFormInput
@@ -680,6 +772,10 @@ export type FormUncheckedCreateWithoutWorkspaceInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -727,6 +823,10 @@ export type FormScalarWhereInput = {
   theme?: Prisma.StringNullableFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
   workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  welcomeDescription?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingTitle?: Prisma.StringNullableFilter<"Form"> | string | null
+  endingDescription?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
 }
@@ -742,6 +842,10 @@ export type FormCreateWithoutResponsesInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
@@ -760,6 +864,10 @@ export type FormUncheckedCreateWithoutResponsesInput = {
   theme?: string | null
   rewardPerGoodAnswer?: number | null
   workspaceId?: string | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -792,6 +900,10 @@ export type FormUpdateWithoutResponsesInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
@@ -810,6 +922,10 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -826,6 +942,10 @@ export type FormCreateWithoutFieldsInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
@@ -844,6 +964,10 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   theme?: string | null
   rewardPerGoodAnswer?: number | null
   workspaceId?: string | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
@@ -876,6 +1000,10 @@ export type FormUpdateWithoutFieldsInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
@@ -894,6 +1022,10 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
@@ -910,6 +1042,10 @@ export type FormCreateManyWorkspaceInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  welcomeTitle?: string | null
+  welcomeDescription?: string | null
+  endingTitle?: string | null
+  endingDescription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -925,6 +1061,10 @@ export type FormUpdateWithoutWorkspaceInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUpdateManyWithoutFormNestedInput
@@ -942,6 +1082,10 @@ export type FormUncheckedUpdateWithoutWorkspaceInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -959,6 +1103,10 @@ export type FormUncheckedUpdateManyWithoutWorkspaceInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  welcomeTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  welcomeDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endingDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1015,6 +1163,10 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   theme?: boolean
   rewardPerGoodAnswer?: boolean
   workspaceId?: boolean
+  welcomeTitle?: boolean
+  welcomeDescription?: boolean
+  endingTitle?: boolean
+  endingDescription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
@@ -1035,6 +1187,10 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   theme?: boolean
   rewardPerGoodAnswer?: boolean
   workspaceId?: boolean
+  welcomeTitle?: boolean
+  welcomeDescription?: boolean
+  endingTitle?: boolean
+  endingDescription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
@@ -1052,6 +1208,10 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   theme?: boolean
   rewardPerGoodAnswer?: boolean
   workspaceId?: boolean
+  welcomeTitle?: boolean
+  welcomeDescription?: boolean
+  endingTitle?: boolean
+  endingDescription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
@@ -1069,11 +1229,15 @@ export type FormSelectScalar = {
   theme?: boolean
   rewardPerGoodAnswer?: boolean
   workspaceId?: boolean
+  welcomeTitle?: boolean
+  welcomeDescription?: boolean
+  endingTitle?: boolean
+  endingDescription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "workspaceId" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "workspaceId" | "welcomeTitle" | "welcomeDescription" | "endingTitle" | "endingDescription" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
@@ -1106,6 +1270,10 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     theme: string | null
     rewardPerGoodAnswer: number | null
     workspaceId: string | null
+    welcomeTitle: string | null
+    welcomeDescription: string | null
+    endingTitle: string | null
+    endingDescription: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["form"]>
@@ -1545,6 +1713,10 @@ export interface FormFieldRefs {
   readonly theme: Prisma.FieldRef<"Form", 'String'>
   readonly rewardPerGoodAnswer: Prisma.FieldRef<"Form", 'Float'>
   readonly workspaceId: Prisma.FieldRef<"Form", 'String'>
+  readonly welcomeTitle: Prisma.FieldRef<"Form", 'String'>
+  readonly welcomeDescription: Prisma.FieldRef<"Form", 'String'>
+  readonly endingTitle: Prisma.FieldRef<"Form", 'String'>
+  readonly endingDescription: Prisma.FieldRef<"Form", 'String'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Form", 'DateTime'>
 }

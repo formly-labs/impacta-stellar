@@ -3,7 +3,7 @@ import z from 'zod';
 
 export async function POST(req: Request) {
   const { messages, formData }: { messages: UIMessage[], formData: unknown } = await req.json();
-
+  
   const result = streamText({
     model: 'anthropic/claude-3-haiku',
     system: `You are an expert assistant specialized in creating forms and surveys.
@@ -68,7 +68,7 @@ ${JSON.stringify(formData, null, 2)}
         description: 'Creates or updates form fields based on the information provided by the user. Returns an array of fields with their complete configuration.',
         inputSchema: z.object({
           fields: z.array(z.object({
-            type: z.enum(['text', 'textarea', 'email', 'number', 'select', 'radio', 'checkbox', 'date']),
+            type: z.enum([ 'text', 'textarea', 'email', 'number', 'phone', 'select', 'radio', 'checkbox', 'date' ]),
             label: z.string(),
             placeholder: z.string().optional(),
             required: z.boolean().optional(),
@@ -83,6 +83,6 @@ ${JSON.stringify(formData, null, 2)}
     },
     stopWhen: stepCountIs(5),
   });
-
+  
   return result.toUIMessageStreamResponse();
 }

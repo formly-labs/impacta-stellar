@@ -47,6 +47,10 @@ model Form {
   workspace           Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   fields              Field[]
   responses           Response[]
+  welcomeTitle        String?
+  welcomeDescription  String?
+  endingTitle         String?
+  endingDescription   String?
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 }

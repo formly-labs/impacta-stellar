@@ -42,6 +42,10 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       isActive: true,
       isArchived: true,
       slug: true,
+      welcomeTitle: true,
+      welcomeDescription: true,
+      endingTitle: true,
+      endingDescription: true,
       fields: {
         orderBy: { id: 'asc' },
         select: {
@@ -55,8 +59,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       },
     },
   });
-  
-  console.log(form);
   
   if (!form) {
     return (
@@ -134,7 +136,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
     );
   }
   
-  // Strip internal flags before passing to client
   const { isActive: _, isArchived: __, ...publicData } = form;
   
   return <PublicSurveyWizard survey={publicData} />;

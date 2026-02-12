@@ -112,6 +112,10 @@ export const FormScalarFieldEnum = {
   theme: 'theme',
   rewardPerGoodAnswer: 'rewardPerGoodAnswer',
   workspaceId: 'workspaceId',
+  welcomeTitle: 'welcomeTitle',
+  welcomeDescription: 'welcomeDescription',
+  endingTitle: 'endingTitle',
+  endingDescription: 'endingDescription',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -7,8 +7,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const body: FormUpdateInput = await req.json();
     const { id: slugOrId } = await params;
     
-    const { title, description, fields, theme, rewardPerGoodAnswer, isActive } = body;
-    
+    const { title, description, fields, theme, rewardPerGoodAnswer, isActive, welcome, ending } = body;
+
     const updatedForm = await prisma.$transaction(async (tx) => {
       const existingForm = await tx.form.findFirst({
         where: {
@@ -18,11 +18,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           ],
         },
       });
-      
+
       if (!existingForm) {
         throw new Error('Formulario no encontrado');
       }
-      
+
       await tx.form.update({
         where: { id: existingForm.id },
         data: {
@@ -30,7 +30,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           description,
           theme,
           rewardPerGoodAnswer,
-          isActive
+          isActive,
+          welcomeTitle: welcome?.title,
+          welcomeDescription: welcome?.description,
+          endingTitle: ending?.title,
+          endingDescription: ending?.description,
         },
       });
       

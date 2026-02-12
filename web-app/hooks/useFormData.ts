@@ -178,6 +178,14 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
           description: data.description || '',
           fields: data.fields || [],
           slug: data.slug || '',
+          welcome: (data.welcomeTitle || data.welcomeDescription) ? {
+            title: data.welcomeTitle || '',
+            description: data.welcomeDescription || '',
+          } : undefined,
+          ending: (data.endingTitle || data.endingDescription) ? {
+            title: data.endingTitle || '',
+            description: data.endingDescription || '',
+          } : undefined,
         });
       }
       storeSetLastUpdate(formId, Date.now());
