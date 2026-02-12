@@ -65,13 +65,14 @@ export interface FormCreateInput {
 }
 
 export interface FormUpdateInput {
-  title?: string;
-  description?: string;
-  fields?: FieldInput[];
-  isActive?: boolean;
-  theme?: string;
-  rewardPerGoodAnswer?: number;
-  workspaceId?: string;
+  id: string,
+  title: string;
+  description: string;
+  fields: FieldInput[];
+  isActive: boolean;
+  theme: string;
+  rewardPerGoodAnswer: number;
+  workspaceId: string;
   slug: string,
 }
 

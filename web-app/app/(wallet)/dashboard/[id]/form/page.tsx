@@ -1,6 +1,7 @@
 'use client';
 
-import { FieldInput, FormResponse, FormUpdateInput } from '@/types';
+import { useFormData } from '@/hooks';
+import { FieldInput, FormUpdateInput } from '@/types';
 import { ArrowLeft, Hash, Loader2, Mail, Phone, Plus, Save, Trash2, Type } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -11,34 +12,21 @@ export default function EditFormPage() {
   const params = useParams();
   const formId = params.id as string;
   
+  const { formData: initialFormData, isLoading, error } = useFormData(formId);
+  const [ formData, setFormData ] = useState<FormUpdateInput>(initialFormData);
+  const [ saving, setSaving ] = useState(false);
+  
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
     }
   }, [ formId, router ]);
   
-  const [ formData, setFormData ] = useState<FormUpdateInput>({
-    title: '',
-    description: '',
-    fields: [],
-  });
-  const [ loading, setLoading ] = useState(!!formId);
-  const [ saving, setSaving ] = useState(false);
-  
   useEffect(() => {
-    if (formId) {
-      fetch(`/api/forms/${formId}`)
-        .then(res => res.json())
-        .then((data: FormResponse) => {
-          setFormData({
-            title: data.title,
-            description: data.description,
-            fields: data.fields,
-          });
-          setLoading(false);
-        });
+    if (!isLoading && initialFormData) {
+      setFormData(initialFormData);
     }
-  }, [ formId ]);
+  }, [ isLoading, initialFormData ]);
   
   const addField = (type: FieldInput['type']) => {
     const newField: FieldInput = {
@@ -81,7 +69,7 @@ export default function EditFormPage() {
     }
   };
   
-  if (loading) {
+  if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
       <Loader2 className="animate-spin text-blue-500 w-12 h-12" /></div>;
   }

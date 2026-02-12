@@ -1,11 +1,9 @@
 'use client';
 
 import { PropsWithChildren, Suspense } from 'react';
-
 import { NetworkType, WalletProvider } from 'stellar-wallet-kit';
-
-import { WalletHeader } from './components/WalletHeader';
 import { WalletGuard } from './components/WalletGuard';
+import { WalletHeader } from './components/WalletHeader';
 
 export default function WalletLayout({ children }: PropsWithChildren) {
   return (

@@ -1,5 +1,8 @@
 'use client';
 
+// Hooks
+import { useForms } from '@/hooks/useForms';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { isOnboardingCompleted } from '@/lib/onboardingStorage';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -7,10 +10,6 @@ import { useWallet } from 'stellar-wallet-kit';
 import { FormList } from './components/forms/FormList';
 import { DashboardHeader } from './components/header/DashboardHeader';
 import { MobileControls } from './components/header/MobileControls';
-
-// Hooks
-import { useForms } from './components/hooks/useForms';
-import { useWorkspace } from './components/hooks/useWorkspace';
 import { DeleteModal } from './components/modals/DeleteModal';
 import { InviteModal } from './components/modals/InviteModal';
 import { LeaveModal } from './components/modals/LeaveModal';

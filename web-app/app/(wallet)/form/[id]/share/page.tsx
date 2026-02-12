@@ -2,7 +2,7 @@
 
 import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
-import { FormResponse, FormUpdateInput } from '@/types';
+import { useFormData } from '@/hooks';
 import {
   Check,
   Code,
@@ -26,14 +26,7 @@ export default function SharePage() {
   const params = useParams();
   const formId = params.id as string;
   
-  const [ formData, setFormData ] = useState<FormUpdateInput>({
-    title: '',
-    description: '',
-    fields: [],
-    slug: '',
-  });
-  const [ isActive, setIsActive ] = useState(false);
-  const [ loading, setLoading ] = useState(true);
+  const { formData, isLoading, setFormData } = useFormData(formId);
   const [ copied, setCopied ] = useState(false);
   const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ shareTab, setShareTab ] = useState<'options' | 'advanced'>('options');
@@ -46,47 +39,14 @@ export default function SharePage() {
     }
   }, [ formId, router ]);
   
-  // Redirigir si el formulario no está activo
   useEffect(() => {
-    if (!loading && !isActive) {
+    if (!isLoading && !formData.isActive) {
       router.push(`/form/${formId}/edit`);
     }
-  }, [ loading, isActive, formId, router ]);
-  
-  useEffect(() => {
-    if (formId) {
-      fetch(`/api/forms/${formId}`)
-        .then(res => res.json())
-        .then((data: FormResponse) => {
-          setFormData({
-            title: data.title,
-            description: data.description || '',
-            fields: data.fields,
-            slug: data.slug || '',
-          });
-          setIsActive(data.isActive || false);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    }
-  }, [ formId ]);
+  }, [ formData.isActive, formId, isLoading, router ]);
   
   const handleSaveFormTitle = (newTitle: string) => {
     setFormData(prev => ({ ...prev, title: newTitle }));
-  };
-  
-  const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
-    if (tab === 'content') {
-      router.push(`/form/${formId}/edit`);
-    } else if (tab === 'responses') {
-      router.push(`/form/${formId}/answers`);
-    } else if (tab === 'rewards') {
-      router.push(`/form/${formId}/rewards`);
-    } else {
-      router.push(`/form/${formId}/share`);
-    }
   };
   
   const handleCopyLink = () => {
@@ -95,16 +55,14 @@ export default function SharePage() {
     setTimeout(() => setCopied(false), 2000);
   };
   
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-full flex-col bg-white">
         <FormEditNavigation
-          formTitle={formData.title || ''}
+          formId={formId}
           activeTab="share"
-          onTabChange={handleTabChange}
           onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
-          isActive={isActive}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -118,14 +76,11 @@ export default function SharePage() {
   
   return (
     <div className="flex h-full flex-col bg-white">
-      {/* Navegación */}
       <FormEditNavigation
-        formTitle={formData.title || ''}
+        formId={formId}
         activeTab="share"
-        onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
-        isActive={isActive}
       />
       
       {/* Modal para editar nombre */}

@@ -1,9 +1,10 @@
 'use client';
 
-import { useWallet } from 'stellar-wallet-kit';
+import { useFormData } from '@/hooks';
+import { ChevronDown, ChevronRight, LogOut, Send, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef, useEffect, useState } from 'react';
-import { LogOut, Wallet, ChevronDown, ChevronRight, Send } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useWallet } from 'stellar-wallet-kit';
 
 function truncateAddress(address: string, start = 6, end = 4) {
   if (!address || address.length <= start + end) return address;
@@ -18,47 +19,60 @@ function getInitials(address: string) {
 type Tab = 'content' | 'responses' | 'rewards' | 'share';
 
 interface FormEditNavigationProps {
-  formTitle: string;
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
-  onFormTitleClick: () => void;
-  onPublish?: () => void;
-  isPublishing?: boolean;
-  showPublishButton?: boolean;
-  isActive?: boolean;
+  formId: string,
+  activeTab: Tab,
+  onFormTitleClick: () => void,
+  showPublishButton?: boolean,
 }
 
-export function FormEditNavigation({ 
-  formTitle, 
-  activeTab, 
-  onTabChange,
-  onFormTitleClick,
-  onPublish,
-  isPublishing = false,
-  showPublishButton = false,
-  isActive = false
-}: FormEditNavigationProps) {
+export function FormEditNavigation({
+                                     formId,
+                                     activeTab,
+                                     onFormTitleClick,
+                                     showPublishButton = false,
+                                   }: FormEditNavigationProps) {
+  const { formData, setFormData, save, isSaving, lastUpdate } = useFormData(formId);
+  const [ isPublishing, setIsPublishing ] = useState(false);
+  const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
+    if (tab === 'content') {
+      router.push(`/form/${formId}/edit`);
+    } else if (tab === 'responses') {
+      router.push(`/form/${formId}/answers`);
+    } else if (tab === 'rewards') {
+      router.push(`/form/${formId}/rewards`);
+    } else {
+      router.push(`/form/${formId}/share`);
+    }
+  };
   const { account, isConnected, disconnect } = useWallet();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [ open, setOpen ] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+    
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-
+  
   const handleLogout = async () => {
     setOpen(false);
     await disconnect();
     router.push('/');
   };
-
+  
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    setFormData(prevState => ({ ...prevState, isActive: !formData.isActive }));
+    await save();
+    setIsPublishing(false);
+  };
+  
   return (
     <nav className="shrink-0 border-b border-gray-200 bg-white shadow-sm">
       <div className="flex h-16 items-center justify-between px-6">
@@ -71,18 +85,27 @@ export function FormEditNavigation({
             Forms
           </button>
           <ChevronRight className="h-4 w-4 text-gray-300" />
-          <button
-            onClick={onFormTitleClick}
-            className="font-semibold text-gray-900 transition-colors hover:text-primary"
-          >
-            {formTitle || 'Untitled Form'}
-          </button>
+          <div className="flex flex-col">
+            <button
+              onClick={onFormTitleClick}
+              className="font-semibold text-gray-900 transition-colors hover:text-primary text-left"
+            >
+              {formData.title || 'Untitled Form'}
+            </button>
+            {isSaving ? (
+              <span className="text-xs text-gray-400 italic">guardando...</span>
+            ) : lastUpdate ? (
+              <span className="text-xs text-gray-400">
+                Actualizado {new Date(lastUpdate).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            ) : null}
+          </div>
         </div>
-
+        
         {/* Tabs - Centro */}
         <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
           <button
-            onClick={() => onTabChange('content')}
+            onClick={() => handleTabChange('content')}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
               activeTab === 'content'
                 ? 'bg-white text-gray-900 shadow-sm'
@@ -92,7 +115,7 @@ export function FormEditNavigation({
             Content
           </button>
           <button
-            onClick={() => onTabChange('rewards')}
+            onClick={() => handleTabChange('rewards')}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
               activeTab === 'rewards'
                 ? 'bg-white text-gray-900 shadow-sm'
@@ -102,10 +125,10 @@ export function FormEditNavigation({
             Rewards
           </button>
           <button
-            onClick={() => isActive && onTabChange('share')}
-            disabled={!isActive}
+            onClick={() => formData.isActive && handleTabChange('share')}
+            disabled={!formData.isActive}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              !isActive
+              !formData.isActive
                 ? 'cursor-not-allowed text-gray-400'
                 : activeTab === 'share'
                   ? 'bg-white text-gray-900 shadow-sm'
@@ -115,10 +138,10 @@ export function FormEditNavigation({
             Share
           </button>
           <button
-            onClick={() => isActive && onTabChange('responses')}
-            disabled={!isActive}
+            onClick={() => formData.isActive && handleTabChange('responses')}
+            disabled={!formData.isActive}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              !isActive
+              !formData.isActive
                 ? 'cursor-not-allowed text-gray-400'
                 : activeTab === 'responses'
                   ? 'bg-white text-gray-900 shadow-sm'
@@ -128,13 +151,11 @@ export function FormEditNavigation({
             Responses
           </button>
         </div>
-
-        {/* Botón Publicar + Wallet - Derecha */}
+        
         <div className="flex items-center gap-3">
-          {/* Botón publicar - Siempre ocupa el espacio */}
           <div className={showPublishButton ? '' : 'invisible'}>
             <button
-              onClick={onPublish}
+              onClick={handlePublish}
               disabled={isPublishing || !showPublishButton}
               className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
@@ -142,7 +163,7 @@ export function FormEditNavigation({
               {isPublishing ? 'Publicando...' : 'Publicar'}
             </button>
           </div>
-
+          
           {!isConnected ? (
             <button
               onClick={() => router.push('/login')}
@@ -165,11 +186,11 @@ export function FormEditNavigation({
                 <span className="hidden max-w-[100px] truncate text-sm font-medium text-gray-700 sm:block">
                   {account?.address ? truncateAddress(account.address, 6, 4) : 'Usuario'}
                 </span>
-                <ChevronDown 
+                <ChevronDown
                   className={`h-3.5 w-3.5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
                 />
               </button>
-
+              
               {open && (
                 <div className="absolute right-0 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg z-50">
                   <div className="px-4 py-3 border-b border-gray-100">
