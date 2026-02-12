@@ -180,7 +180,9 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
             <p className="text-xs text-red-500">
               Usaste tus {FREE_LIMIT} consultas gratuitas. Para continuar usando el AI Assistant,{' '}
               <a
-                href="mailto:contact@formly.app"
+                href="https://formly.juki.ly/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="font-semibold underline underline-offset-2 hover:text-red-700"
               >
                 contáctanos
