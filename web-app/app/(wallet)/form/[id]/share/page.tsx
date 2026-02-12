@@ -10,14 +10,11 @@ import {
   Mail, 
   Code, 
   Users, 
-  Copy, 
   Check,
-  ExternalLink,
   Eye,
   Settings,
   MoreHorizontal,
   Grid,
-  Smartphone,
   Facebook,
   Linkedin,
   Twitter,
@@ -91,7 +88,7 @@ export default function SharePage() {
     return (
       <div className="flex h-full flex-col bg-white">
         <FormEditNavigation
-          formTitle={formData.title}
+          formTitle={formData.title || ''}
           activeTab="share"
           onTabChange={handleTabChange}
           onFormTitleClick={() => setIsEditModalOpen(true)}

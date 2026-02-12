@@ -6,7 +6,6 @@ import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/Edit
 import { useEffect, useState } from 'react';
 import { FormResponse, FormUpdateInput } from '@/types';
 import { Rocket, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 
 export default function RewardsPage() {
   const router = useRouter();
@@ -65,10 +64,11 @@ export default function RewardsPage() {
     return (
       <div className="flex h-full flex-col bg-gray-50">
         <FormEditNavigation
-          formTitle={formData.title}
+          formTitle={formData.title || ''}
           activeTab="rewards"
           onTabChange={handleTabChange}
           onFormTitleClick={() => setIsEditModalOpen(true)}
+          showPublishButton={false}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -84,7 +84,7 @@ export default function RewardsPage() {
     <div className="flex h-full flex-col bg-white">
       {/* Navegación */}
       <FormEditNavigation
-        formTitle={formData.title}
+        formTitle={formData.title || ''}
         activeTab="rewards"
         onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
@@ -95,7 +95,7 @@ export default function RewardsPage() {
       <EditFormNameModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        currentTitle={formData.title}
+        currentTitle={formData.title || ''}
         onSave={handleSaveFormTitle}
       />
 

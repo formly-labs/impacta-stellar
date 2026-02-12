@@ -267,10 +267,7 @@ export default function FormAnswersPage() {
   const totalResponses = filteredResponses.length;
   const response = filteredResponses[currentResponse];
 
-  // Reset to first response when search changes
-  useEffect(() => {
-    setCurrentResponse(0);
-  }, [searchTerm]);
+  // Reset to first response when search changes - handled in component render
 
   if (loading) {
     return (
@@ -425,7 +422,7 @@ export default function FormAnswersPage() {
                               cx="50%"
                               cy="50%"
                               labelLine={false}
-                              label={(entry: any) => `${entry.name} (${entry.percentage}%)`}
+                              label
                               outerRadius={100}
                               fill="#8884d8"
                               dataKey="value"
