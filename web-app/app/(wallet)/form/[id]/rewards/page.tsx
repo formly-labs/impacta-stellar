@@ -1,19 +1,17 @@
 'use client';
 
-import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { useFormData } from '@/hooks';
 import { ArrowRight, Rocket } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function RewardsPage() {
   const router = useRouter();
   const params = useParams();
   const formId = params.id as string;
   
-  const { formData, isLoading, setFormData } = useFormData(formId);
-  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
+  const { formData, isLoading } = useFormData(formId);
   
   useEffect(() => {
     if (!params.id) {
@@ -21,17 +19,12 @@ export default function RewardsPage() {
     }
   }, [ params.id, router ]);
   
-  const handleSaveFormTitle = (newTitle: string) => {
-    setFormData(prev => ({ ...prev, title: newTitle }));
-  };
-  
   if (isLoading) {
     return (
       <div className="flex h-full flex-col bg-gray-50">
         <FormEditNavigation
           formId={formId}
           activeTab="rewards"
-          onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
         />
         <div className="flex flex-1 items-center justify-center">
@@ -46,22 +39,12 @@ export default function RewardsPage() {
   
   return (
     <div className="flex h-full flex-col bg-white">
-      {/* Navegación */}
       <FormEditNavigation
         formId={formId}
         activeTab="rewards"
-        onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
       />
       
-      <EditFormNameModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        currentTitle={formData.title || ''}
-        onSave={handleSaveFormTitle}
-      />
-      
-      {/* Contenido de Rewards con mismo layout */}
       <div className="flex flex-1 gap-4 overflow-hidden bg-gray-50 p-4">
         <div className="flex flex-1 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm">
           <div className="max-w-md text-center px-6 py-12">

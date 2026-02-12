@@ -1,6 +1,5 @@
 'use client';
 
-import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { useFormData } from '@/hooks';
 import { FieldInput } from '@/types';
@@ -51,7 +50,6 @@ export default function FormAnswersPage() {
   const { formData, isLoading, setFormData } = useFormData(formId);
   const [ responses, setResponses ] = useState<ResponseData[]>([]);
   const [ loadingResponses, setLoadingResponses ] = useState(true);
-  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ tab, setTab ] = useState<Tab>('insight');
   const [ currentResponse, setCurrentResponse ] = useState(0);
   const [ searchTerm, setSearchTerm ] = useState('');
@@ -142,7 +140,6 @@ export default function FormAnswersPage() {
         <FormEditNavigation
           formId={formId}
           activeTab="responses"
-          onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
         />
         <div className="flex flex-1 items-center justify-center">
@@ -160,15 +157,7 @@ export default function FormAnswersPage() {
       <FormEditNavigation
         formId={formId}
         activeTab="responses"
-        onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
-      />
-      
-      <EditFormNameModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        currentTitle={formData.title || ''}
-        onSave={handleSaveFormTitle}
       />
       
       <div className="flex flex-1 gap-4 overflow-hidden p-4">

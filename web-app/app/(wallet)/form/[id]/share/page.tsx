@@ -1,6 +1,5 @@
 'use client';
 
-import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { useFormData } from '@/hooks';
 import {
@@ -26,12 +25,11 @@ export default function SharePage() {
   const params = useParams();
   const formId = params.id as string;
   
-  const { formData, isLoading, setFormData } = useFormData(formId);
+  const { formData, isLoading } = useFormData(formId);
   const [ copied, setCopied ] = useState(false);
-  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ shareTab, setShareTab ] = useState<'options' | 'advanced'>('options');
   
-  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/encuesta/${formData.slug}`;
+  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/f/${formData.slug}`;
   
   useEffect(() => {
     if (!formId) {
@@ -45,10 +43,6 @@ export default function SharePage() {
     }
   }, [ formData.isActive, formId, isLoading, router ]);
   
-  const handleSaveFormTitle = (newTitle: string) => {
-    setFormData(prev => ({ ...prev, title: newTitle }));
-  };
-  
   const handleCopyLink = () => {
     navigator.clipboard.writeText(formUrl);
     setCopied(true);
@@ -61,7 +55,6 @@ export default function SharePage() {
         <FormEditNavigation
           formId={formId}
           activeTab="share"
-          onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
         />
         <div className="flex flex-1 items-center justify-center">
@@ -79,21 +72,10 @@ export default function SharePage() {
       <FormEditNavigation
         formId={formId}
         activeTab="share"
-        onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
       />
       
-      {/* Modal para editar nombre */}
-      <EditFormNameModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        currentTitle={formData.title || ''}
-        onSave={handleSaveFormTitle}
-      />
-      
-      {/* Contenido principal con layout de tres columnas */}
       <div className="flex flex-1 gap-4 overflow-hidden bg-gray-50 p-4">
-        {/* Sidebar izquierdo - opciones de compartir */}
         <aside className="flex w-56 shrink-0 flex-col">
           <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
             <div className="flex-1 overflow-y-auto p-3">

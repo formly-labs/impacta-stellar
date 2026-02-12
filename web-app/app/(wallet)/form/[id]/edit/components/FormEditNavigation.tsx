@@ -1,5 +1,6 @@
 'use client';
 
+import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { useFormData } from '@/hooks';
 import { ChevronDown, ChevronRight, LogOut, Send, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -21,18 +22,17 @@ type Tab = 'content' | 'responses' | 'rewards' | 'share';
 interface FormEditNavigationProps {
   formId: string,
   activeTab: Tab,
-  onFormTitleClick: () => void,
   showPublishButton?: boolean,
 }
 
 export function FormEditNavigation({
                                      formId,
                                      activeTab,
-                                     onFormTitleClick,
                                      showPublishButton = false,
                                    }: FormEditNavigationProps) {
   const { formData, setFormData, save, isSaving, lastUpdate } = useFormData(formId);
   const [ isPublishing, setIsPublishing ] = useState(false);
+  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
     if (tab === 'content') {
       router.push(`/form/${formId}/edit`);
@@ -73,8 +73,19 @@ export function FormEditNavigation({
     setIsPublishing(false);
   };
   
+  const handleSaveFormTitle = async (newTitle: string) => {
+    setFormData(prev => ({ ...prev, title: newTitle }));
+    await save();
+  };
+  
   return (
     <nav className="shrink-0 border-b border-gray-200 bg-white shadow-sm">
+      <EditFormNameModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentTitle={formData.title || ''}
+        onSave={handleSaveFormTitle}
+      />
       <div className="flex h-16 items-center justify-between px-6">
         {/* Breadcrumbs - Izquierda */}
         <div className="flex items-center gap-2 text-sm">
@@ -87,7 +98,7 @@ export function FormEditNavigation({
           <ChevronRight className="h-4 w-4 text-gray-300" />
           <div className="flex flex-col">
             <button
-              onClick={onFormTitleClick}
+              onClick={() => setIsEditModalOpen(true)}
               className="font-semibold text-gray-900 transition-colors hover:text-primary text-left"
             >
               {formData.title || 'Untitled Form'}

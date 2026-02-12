@@ -1,5 +1,5 @@
 import { FormResponse, FormUpdateInput } from '@/types';
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef } from 'react';
 import { create } from 'zustand';
 
 interface FormState {
@@ -13,7 +13,7 @@ interface FormState {
 
 interface FormStore {
   forms: Record<string, FormState>;
-  setFormData: (formId: string, data: FormUpdateInput | ((prev: FormUpdateInput) => FormUpdateInput)) => void;
+  setFormData: (formId: string, data: FormUpdateInput | ((prev: FormUpdateInput) => FormUpdateInput), next?: (data: FormUpdateInput) => void) => void;
   setLoading: (formId: string, loading: boolean) => void;
   setValidating: (formId: string, validating: boolean) => void;
   setSaving: (formId: string, saving: boolean) => void;
@@ -24,17 +24,21 @@ interface FormStore {
 const useFormStore = create<FormStore>((set) => ({
   forms: {},
   
-  setFormData: (formId, data) => set((state) => ({
-    forms: {
-      ...state.forms,
-      [formId]: {
-        ...state.forms[formId],
-        formData: typeof data === 'function'
-          ? data(state.forms[formId]?.formData || getDefaultFormData())
-          : data,
+  setFormData: (formId, data, next) => set((state) => {
+    const formData = {
+      ...state.forms[formId],
+      formData: typeof data === 'function'
+        ? data(state.forms[formId]?.formData || getDefaultFormData())
+        : data,
+    };
+    next?.(formData.formData);
+    return ({
+      forms: {
+        ...state.forms,
+        [formId]: formData,
       },
-    },
-  })),
+    });
+  }),
   
   setLoading: (formId, loading) => set((state) => ({
     forms: {
@@ -109,7 +113,7 @@ interface UseFormDataReturn {
   error: string | null;
   refetch: () => Promise<void>;
   isSaving: boolean;
-  save: () => Promise<void>;
+  // save: () => Promise<void>;
   lastUpdate: number;
 }
 
@@ -193,18 +197,17 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
     await fetchFormData(true);
   }, [ fetchFormData ]);
   
-  const save = useCallback(async () => {
+  const formDataRef = useRef(formState.formData);
+  formDataRef.current = formState.formData;
+  const save = useCallback(async (data: FormUpdateInput) => {
     if (!formId) return;
-    
-    const currentFormData = formState.formData;
-    if (!currentFormData) return;
     
     storeSetSaving(formId, true);
     try {
       await fetch(`/api/forms/${formId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentFormData),
+        body: JSON.stringify(data),
       });
       await refetch();
     } catch (error) {
@@ -212,15 +215,16 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
     } finally {
       storeSetSaving(formId, false);
     }
-  }, [ formId, formState.formData, storeSetSaving, refetch ]);
+  }, [ formId, storeSetSaving, refetch ]);
   
   const setFormData = useCallback(
     (data: FormUpdateInput | ((prev: FormUpdateInput) => FormUpdateInput)) => {
       if (formId) {
-        storeSetFormData(formId, data);
+        const withSave = true;
+        storeSetFormData(formId, data, withSave ? ((data: FormUpdateInput) => save(data)) : undefined);
       }
     },
-    [ formId, storeSetFormData ],
+    [ formId, save, storeSetFormData ],
   );
   
   return {
@@ -230,7 +234,6 @@ export function useFormData(formId: string | undefined): UseFormDataReturn {
     isValidating: formState.isValidating ?? false,
     error: formState.error ?? null,
     refetch,
-    save,
     isSaving: formState.isSaving ?? false,
     lastUpdate: formState.lastUpdate ?? 0,
   };

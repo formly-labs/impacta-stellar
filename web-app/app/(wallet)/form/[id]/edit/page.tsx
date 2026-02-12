@@ -1,7 +1,6 @@
 'use client';
 
 import { AIAssistantForm } from '@/app/(wallet)/form/[id]/edit/AIAssistant';
-import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { PublishSuccessModal } from '@/app/(wallet)/form/[id]/edit/components/PublishSuccessModal';
 import { QuestionTypeSelector } from '@/app/(wallet)/form/[id]/edit/components/QuestionTypeSelector';
@@ -80,14 +79,12 @@ const FIELD_TYPES = [
 ];
 
 export default function CreateFormPage() {
+  
   const router = useRouter();
   const params = useParams();
   const formId = params.id as string;
-  
   const { formData, setFormData, isLoading } = useFormData(formId);
-  console.log({ formId, formData });
   const [ selectedQuestionIndex, setSelectedQuestionIndex ] = useState<number | null>(null);
-  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ viewMode, setViewMode ] = useState<'desktop' | 'mobile'>('desktop');
   const [ showActionsMenu, setShowActionsMenu ] = useState(false);
   const [ showRewardsModal, setShowRewardsModal ] = useState(false);
@@ -104,7 +101,6 @@ export default function CreateFormPage() {
     buttonText: 'Cerrar',
   });
   
-  console.log('page', { formData });
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
@@ -124,7 +120,7 @@ export default function CreateFormPage() {
     }
   }, [ formData.fields, selectedQuestionIndex ]);
   
-  const addField = () => {
+  const addField = async () => {
     const newField: FieldInput = {
       type: 'text',
       label: `Pregunta ${(formData.fields?.length || 0) + 1}`,
@@ -135,15 +131,17 @@ export default function CreateFormPage() {
     setFormData(prev => ({ ...prev, fields: newFields }));
     setSelectedQuestionIndex(newFields.length - 1);
     setSelectedScreen('question');
+    // await save();
   };
   
-  const updateField = (index: number, updatedField: Partial<FieldInput>) => {
+  const updateField = async (index: number, updatedField: Partial<FieldInput>) => {
     const newFields = [ ...(formData.fields || []) ];
     newFields[index] = { ...newFields[index], ...updatedField };
     setFormData({ ...formData, fields: newFields });
+    // await save();
   };
   
-  const removeField = (index: number) => {
+  const removeField = async (index: number) => {
     const newFields = formData.fields?.filter((_, i) => i !== index);
     setFormData({
       ...formData,
@@ -154,9 +152,10 @@ export default function CreateFormPage() {
     } else if (selectedQuestionIndex !== null && selectedQuestionIndex > index) {
       setSelectedQuestionIndex(selectedQuestionIndex - 1);
     }
+    // await save();
   };
   
-  const duplicateField = (index: number) => {
+  const duplicateField = async (index: number) => {
     const fieldToDuplicate = formData.fields?.[index];
     if (!fieldToDuplicate) return;
     
@@ -169,6 +168,7 @@ export default function CreateFormPage() {
     newFields.splice(index + 1, 0, duplicatedField);
     setFormData({ ...formData, fields: newFields });
     setSelectedQuestionIndex(index + 1);
+    // await save();
   };
   
   const handleRewardsYes = () => {
@@ -196,10 +196,6 @@ export default function CreateFormPage() {
     );
   }
   
-  const handleSaveFormTitle = (newTitle: string) => {
-    setFormData(prev => ({ ...prev, title: newTitle }));
-  };
-  
   const selectedField = selectedQuestionIndex !== null && formData.fields ? formData.fields[selectedQuestionIndex] : null;
   
   return (
@@ -207,14 +203,6 @@ export default function CreateFormPage() {
       <FormEditNavigation
         formId={formId}
         activeTab="content"
-        onFormTitleClick={() => setIsEditModalOpen(true)}
-      />
-      
-      <EditFormNameModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        currentTitle={formData.title || ''}
-        onSave={handleSaveFormTitle}
       />
       
       <RewardsModal

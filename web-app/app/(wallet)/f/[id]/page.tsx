@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/db';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicSurveyWizard from './PublicSurveyWizard';
 
@@ -8,13 +7,18 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-
-  const form = await prisma.form.findUnique({
-    where: { id },
+  const { id: slugOrId } = await params;
+  
+  const form = await prisma.form.findFirst({
+    where: {
+      OR: [
+        { slug: slugOrId },
+        { id: slugOrId },
+      ],
+    },
     select: { title: true, description: true },
   });
-
+  
   return {
     title: form ? `${form.title} — Formly` : 'Encuesta — Formly',
     description: form?.description || 'Responde esta encuesta en Formly',
@@ -22,10 +26,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PublicSurveyPage({ params }: PageProps) {
-  const { id } = await params;
-
-  const form = await prisma.form.findUnique({
-    where: { id },
+  const { id: slugOrId } = await params;
+  
+  const form = await prisma.form.findFirst({
+    where: {
+      OR: [
+        { slug: slugOrId },
+        { id: slugOrId },
+      ],
+    },
     select: {
       id: true,
       title: true,
@@ -45,9 +54,9 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       },
     },
   });
-
+  
   console.log(form);
-
+  
   // Not found
   if (!form) {
     return (
@@ -78,7 +87,7 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       </div>
     );
   }
-
+  
   // Not available (inactive or archived)
   if (!form.isActive || form.isArchived) {
     return (
@@ -110,7 +119,7 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       </div>
     );
   }
-
+  
   // No fields
   if (form.fields.length === 0) {
     return (
@@ -126,9 +135,9 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       </div>
     );
   }
-
+  
   // Strip internal flags before passing to client
   const { isActive: _, isArchived: __, ...publicData } = form;
-
+  
   return <PublicSurveyWizard survey={publicData} />;
 }
