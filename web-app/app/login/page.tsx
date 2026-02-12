@@ -5,17 +5,26 @@ import Link from "next/link";
 import { Suspense, useEffect } from "react";
 import { Sparkles, Zap, Shield } from "lucide-react";
 import { ConnectButton, useWallet, WalletProvider, NetworkType } from "stellar-wallet-kit";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginContent() {
   const { account, isConnected } = useWallet();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (isConnected) {
-      router.push("/dashboard");
+      // Obtener la URL de redirección del query param
+      const redirectTo = searchParams.get('redirectTo');
+
+      // Si hay una URL de redirección, ir ahí, sino al dashboard
+      if (redirectTo) {
+        router.push(decodeURIComponent(redirectTo));
+      } else {
+        router.push("/dashboard");
+      }
     }
-  }, [isConnected, router]);
+  }, [isConnected, router, searchParams]);
 
   return (
     <div className="flex min-h-screen">
@@ -126,11 +135,11 @@ function LoginContent() {
                     {account?.address}
                   </p>
                 </div>
-                <Link 
-                  href="/dashboard"
+                <Link
+                  href={searchParams.get('redirectTo') ? decodeURIComponent(searchParams.get('redirectTo')!) : "/dashboard"}
                   className="block w-full rounded-lg bg-primary px-6 py-3 text-center font-semibold text-white transition-all hover:bg-primary-600"
                 >
-                  Ir al Dashboard
+                  Continuar
                 </Link>
               </div>
             )}

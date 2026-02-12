@@ -68,7 +68,7 @@ export function WalletHeader() {
         <div className="flex items-center gap-3">
           {!isConnected ? (
             <Link
-              href="/login"
+              href={`/login?redirectTo=${encodeURIComponent(pathname || '/dashboard')}`}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"
             >
               Iniciar sesión
