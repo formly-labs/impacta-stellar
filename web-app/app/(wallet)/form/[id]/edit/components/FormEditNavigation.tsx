@@ -25,6 +25,7 @@ interface FormEditNavigationProps {
   onPublish?: () => void;
   isPublishing?: boolean;
   showPublishButton?: boolean;
+  isActive?: boolean;
 }
 
 export function FormEditNavigation({ 
@@ -34,7 +35,8 @@ export function FormEditNavigation({
   onFormTitleClick,
   onPublish,
   isPublishing = false,
-  showPublishButton = false
+  showPublishButton = false,
+  isActive = false
 }: FormEditNavigationProps) {
   const { account, isConnected, disconnect } = useWallet();
   const router = useRouter();
@@ -99,26 +101,30 @@ export function FormEditNavigation({
           >
             Rewards
           </button>
-          <button
-            onClick={() => onTabChange('share')}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              activeTab === 'share'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Share
-          </button>
-          <button
-            onClick={() => onTabChange('responses')}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              activeTab === 'responses'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Responses
-          </button>
+          {isActive && (
+            <>
+              <button
+                onClick={() => onTabChange('share')}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
+                  activeTab === 'share'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Share
+              </button>
+              <button
+                onClick={() => onTabChange('responses')}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
+                  activeTab === 'responses'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Responses
+              </button>
+            </>
+          )}
         </div>
 
         {/* Botón Publicar + Wallet - Derecha */}

@@ -31,6 +31,7 @@ export default function SharePage() {
     description: '',
     fields: [],
   });
+  const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -44,6 +45,13 @@ export default function SharePage() {
     }
   }, [formId, router]);
 
+  // Redirigir si el formulario no está activo
+  useEffect(() => {
+    if (!loading && !isActive) {
+      router.push(`/form/${formId}/edit`);
+    }
+  }, [loading, isActive, formId, router]);
+
   useEffect(() => {
     if (formId) {
       fetch(`/api/forms/${formId}`)
@@ -54,6 +62,7 @@ export default function SharePage() {
             description: data.description || '',
             fields: data.fields,
           });
+          setIsActive(data.isActive || false);
           setLoading(false);
         })
         .catch(() => {
@@ -93,6 +102,7 @@ export default function SharePage() {
           onTabChange={handleTabChange}
           onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
+          isActive={isActive}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -113,6 +123,7 @@ export default function SharePage() {
         onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
+        isActive={isActive}
       />
 
       {/* Modal para editar nombre */}

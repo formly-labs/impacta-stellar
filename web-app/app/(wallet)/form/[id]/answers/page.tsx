@@ -1,6 +1,6 @@
 'use client';
 
-import { FormResponse, FormUpdateInput } from '@/types';
+import { FormResponse, FormUpdateInput, FieldInput } from '@/types';
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
 import {
@@ -16,10 +16,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie } from 'recharts';
 
-/* ────────────────────────────────────────────────────────────
-   Demo responses (until real response model exists)
-   ──────────────────────────────────────────────────────────── */
-const DEMO_RESPONSES = [
+type Tab = 'insight' | 'resumen' | 'individual';
+
+interface SurveyResponse {
+  id: string;
+  respondentName?: string;
+  respondentEmail?: string;
+  responses: Record<string, string | number | boolean>;
+  createdAt: string;
+}
+
+/* Removed DEMO_RESPONSES array - now using real data from API
   {
     id: 'r1',
     respondent: { name: 'Juan Delgado', email: 'juan.d@example.com' },
@@ -198,11 +205,20 @@ const DEMO_RESPONSES = [
       { question: '¿Recomendarías este producto?', answer: 'Sí' },
       { question: '¿Qué dispositivo usas más?', answer: 'Móvil' },
       { question: 'Califica del 1 al 5 la facilidad de uso', answer: '4' },
-    ],
-  },
-];
+ */
 
-type Tab = 'resumen' | 'individual' | 'analisis';
+interface ResponseData {
+  id: string;
+  respondent: {
+    name: string;
+    email: string;
+  };
+  date: string;
+  answers: Array<{
+    question: string;
+    answer: string;
+  }>;
+}
 
 export default function FormAnswersPage() {
   const { id } = useParams();
@@ -212,9 +228,12 @@ export default function FormAnswersPage() {
     description: '',
     fields: [],
   });
+  const [isActive, setIsActive] = useState(false);
+  const [responses, setResponses] = useState<ResponseData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingResponses, setLoadingResponses] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('individual');
+  const [tab, setTab] = useState<Tab>('insight');
   const [currentResponse, setCurrentResponse] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -224,20 +243,97 @@ export default function FormAnswersPage() {
     }
   }, [id, router]);
 
+  // Redirigir si el formulario no está activo
+  useEffect(() => {
+    if (!loading && !isActive) {
+      router.push(`/form/${id}/edit`);
+    }
+  }, [loading, isActive, id, router]);
+
   useEffect(() => {
     if (id) {
+      // Primero cargar datos del formulario
+      let fieldsData: FieldInput[] = [];
+      
       fetch(`/api/forms/${id}`)
         .then((res) => res.json())
         .then((data: FormResponse) => {
+          fieldsData = data.fields || [];
           setFormData({
             title: data.title,
             description: data.description || '',
-            fields: data.fields,
+            fields: fieldsData,
           });
+          setIsActive(data.isActive || false);
           setLoading(false);
+          
+          // Después de cargar el formulario, cargar las respuestas
+          return fetch(`/api/public/surveys/${id}/responses`);
         })
-        .catch(() => {
+        .then((res) => {
+          if (!res) return Promise.reject('No response');
+          if (!res.ok) {
+            // Si no hay respuestas, no es un error fatal
+            return Promise.resolve([]);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log('Respuestas del backend:', data);
+          
+          if (Array.isArray(data) && data.length > 0) {
+            // Mapear las respuestas al formato esperado
+            const formattedResponses: ResponseData[] = data.map((r: SurveyResponse) => {
+              // Usar r.answers o r.responses dependiendo de lo que devuelva el backend
+              const responseData = r.responses || (r as unknown as { answers: Record<string, string | number | boolean> }).answers || {};
+              
+              console.log('Response data:', responseData);
+              console.log('Fields data:', fieldsData);
+              
+              // Mapear las respuestas usando los IDs de las preguntas del formulario
+              const answersArray = fieldsData.map((field, index) => {
+                // Los fields del backend tienen un ID, aunque no esté en el tipo
+                const fieldId = (field as FieldInput & { id?: string }).id || field.label;
+                const answer = responseData[fieldId] || responseData[String(index)] || '';
+                
+                return {
+                  question: field.label,
+                  answer: String(answer),
+                };
+              });
+
+              return {
+                id: r.id || '',
+                respondent: {
+                  name: r.respondentName || 'Anónimo',
+                  email: r.respondentEmail || '',
+                },
+                date: new Date(r.createdAt).toLocaleString('es-ES', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }),
+                answers: answersArray,
+              };
+            });
+            
+            console.log('Respuestas formateadas:', formattedResponses);
+            setResponses(formattedResponses);
+          } else {
+            // Si no hay respuestas, usar array vacío
+            console.log('No hay respuestas o formato incorrecto');
+            setResponses([]);
+          }
+          setLoadingResponses(false);
+        })
+        .catch((error) => {
+          // En caso de error, usar array vacío
+          console.error('Error al cargar datos:', error);
           setLoading(false);
+          setResponses([]);
+          setLoadingResponses(false);
         });
     }
   }, [id]);
@@ -259,7 +355,7 @@ export default function FormAnswersPage() {
   };
 
   // Filter responses based on search term
-  const filteredResponses = DEMO_RESPONSES.filter((response) =>
+  const filteredResponses = responses.filter((response) =>
     response.respondent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     response.respondent.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -278,6 +374,7 @@ export default function FormAnswersPage() {
         onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
+        isActive={isActive}
       />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -298,6 +395,7 @@ export default function FormAnswersPage() {
         onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
+        isActive={isActive}
       />
 
       {/* Modal para editar nombre */}
@@ -314,6 +412,17 @@ export default function FormAnswersPage() {
           {/* Tabs internos */}
           <div className="shrink-0 border-b border-gray-200 px-6 py-3 bg-gray-50">
             <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={() => setTab('insight')}
+                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  tab === 'insight'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Insight
+              </button>
               <button
                 type="button"
                 onClick={() => setTab('resumen')}
@@ -336,23 +445,48 @@ export default function FormAnswersPage() {
               >
                 Individual
               </button>
-              <button
-                type="button"
-                onClick={() => setTab('analisis')}
-                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                  tab === 'analisis'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Análisis
-              </button>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
-          {/* ── Resumen tab ── */}
-          {tab === 'resumen' && (
+          {/* Loading responses */}
+          {loadingResponses ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary" />
+                <p className="text-sm text-gray-500">Cargando respuestas...</p>
+              </div>
+            </div>
+          ) : responses.length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <p className="text-lg font-medium text-gray-900">No hay respuestas todavía</p>
+                <p className="mt-1 text-sm text-gray-500">Las respuestas aparecerán aquí cuando alguien complete el formulario</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* ── Insight tab (primero) ── */}
+              {tab === 'insight' && (
+                <div className="animate-fade-in space-y-4">
+                  {/* Key Insights */}
+                  <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                        KEY INSIGHTS
+                      </p>
+                    </div>
+                    <div className="p-6">
+                      <p className="text-sm text-gray-600">
+                        Análisis de {totalResponses} respuestas recibidas
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Resumen tab ── */}
+              {tab === 'resumen' && (
             <div className="animate-fade-in space-y-4">
               {/* Who has responded */}
               <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -362,7 +496,7 @@ export default function FormAnswersPage() {
                   </p>
                 </div>
                 <div className="p-5 space-y-2">
-                  {DEMO_RESPONSES.map((response, idx) => (
+                  {responses.map((response, idx) => (
                     <div key={idx} className="text-sm text-gray-700 py-1">
                       {response.respondent.email}
                     </div>
@@ -372,9 +506,9 @@ export default function FormAnswersPage() {
 
               {/* Charts for each question */}
               {formData.fields && formData.fields.map((field, fieldIndex) => {
-                const responses = DEMO_RESPONSES.map(r => r.answers[fieldIndex]?.answer).filter(Boolean);
+                const questionResponses = responses.map(r => r.answers[fieldIndex]?.answer).filter(Boolean);
                 const responseCounts: Record<string, number> = {};
-                responses.forEach(answer => {
+                questionResponses.forEach(answer => {
                   responseCounts[answer] = (responseCounts[answer] || 0) + 1;
                 });
                 
@@ -672,8 +806,8 @@ export default function FormAnswersPage() {
             </div>
           )}
 
-          {/* ── Análisis tab ── */}
-          {tab === 'analisis' && (
+          {/* ── Insight tab ── */}
+          {tab === 'insight' && (
             <div className="animate-fade-in space-y-4">
               {/* Key Insights */}
               <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -777,7 +911,7 @@ export default function FormAnswersPage() {
                 </div>
                 <div className="p-6">
                   <div className="space-y-3">
-                    {DEMO_RESPONSES.map((resp, idx) => (
+                    {responses.map((resp, idx) => (
                       <div key={idx} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100">
                           <User className="h-5 w-5 text-primary-600" />
@@ -825,6 +959,8 @@ export default function FormAnswersPage() {
                 </div>
               </div>
             </div>
+          )}
+            </>
           )}
           </div>
         </div>

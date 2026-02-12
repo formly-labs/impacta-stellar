@@ -73,6 +73,7 @@ export default function CreateFormPage() {
     description: '',
     fields: [],
   });
+  const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(!!formId);
   const [saving, setSaving] = useState(false);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number | null>(null);
@@ -127,6 +128,7 @@ export default function CreateFormPage() {
             description: data.description || '',
             fields: data.fields,
           });
+          setIsActive(data.isActive || false);
           setLoading(false);
           // Seleccionar la primera pregunta si existe
           if (data.fields && data.fields.length > 0) {
@@ -192,13 +194,20 @@ export default function CreateFormPage() {
     const url = `/api/forms/${formId}`;
 
     try {
+      // Guardar el formulario y activarlo al publicar
       const response = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData }),
+        body: JSON.stringify({ 
+          ...formData,
+          isActive: true // Activar el formulario al publicar
+        }),
       });
 
       if (response.ok) {
+        // Actualizar el estado local para reflejar que está activo
+        setFormData(prev => ({ ...prev, isActive: true }));
+        setIsActive(true);
         // Mostrar modal de rewards después de guardar exitosamente
         setShowRewardsModal(true);
       }
@@ -266,6 +275,7 @@ export default function CreateFormPage() {
         onPublish={handleSave}
         isPublishing={saving}
         showPublishButton={true}
+        isActive={isActive}
       />
 
       {/* Modal para editar nombre */}

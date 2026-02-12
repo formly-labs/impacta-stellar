@@ -17,6 +17,7 @@ export default function RewardsPage() {
     description: '',
     fields: [],
   });
+  const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -36,6 +37,7 @@ export default function RewardsPage() {
             description: data.description || '',
             fields: data.fields,
           });
+          setIsActive(data.isActive || false);
           setLoading(false);
         })
         .catch(() => {
@@ -69,6 +71,7 @@ export default function RewardsPage() {
           onTabChange={handleTabChange}
           onFormTitleClick={() => setIsEditModalOpen(true)}
           showPublishButton={false}
+          isActive={isActive}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -89,6 +92,7 @@ export default function RewardsPage() {
         onTabChange={handleTabChange}
         onFormTitleClick={() => setIsEditModalOpen(true)}
         showPublishButton={false}
+        isActive={isActive}
       />
 
       {/* Modal para editar nombre */}
