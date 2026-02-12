@@ -101,30 +101,32 @@ export function FormEditNavigation({
           >
             Rewards
           </button>
-          {isActive && (
-            <>
-              <button
-                onClick={() => onTabChange('share')}
-                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-                  activeTab === 'share'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Share
-              </button>
-              <button
-                onClick={() => onTabChange('responses')}
-                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-                  activeTab === 'responses'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Responses
-              </button>
-            </>
-          )}
+          <button
+            onClick={() => isActive && onTabChange('share')}
+            disabled={!isActive}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
+              !isActive
+                ? 'cursor-not-allowed text-gray-400'
+                : activeTab === 'share'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Share
+          </button>
+          <button
+            onClick={() => isActive && onTabChange('responses')}
+            disabled={!isActive}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
+              !isActive
+                ? 'cursor-not-allowed text-gray-400'
+                : activeTab === 'responses'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Responses
+          </button>
         </div>
 
         {/* Botón Publicar + Wallet - Derecha */}
