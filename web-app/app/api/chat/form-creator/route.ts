@@ -1,8 +1,29 @@
+import { prisma } from '@/lib/db';
 import { convertToModelMessages, stepCountIs, streamText, tool, UIMessage } from 'ai';
+import { NextResponse } from 'next/server';
 import z from 'zod';
 
+const FREE_LIMIT = 5;
+
 export async function POST(req: Request) {
-  const { messages, formData }: { messages: UIMessage[], formData: unknown } = await req.json();
+  const { messages, formData, wallet }: { messages: UIMessage[], formData: unknown, wallet?: string } = await req.json();
+
+  if (wallet) {
+    const record = await prisma.aIUsage.findUnique({
+      where: { walletAddress: wallet },
+      select: { usageCount: true },
+    });
+
+    if ((record?.usageCount ?? 0) >= FREE_LIMIT) {
+      return NextResponse.json({ error: 'Límite gratuito alcanzado' }, { status: 403 });
+    }
+
+    await prisma.aIUsage.upsert({
+      where: { walletAddress: wallet },
+      update: { usageCount: { increment: 1 } },
+      create: { walletAddress: wallet, usageCount: 1 },
+    });
+  }
   
   const result = streamText({
     model: 'anthropic/claude-3-haiku',

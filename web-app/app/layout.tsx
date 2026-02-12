@@ -12,6 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Formly - Verified data. Fair payments.",
   description: "A platform where form creators get quality data and contributors earn instantly for every verified response. Built on Stellar blockchain.",
