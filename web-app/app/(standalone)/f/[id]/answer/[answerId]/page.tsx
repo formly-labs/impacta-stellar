@@ -31,7 +31,9 @@ export default function AnswerResultPage() {
   
   const formLink = `/f/${formId}`;
   
-  if (loading) return <div className="flex min-h-screen w-full"><Loader /></div>;
+  if (loading) {
+    return <div className="flex min-h-screen w-full items-center justify-center"><Loader /></div>;
+  }
   
   const isCompleted = status?.exists ?? false;
   const submittedAt = status?.submittedAt
