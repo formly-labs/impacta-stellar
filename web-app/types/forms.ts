@@ -1,3 +1,50 @@
+// ============== Workspace Types ==============
+
+export type LinkAccess = 'RESTRICTED' | 'ANYONE_WITH_LINK';
+export type Permission = 'VIEWER' | 'EDITOR';
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  walletAddress: string;
+  permission: Permission;
+  createdAt: string;
+}
+
+export interface WorkspaceCreateInput {
+  name: string;
+  description?: string;
+  ownerAddress: string;
+  linkAccess?: LinkAccess;
+  linkPermission?: Permission;
+}
+
+export interface WorkspaceUpdateInput {
+  name?: string;
+  description?: string;
+  linkAccess?: LinkAccess;
+  linkPermission?: Permission;
+}
+
+export interface WorkspaceResponse {
+  id: string;
+  name: string;
+  description?: string;
+  ownerAddress: string;
+  linkAccess: LinkAccess;
+  linkPermission: Permission;
+  members?: WorkspaceMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AddMemberInput {
+  walletAddress: string;
+  permission: Permission;
+}
+
+// ============== Form Types ==============
+
 export interface FieldInput {
   type: 'text' | 'email' | 'phone' | 'number' | 'radio' | 'checkbox' | 'short_text' | 'long_text';
   label: string;
@@ -14,6 +61,7 @@ export interface FormCreateInput {
   fields: FieldInput[];
   theme?: string;
   rewardPerGoodAnswer?: number;
+  workspaceId?: string;
 }
 
 export interface FormUpdateInput {
@@ -23,6 +71,8 @@ export interface FormUpdateInput {
   isActive?: boolean;
   theme?: string;
   rewardPerGoodAnswer?: number;
+  workspaceId?: string;
+  slug: string,
 }
 
 export interface FormResponse extends FormCreateInput {
@@ -31,4 +81,5 @@ export interface FormResponse extends FormCreateInput {
   isActive: boolean;
   isArchived: boolean;
   budget: number;
+  slug: string,
 }

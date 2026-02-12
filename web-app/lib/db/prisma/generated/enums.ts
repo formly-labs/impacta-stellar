@@ -9,7 +9,17 @@
 * 🟢 You can import this file directly.
 */
 
+export const LinkAccess = {
+  RESTRICTED: 'RESTRICTED',
+  ANYONE_WITH_LINK: 'ANYONE_WITH_LINK'
+} as const
+
+export type LinkAccess = (typeof LinkAccess)[keyof typeof LinkAccess]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const Permission = {
+  VIEWER: 'VIEWER',
+  EDITOR: 'EDITOR'
+} as const
+
+export type Permission = (typeof Permission)[keyof typeof Permission]

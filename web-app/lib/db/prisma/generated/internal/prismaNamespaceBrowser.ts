@@ -51,6 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Workspace: 'Workspace',
+  WorkspaceMember: 'WorkspaceMember',
   Form: 'Form',
   Response: 'Response',
   Field: 'Field',
@@ -73,6 +75,31 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const WorkspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  ownerAddress: 'ownerAddress',
+  linkAccess: 'linkAccess',
+  linkPermission: 'linkPermission',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
+export const WorkspaceMemberScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  walletAddress: 'walletAddress',
+  permission: 'permission',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
+
+
 export const FormScalarFieldEnum = {
   id: 'id',
   slug: 'slug',
@@ -84,6 +111,7 @@ export const FormScalarFieldEnum = {
   isArchived: 'isArchived',
   theme: 'theme',
   rewardPerGoodAnswer: 'rewardPerGoodAnswer',
+  workspaceId: 'workspaceId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

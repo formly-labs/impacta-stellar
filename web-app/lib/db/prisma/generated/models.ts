@@ -8,6 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Workspace'
+export type * from './models/WorkspaceMember'
 export type * from './models/Form'
 export type * from './models/Response'
 export type * from './models/Field'

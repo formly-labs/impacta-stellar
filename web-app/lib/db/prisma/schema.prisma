@@ -8,6 +8,30 @@ generator client {
   engineType = "client"
 }
 
+model Workspace {
+  id               String             @id @default(cuid())
+  name             String
+  description      String?
+  ownerAddress     String
+  linkAccess       LinkAccess         @default(RESTRICTED) // "RESTRICTED" o "ANYONE_WITH_LINK"
+  linkPermission   Permission         @default(VIEWER) // "VIEWER" o "EDITOR"
+  forms            Form[]
+  members          WorkspaceMember[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model WorkspaceMember {
+  id            String     @id @default(cuid())
+  workspaceId   String
+  workspace     Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  walletAddress String
+  permission    Permission @default(VIEWER) // "VIEWER" o "EDITOR"
+  createdAt     DateTime   @default(now())
+
+  @@unique([workspaceId, walletAddress])
+}
+
 model Form {
   id                  String     @id @default(cuid())
   slug                String
@@ -19,6 +43,8 @@ model Form {
   isArchived          Boolean    @default(false)
   theme               String? // "Product UX", "Segmentation", "Sales"
   rewardPerGoodAnswer Float? // XLM por respuesta válida
+  workspaceId         String?
+  workspace           Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   fields              Field[]
   responses           Response[]
   createdAt           DateTime   @default(now())
@@ -54,4 +80,14 @@ model UserProfile {
   phone         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+enum LinkAccess {
+  RESTRICTED          // Solo miembros invitados
+  ANYONE_WITH_LINK    // Cualquiera con el link
+}
+
+enum Permission {
+  VIEWER              // Solo lectura
+  EDITOR              // Editar
 }

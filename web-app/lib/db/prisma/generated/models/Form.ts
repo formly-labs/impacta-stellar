@@ -47,6 +47,7 @@ export type FormMinAggregateOutputType = {
   isArchived: boolean | null
   theme: string | null
   rewardPerGoodAnswer: number | null
+  workspaceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +63,7 @@ export type FormMaxAggregateOutputType = {
   isArchived: boolean | null
   theme: string | null
   rewardPerGoodAnswer: number | null
+  workspaceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -77,6 +79,7 @@ export type FormCountAggregateOutputType = {
   isArchived: number
   theme: number
   rewardPerGoodAnswer: number
+  workspaceId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -104,6 +107,7 @@ export type FormMinAggregateInputType = {
   isArchived?: true
   theme?: true
   rewardPerGoodAnswer?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -119,6 +123,7 @@ export type FormMaxAggregateInputType = {
   isArchived?: true
   theme?: true
   rewardPerGoodAnswer?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -134,6 +139,7 @@ export type FormCountAggregateInputType = {
   isArchived?: true
   theme?: true
   rewardPerGoodAnswer?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -236,6 +242,7 @@ export type FormGroupByOutputType = {
   isArchived: boolean
   theme: string | null
   rewardPerGoodAnswer: number | null
+  workspaceId: string | null
   createdAt: Date
   updatedAt: Date
   _count: FormCountAggregateOutputType | null
@@ -274,8 +281,10 @@ export type FormWhereInput = {
   isArchived?: Prisma.BoolFilter<"Form"> | boolean
   theme?: Prisma.StringNullableFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
+  workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   fields?: Prisma.FieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
 }
@@ -291,8 +300,10 @@ export type FormOrderByWithRelationInput = {
   isArchived?: Prisma.SortOrder
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  workspace?: Prisma.WorkspaceOrderByWithRelationInput
   fields?: Prisma.FieldOrderByRelationAggregateInput
   responses?: Prisma.ResponseOrderByRelationAggregateInput
 }
@@ -311,8 +322,10 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   isArchived?: Prisma.BoolFilter<"Form"> | boolean
   theme?: Prisma.StringNullableFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
+  workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   fields?: Prisma.FieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
 }, "id">
@@ -328,6 +341,7 @@ export type FormOrderByWithAggregationInput = {
   isArchived?: Prisma.SortOrder
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrderInput | Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
@@ -351,6 +365,7 @@ export type FormScalarWhereWithAggregatesInput = {
   isArchived?: Prisma.BoolWithAggregatesFilter<"Form"> | boolean
   theme?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   rewardPerGoodAnswer?: Prisma.FloatNullableWithAggregatesFilter<"Form"> | number | null
+  workspaceId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
 }
@@ -368,6 +383,7 @@ export type FormCreateInput = {
   rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
   fields?: Prisma.FieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
 }
@@ -383,6 +399,7 @@ export type FormUncheckedCreateInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -402,6 +419,7 @@ export type FormUpdateInput = {
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
   fields?: Prisma.FieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
 }
@@ -417,6 +435,7 @@ export type FormUncheckedUpdateInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -434,6 +453,7 @@ export type FormCreateManyInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -464,8 +484,19 @@ export type FormUncheckedUpdateManyInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type FormListRelationFilter = {
+  every?: Prisma.FormWhereInput
+  some?: Prisma.FormWhereInput
+  none?: Prisma.FormWhereInput
+}
+
+export type FormOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type FormCountOrderByAggregateInput = {
@@ -479,6 +510,7 @@ export type FormCountOrderByAggregateInput = {
   isArchived?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -499,6 +531,7 @@ export type FormMaxOrderByAggregateInput = {
   isArchived?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -514,6 +547,7 @@ export type FormMinOrderByAggregateInput = {
   isArchived?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   rewardPerGoodAnswer?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -528,12 +562,46 @@ export type FormScalarRelationFilter = {
   isNot?: Prisma.FormWhereInput
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type FormCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput> | Prisma.FormCreateWithoutWorkspaceInput[] | Prisma.FormUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutWorkspaceInput | Prisma.FormCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.FormCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
+export type FormUncheckedCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput> | Prisma.FormCreateWithoutWorkspaceInput[] | Prisma.FormUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutWorkspaceInput | Prisma.FormCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.FormCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+}
+
+export type FormUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput> | Prisma.FormCreateWithoutWorkspaceInput[] | Prisma.FormUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutWorkspaceInput | Prisma.FormCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.FormUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.FormCreateManyWorkspaceInputEnvelope
+  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  update?: Prisma.FormUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.FormUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.FormUpdateManyWithWhereWithoutWorkspaceInput | Prisma.FormUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+}
+
+export type FormUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput> | Prisma.FormCreateWithoutWorkspaceInput[] | Prisma.FormUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutWorkspaceInput | Prisma.FormCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.FormUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.FormCreateManyWorkspaceInputEnvelope
+  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  update?: Prisma.FormUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.FormUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.FormUpdateManyWithWhereWithoutWorkspaceInput | Prisma.FormUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
 }
 
 export type FloatFieldUpdateOperationsInput = {
@@ -554,10 +622,6 @@ export type NullableFloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
 }
 
 export type FormCreateNestedOneWithoutResponsesInput = {
@@ -588,6 +652,85 @@ export type FormUpdateOneRequiredWithoutFieldsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FormUpdateToOneWithWhereWithoutFieldsInput, Prisma.FormUpdateWithoutFieldsInput>, Prisma.FormUncheckedUpdateWithoutFieldsInput>
 }
 
+export type FormCreateWithoutWorkspaceInput = {
+  id?: string
+  slug: string
+  title: string
+  description?: string | null
+  ownerAddress: string
+  budget?: number
+  isActive?: boolean
+  isArchived?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fields?: Prisma.FieldCreateNestedManyWithoutFormInput
+  responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+}
+
+export type FormUncheckedCreateWithoutWorkspaceInput = {
+  id?: string
+  slug: string
+  title: string
+  description?: string | null
+  ownerAddress: string
+  budget?: number
+  isActive?: boolean
+  isArchived?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
+  responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+}
+
+export type FormCreateOrConnectWithoutWorkspaceInput = {
+  where: Prisma.FormWhereUniqueInput
+  create: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type FormCreateManyWorkspaceInputEnvelope = {
+  data: Prisma.FormCreateManyWorkspaceInput | Prisma.FormCreateManyWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
+export type FormUpsertWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.FormWhereUniqueInput
+  update: Prisma.XOR<Prisma.FormUpdateWithoutWorkspaceInput, Prisma.FormUncheckedUpdateWithoutWorkspaceInput>
+  create: Prisma.XOR<Prisma.FormCreateWithoutWorkspaceInput, Prisma.FormUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type FormUpdateWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.FormWhereUniqueInput
+  data: Prisma.XOR<Prisma.FormUpdateWithoutWorkspaceInput, Prisma.FormUncheckedUpdateWithoutWorkspaceInput>
+}
+
+export type FormUpdateManyWithWhereWithoutWorkspaceInput = {
+  where: Prisma.FormScalarWhereInput
+  data: Prisma.XOR<Prisma.FormUpdateManyMutationInput, Prisma.FormUncheckedUpdateManyWithoutWorkspaceInput>
+}
+
+export type FormScalarWhereInput = {
+  AND?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+  OR?: Prisma.FormScalarWhereInput[]
+  NOT?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+  id?: Prisma.StringFilter<"Form"> | string
+  slug?: Prisma.StringFilter<"Form"> | string
+  title?: Prisma.StringFilter<"Form"> | string
+  description?: Prisma.StringNullableFilter<"Form"> | string | null
+  ownerAddress?: Prisma.StringFilter<"Form"> | string
+  budget?: Prisma.FloatFilter<"Form"> | number
+  isActive?: Prisma.BoolFilter<"Form"> | boolean
+  isArchived?: Prisma.BoolFilter<"Form"> | boolean
+  theme?: Prisma.StringNullableFilter<"Form"> | string | null
+  rewardPerGoodAnswer?: Prisma.FloatNullableFilter<"Form"> | number | null
+  workspaceId?: Prisma.StringNullableFilter<"Form"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+}
+
 export type FormCreateWithoutResponsesInput = {
   id?: string
   slug: string
@@ -601,6 +744,7 @@ export type FormCreateWithoutResponsesInput = {
   rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
   fields?: Prisma.FieldCreateNestedManyWithoutFormInput
 }
 
@@ -615,6 +759,7 @@ export type FormUncheckedCreateWithoutResponsesInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   fields?: Prisma.FieldUncheckedCreateNestedManyWithoutFormInput
@@ -649,6 +794,7 @@ export type FormUpdateWithoutResponsesInput = {
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
   fields?: Prisma.FieldUpdateManyWithoutFormNestedInput
 }
 
@@ -663,6 +809,7 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
@@ -681,6 +828,7 @@ export type FormCreateWithoutFieldsInput = {
   rewardPerGoodAnswer?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutFormsInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
 }
 
@@ -695,6 +843,7 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   isArchived?: boolean
   theme?: string | null
   rewardPerGoodAnswer?: number | null
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
@@ -729,6 +878,7 @@ export type FormUpdateWithoutFieldsInput = {
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneWithoutFormsNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
 }
 
@@ -743,9 +893,74 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+}
+
+export type FormCreateManyWorkspaceInput = {
+  id?: string
+  slug: string
+  title: string
+  description?: string | null
+  ownerAddress: string
+  budget?: number
+  isActive?: boolean
+  isArchived?: boolean
+  theme?: string | null
+  rewardPerGoodAnswer?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type FormUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.FloatFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.FieldUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+}
+
+export type FormUncheckedUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.FloatFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.FieldUncheckedUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+}
+
+export type FormUncheckedUpdateManyWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  budget?: Prisma.FloatFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rewardPerGoodAnswer?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -799,8 +1014,10 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   isArchived?: boolean
   theme?: boolean
   rewardPerGoodAnswer?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
@@ -817,8 +1034,10 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isArchived?: boolean
   theme?: boolean
   rewardPerGoodAnswer?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -832,8 +1051,10 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isArchived?: boolean
   theme?: boolean
   rewardPerGoodAnswer?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectScalar = {
@@ -847,22 +1068,29 @@ export type FormSelectScalar = {
   isArchived?: boolean
   theme?: boolean
   rewardPerGoodAnswer?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "description" | "ownerAddress" | "budget" | "isActive" | "isArchived" | "theme" | "rewardPerGoodAnswer" | "workspaceId" | "createdAt" | "updatedAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type FormIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type FormIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type FormIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
+}
+export type FormIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  workspace?: boolean | Prisma.Form$workspaceArgs<ExtArgs>
+}
 
 export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Form"
   objects: {
+    workspace: Prisma.$WorkspacePayload<ExtArgs> | null
     fields: Prisma.$FieldPayload<ExtArgs>[]
     responses: Prisma.$ResponsePayload<ExtArgs>[]
   }
@@ -877,6 +1105,7 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     isArchived: boolean
     theme: string | null
     rewardPerGoodAnswer: number | null
+    workspaceId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["form"]>
@@ -1273,6 +1502,7 @@ readonly fields: FormFieldRefs;
  */
 export interface Prisma__FormClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  workspace<T extends Prisma.Form$workspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$workspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   fields<T extends Prisma.Form$fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   responses<T extends Prisma.Form$responsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$responsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1314,6 +1544,7 @@ export interface FormFieldRefs {
   readonly isArchived: Prisma.FieldRef<"Form", 'Boolean'>
   readonly theme: Prisma.FieldRef<"Form", 'String'>
   readonly rewardPerGoodAnswer: Prisma.FieldRef<"Form", 'Float'>
+  readonly workspaceId: Prisma.FieldRef<"Form", 'String'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Form", 'DateTime'>
 }
@@ -1565,6 +1796,10 @@ export type FormCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.FormCreateManyInput | Prisma.FormCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FormIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1635,6 +1870,10 @@ export type FormUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Forms to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FormIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1701,6 +1940,25 @@ export type FormDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Forms to delete.
    */
   limit?: number
+}
+
+/**
+ * Form.workspace
+ */
+export type Form$workspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Workspace
+   */
+  select?: Prisma.WorkspaceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Workspace
+   */
+  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceWhereInput
 }
 
 /**

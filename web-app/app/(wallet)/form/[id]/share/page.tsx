@@ -1,57 +1,58 @@
 'use client';
 
+import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
+import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
+import { FormResponse, FormUpdateInput } from '@/types';
+import {
+  Check,
+  Code,
+  Eye,
+  Facebook,
+  Grid,
+  Link as LinkIcon,
+  Linkedin,
+  Mail,
+  MoreHorizontal,
+  Settings,
+  Share2,
+  Twitter,
+  Users,
+} from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FormResponse, FormUpdateInput } from '@/types';
-import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
-import { EditFormNameModal } from '@/app/(wallet)/form/[id]/edit/components/EditFormNameModal';
-import { 
-  Link as LinkIcon, 
-  Mail, 
-  Code, 
-  Users, 
-  Check,
-  Eye,
-  Settings,
-  MoreHorizontal,
-  Grid,
-  Facebook,
-  Linkedin,
-  Twitter,
-  Share2
-} from 'lucide-react';
 
 export default function SharePage() {
   const router = useRouter();
   const params = useParams();
   const formId = params.id as string;
   
-  const [formData, setFormData] = useState<FormUpdateInput>({
+  const [ formData, setFormData ] = useState<FormUpdateInput>({
     title: '',
     description: '',
     fields: [],
+    slug: '',
   });
-  const [isActive, setIsActive] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [shareTab, setShareTab] = useState<'options' | 'advanced'>('options');
-
-  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/encuesta/${formId}`;
-
+  const [ isActive, setIsActive ] = useState(false);
+  const [ loading, setLoading ] = useState(true);
+  const [ copied, setCopied ] = useState(false);
+  const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
+  const [ shareTab, setShareTab ] = useState<'options' | 'advanced'>('options');
+  
+  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/encuesta/${formData.slug}`;
+  
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
     }
-  }, [formId, router]);
-
+  }, [ formId, router ]);
+  
   // Redirigir si el formulario no está activo
   useEffect(() => {
     if (!loading && !isActive) {
       router.push(`/form/${formId}/edit`);
     }
-  }, [loading, isActive, formId, router]);
-
+  }, [ loading, isActive, formId, router ]);
+  
   useEffect(() => {
     if (formId) {
       fetch(`/api/forms/${formId}`)
@@ -61,6 +62,7 @@ export default function SharePage() {
             title: data.title,
             description: data.description || '',
             fields: data.fields,
+            slug: data.slug || '',
           });
           setIsActive(data.isActive || false);
           setLoading(false);
@@ -69,12 +71,12 @@ export default function SharePage() {
           setLoading(false);
         });
     }
-  }, [formId]);
-
+  }, [ formId ]);
+  
   const handleSaveFormTitle = (newTitle: string) => {
     setFormData(prev => ({ ...prev, title: newTitle }));
   };
-
+  
   const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
     if (tab === 'content') {
       router.push(`/form/${formId}/edit`);
@@ -86,13 +88,13 @@ export default function SharePage() {
       router.push(`/form/${formId}/share`);
     }
   };
-
+  
   const handleCopyLink = () => {
     navigator.clipboard.writeText(formUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+  
   if (loading) {
     return (
       <div className="flex h-full flex-col bg-white">
@@ -113,7 +115,7 @@ export default function SharePage() {
       </div>
     );
   }
-
+  
   return (
     <div className="flex h-full flex-col bg-white">
       {/* Navegación */}
@@ -125,7 +127,7 @@ export default function SharePage() {
         showPublishButton={false}
         isActive={isActive}
       />
-
+      
       {/* Modal para editar nombre */}
       <EditFormNameModal
         isOpen={isEditModalOpen}
@@ -133,7 +135,7 @@ export default function SharePage() {
         currentTitle={formData.title || ''}
         onSave={handleSaveFormTitle}
       />
-
+      
       {/* Contenido principal con layout de tres columnas */}
       <div className="flex flex-1 gap-4 overflow-hidden bg-gray-50 p-4">
         {/* Sidebar izquierdo - opciones de compartir */}
@@ -161,7 +163,7 @@ export default function SharePage() {
             </div>
           </div>
         </aside>
-
+        
         {/* Área central - Preview del formulario */}
         <main className="flex flex-1 flex-col overflow-hidden">
           {/* Barra superior con botones */}
@@ -202,7 +204,7 @@ export default function SharePage() {
               <MoreHorizontal className="h-4 w-4" />
             </button>
           </div>
-
+          
           {/* Preview del formulario */}
           <div className="flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
             <div className="flex h-full items-center justify-center p-8">
@@ -232,7 +234,7 @@ export default function SharePage() {
             </div>
           </div>
         </main>
-
+        
         {/* Sidebar derecho - Configuraciones */}
         <aside className="flex w-80 shrink-0 flex-col">
           <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -262,7 +264,7 @@ export default function SharePage() {
                   </button>
                 </div>
               </div>
-
+              
               {/* Contenido del tab */}
               <div className="p-4">
                 {shareTab === 'options' && (
@@ -288,7 +290,7 @@ export default function SharePage() {
                         </button>
                       </div>
                     </div>
-
+                    
                     {/* Link settings */}
                     <div>
                       <div className="mb-3 flex items-center gap-2">
@@ -296,7 +298,7 @@ export default function SharePage() {
                         <Eye className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
-
+                    
                     {/* Preview */}
                     <div>
                       <h3 className="mb-3 text-sm font-medium text-gray-900">Preview</h3>
@@ -307,7 +309,7 @@ export default function SharePage() {
                         </div>
                       </div>
                     </div>
-
+                    
                     {/* Thumbnail */}
                     <div>
                       <div className="mb-3 flex items-center gap-2">
@@ -324,7 +326,7 @@ export default function SharePage() {
                         </button>
                       </div>
                     </div>
-
+                    
                     {/* Title */}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-900">
@@ -337,7 +339,7 @@ export default function SharePage() {
                         className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
                       />
                     </div>
-
+                    
                     {/* Description */}
                     <div>
                       <div className="mb-2 flex items-center gap-2">
@@ -355,7 +357,7 @@ export default function SharePage() {
                     </div>
                   </div>
                 )}
-
+                
                 {shareTab === 'advanced' && (
                   <div className="py-8 text-center text-sm text-gray-500">
                     Configuración avanzada

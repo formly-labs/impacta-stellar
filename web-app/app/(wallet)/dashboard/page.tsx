@@ -4,20 +4,20 @@ import { isOnboardingCompleted } from '@/lib/onboardingStorage';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useWallet } from 'stellar-wallet-kit';
+import { FormList } from './components/forms/FormList';
+import { DashboardHeader } from './components/header/DashboardHeader';
+import { MobileControls } from './components/header/MobileControls';
 
 // Hooks
 import { useForms } from './components/hooks/useForms';
 import { useWorkspace } from './components/hooks/useWorkspace';
+import { DeleteModal } from './components/modals/DeleteModal';
+import { InviteModal } from './components/modals/InviteModal';
+import { LeaveModal } from './components/modals/LeaveModal';
+import { RenameModal } from './components/modals/RenameModal';
 
 // Components
 import { DashboardSidebar } from './components/sidebar/DashboardSidebar';
-import { DashboardHeader } from './components/header/DashboardHeader';
-import { MobileControls } from './components/header/MobileControls';
-import { FormList } from './components/forms/FormList';
-import { InviteModal } from './components/modals/InviteModal';
-import { RenameModal } from './components/modals/RenameModal';
-import { LeaveModal } from './components/modals/LeaveModal';
-import { DeleteModal } from './components/modals/DeleteModal';
 
 type Tab = 'active' | 'archived';
 type ViewMode = 'list' | 'grid';
@@ -26,7 +26,10 @@ export default function CreatorDashboard() {
   const { account } = useWallet();
   const router = useRouter();
   
-  // Custom hooks
+  const [ selectedWorkspaceId, setSelectedWorkspaceId ] = useState<string | undefined>();
+  
+  const workspaceFilter = selectedWorkspaceId === 'default' ? null : selectedWorkspaceId;
+  
   const {
     forms,
     archivedForms,
@@ -35,8 +38,8 @@ export default function CreatorDashboard() {
     archivingId,
     fetchArchived,
     handleArchive,
-  } = useForms(account?.address);
-
+  } = useForms(account?.address, workspaceFilter);
+  
   const {
     workspaceName,
     renameModalOpen,
@@ -48,54 +51,49 @@ export default function CreatorDashboard() {
     openRenameModal,
     handleRename: workspaceHandleRename,
   } = useWorkspace();
-
+  
   // Local state
-  const [tab, setTab] = useState<Tab>('active');
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
-
-  // Redirect to onboarding if not completed
+  const [ tab, setTab ] = useState<Tab>('active');
+  const [ viewMode, setViewMode ] = useState<ViewMode>('list');
+  const [ sortBy, setSortBy ] = useState<'date' | 'name'>('date');
+  const [ inviteModalOpen, setInviteModalOpen ] = useState(false);
+  
   useEffect(() => {
     if (!isOnboardingCompleted()) {
       router.replace('/dashboard/onboarding?step=details');
     }
-  }, [router]);
-
-  // Fetch archived when switching to that tab
+  }, [ router ]);
+  
   useEffect(() => {
     if (tab === 'archived') {
       fetchArchived();
     }
-  }, [tab, fetchArchived]);
-
+  }, [ tab, fetchArchived ]);
+  
   // Handlers
   const handleLeaveConfirm = () => {
     setLeaveModalOpen(false);
     router.push('/dashboard');
   };
-
+  
   const handleDeleteConfirm = () => {
     setDeleteModalOpen(false);
     router.push('/dashboard');
   };
-
+  
   return (
     <div className="flex h-full overflow-hidden bg-white">
-      {/* Sidebar */}
       <DashboardSidebar
-        workspaceName={workspaceName}
         activeTab={tab}
-        formsCount={forms.length}
         archivedCount={archivedForms.length}
         onTabChange={setTab}
         ownerAddress={account?.address || ''}
+        selectedWorkspaceId={selectedWorkspaceId}
+        onWorkspaceSelect={setSelectedWorkspaceId}
       />
-
-      {/* Main content */}
+      
       <main className="flex-1 overflow-y-auto bg-gray-50">
         <div className="p-4 sm:p-6">
-          {/* Mobile Controls */}
           <MobileControls
             workspaceName={workspaceName}
             activeTab={tab}
@@ -104,8 +102,7 @@ export default function CreatorDashboard() {
             onViewModeToggle={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
             onInviteClick={() => setInviteModalOpen(true)}
           />
-
-          {/* Desktop Header */}
+          
           <DashboardHeader
             workspaceName={workspaceName}
             viewMode={viewMode}
@@ -115,8 +112,7 @@ export default function CreatorDashboard() {
             onInviteClick={() => setInviteModalOpen(true)}
             onRenameClick={openRenameModal}
           />
-
-          {/* Form List */}
+          
           <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-2'}`}>
             {tab === 'active' ? (
               <FormList
@@ -139,29 +135,28 @@ export default function CreatorDashboard() {
           </div>
         </div>
       </main>
-
-      {/* Modals */}
+      
       <InviteModal
         isOpen={inviteModalOpen}
         workspaceName={workspaceName}
         accountAddress={account?.address}
         onClose={() => setInviteModalOpen(false)}
       />
-
+      
       <RenameModal
         isOpen={renameModalOpen}
         workspaceName={workspaceName}
         onClose={() => setRenameModalOpen(false)}
         onRename={workspaceHandleRename}
       />
-
+      
       <LeaveModal
         isOpen={leaveModalOpen}
         workspaceName={workspaceName}
         onClose={() => setLeaveModalOpen(false)}
         onConfirm={handleLeaveConfirm}
       />
-
+      
       <DeleteModal
         isOpen={deleteModalOpen}
         workspaceName={workspaceName}
