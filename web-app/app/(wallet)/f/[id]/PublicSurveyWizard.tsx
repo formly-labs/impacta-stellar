@@ -130,13 +130,13 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
-
+      
       if (e.key === 'Enter' && !isTyping && survey.welcomeTitle && !started) {
         e.preventDefault();
         setStarted(true);
         return;
       }
-
+      
       if (e.key === 'Enter' && !isTyping) {
         e.preventDefault();
         if (isLast) {
@@ -168,7 +168,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   }, [ handleNext, handleSubmit, isLast, currentField ]);
   
   const handleCopyAnswerLink = async () => {
-    const link = `${window.location.origin}/f/${survey.slug}/answer?answerId=${submittedId}`;
+    const link = `${window.location.origin}/f/${survey.slug}/answer/${submittedId}`;
     await navigator.clipboard.writeText(link);
     setCopiedAnswer(true);
     setTimeout(() => setCopiedAnswer(false), 2000);
@@ -216,7 +216,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       </div>
     );
   }
-
+  
   if (survey.welcomeTitle && !started) {
     return (
       <div className="flex h-full flex-col overflow-hidden">
