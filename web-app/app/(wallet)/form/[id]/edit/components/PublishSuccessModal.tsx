@@ -26,7 +26,7 @@ export function PublishSuccessModal({ isOpen, onComplete }: PublishSuccessModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 backdrop-blur-sm">
-      <div className="relative">
+      <div className="relative flex flex-col items-center justify-center">
         {/* Círculo animado */}
         <div className="relative flex h-32 w-32 items-center justify-center">
           {/* Partículas flotantes */}
@@ -51,7 +51,7 @@ export function PublishSuccessModal({ isOpen, onComplete }: PublishSuccessModalP
         </div>
 
         {/* Texto */}
-        <p className="mt-8 text-center text-xl font-semibold text-white animate-fade-in">
+        <p className="mt-8 text-center text-2xl font-semibold text-white animate-fade-in">
           ¡Formulario publicado!
         </p>
       </div>

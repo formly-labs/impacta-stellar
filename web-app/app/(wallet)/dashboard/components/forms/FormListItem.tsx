@@ -1,5 +1,5 @@
 import { FormResponse } from '@/types';
-import { Archive, ArchiveRestore, ChevronRight, Edit, FileText, Loader2 } from 'lucide-react';
+import { Archive, ArchiveRestore, ChevronRight, FileText, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface FormListItemProps {
@@ -19,7 +19,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
       }`}
     >
       <Link
-        href={`/form/${form.id}`}
+        href={`/form/${form.id}/edit`}
         className="flex min-w-0 flex-1 items-center gap-4"
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-100">
@@ -46,17 +46,6 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
         </div>
       </Link>
       
-      {!isArchived && (
-        <Link
-          href={`/form/${form.id}/edit`}
-          className="shrink-0 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-primary-600"
-          title="Editar"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Edit className="h-4 w-4" />
-        </Link>
-      )}
-      
       <button
         type="button"
         onClick={() => onArchive(form.id, !isArchived)}
@@ -78,7 +67,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
       </button>
       
       {!isArchived && (
-        <Link href={`/form/${form.id}`}>
+        <Link href={`/form/${form.id}/edit`}>
           <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
         </Link>
       )}

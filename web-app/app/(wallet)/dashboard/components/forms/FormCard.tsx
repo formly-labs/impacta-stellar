@@ -42,7 +42,7 @@ export function FormCard({ form, isArchived = false, archivingId, onArchive }: F
           )}
         </button>
       </div>
-      <Link href={`/form/${form.id}`} className="mt-3 block">
+      <Link href={`/form/${form.id}/edit`} className="mt-3 block">
         <div className="flex items-center gap-2 mb-1">
           <h3 className={`line-clamp-2 text-sm font-medium ${isArchived ? 'text-gray-600' : 'text-gray-900'}`}>
             {form.title}

@@ -86,7 +86,7 @@ export function QuestionTypeSelector({ value, onChange }: QuestionTypeSelectorPr
         className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none"
       >
         <div className={`flex h-6 w-6 items-center justify-center rounded ${selectedType?.bgColor || 'bg-gray-100'}`}>
-          <SelectedIcon className="h-3.5 w-3.5 text-gray-700" />
+          <SelectedIcon className={`h-3.5 w-3.5 ${selectedType?.textColor || 'text-gray-700'}`} />
         </div>
         <span>{selectedType?.label || 'Seleccionar tipo'}</span>
         <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -116,7 +116,7 @@ export function QuestionTypeSelector({ value, onChange }: QuestionTypeSelectorPr
                   >
                     {/* Icono con color */}
                     <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${type.bgColor}`}>
-                      <TypeIcon className="h-4 w-4 text-gray-700" />
+                      <TypeIcon className={`h-4 w-4 ${type.textColor}`} />
                     </div>
                     
                     {/* Label */}

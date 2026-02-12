@@ -39,7 +39,7 @@ export default function SharePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [shareTab, setShareTab] = useState<'options' | 'advanced'>('options');
 
-  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/form/${formId}`;
+  const formUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/encuesta/${formId}`;
 
   useEffect(() => {
     if (!formId) {
