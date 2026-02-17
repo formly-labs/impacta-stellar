@@ -65,6 +65,11 @@ export type Response = Prisma.ResponseModel
  */
 export type Field = Prisma.FieldModel
 /**
+ * Model AIUsage
+ * 
+ */
+export type AIUsage = Prisma.AIUsageModel
+/**
  * Model UserProfile
  * 
  */

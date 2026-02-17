@@ -56,6 +56,7 @@ export const ModelName = {
   Form: 'Form',
   Response: 'Response',
   Field: 'Field',
+  AIUsage: 'AIUsage',
   UserProfile: 'UserProfile'
 } as const
 
@@ -146,6 +147,17 @@ export const FieldScalarFieldEnum = {
 } as const
 
 export type FieldScalarFieldEnum = (typeof FieldScalarFieldEnum)[keyof typeof FieldScalarFieldEnum]
+
+
+export const AIUsageScalarFieldEnum = {
+  id: 'id',
+  walletAddress: 'walletAddress',
+  usageCount: 'usageCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AIUsageScalarFieldEnum = (typeof AIUsageScalarFieldEnum)[keyof typeof AIUsageScalarFieldEnum]
 
 
 export const UserProfileScalarFieldEnum = {

@@ -15,6 +15,7 @@ import {
   Copy,
   FileText,
   Hash,
+  Lock,
   Mail,
   Monitor,
   MoreVertical,
@@ -186,6 +187,7 @@ export default function CreateFormPage() {
     );
   }
   
+  const isReadOnly = !!formData.isActive;
   const selectedField = selectedQuestionIndex !== null && formData.fields ? formData.fields[selectedQuestionIndex] : null;
   
   return (
@@ -195,6 +197,16 @@ export default function CreateFormPage() {
         activeTab="content"
       />
       
+      {isReadOnly && (
+        <div className="shrink-0 flex items-center gap-3 border-b border-amber-200 bg-amber-50 px-6 py-3">
+          <Lock className="h-4 w-4 shrink-0 text-amber-600" />
+          <p className="text-sm text-amber-800">
+            <strong>Formulario publicado.</strong> No podés modificar el contenido mientras el formulario está activo.
+            Desactivalo primero desde la navegación.
+          </p>
+        </div>
+      )}
+      
       <RewardsModal
         isOpen={showRewardsModal}
         onClose={() => setShowRewardsModal(false)}
@@ -202,13 +214,12 @@ export default function CreateFormPage() {
         onNo={handleRewardsNo}
       />
       
-      {/* Animación de éxito */}
       <PublishSuccessModal
         isOpen={showSuccessModal}
         onComplete={handleSuccessComplete}
       />
       
-      <div className="flex flex-1 gap-4 overflow-hidden p-4">
+      <div className={`flex flex-1 gap-4 overflow-hidden p-4 ${isReadOnly ? 'pointer-events-none select-none opacity-50' : ''}`}>
         {/* Sidebar izquierdo - Columna con 3 cajas */}
         <aside className="flex w-64 shrink-0 flex-col gap-4">
           {/* Caja 1: Lista de preguntas */}
@@ -446,18 +457,28 @@ export default function CreateFormPage() {
                       <input
                         type="text"
                         value={formData.welcome?.title || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, welcome: { ...prev.welcome, title: e.target.value, description: prev.welcome?.description || '' } }))}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          welcome: {
+                            ...prev.welcome,
+                            title: e.target.value,
+                            description: prev.welcome?.description || '',
+                          },
+                        }))}
                         placeholder="Say hi! Recall information with @"
                         className={`w-full mb-4 border-none bg-transparent px-0 py-0 font-normal italic text-gray-900 placeholder-gray-400 focus:outline-none focus:not-italic ${
                           viewMode === 'mobile' ? 'text-xl' : 'text-3xl'
                         }`}
                       />
-
+                      
                       {/* Descripción editable */}
                       <input
                         type="text"
                         value={formData.welcome?.description || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, welcome: { title: prev.welcome?.title || '', description: e.target.value } }))}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          welcome: { title: prev.welcome?.title || '', description: e.target.value },
+                        }))}
                         placeholder="Description (optional)"
                         className={`w-full mb-12 border-none bg-transparent px-0 py-0 font-normal italic text-gray-500 placeholder-gray-400 focus:outline-none ${
                           viewMode === 'mobile' ? 'text-sm' : 'text-base'
@@ -519,17 +540,23 @@ export default function CreateFormPage() {
                       <input
                         type="text"
                         value={formData.ending?.title || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, ending: { title: e.target.value, description: prev.ending?.description || '' } }))}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          ending: { title: e.target.value, description: prev.ending?.description || '' },
+                        }))}
                         placeholder="¡Gracias!"
                         className={`w-full mb-6 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-bold text-gray-900 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none text-center ${
                           viewMode === 'mobile' ? 'text-2xl' : 'text-4xl'
                         }`}
                       />
-
+                      
                       {/* Descripción editable */}
                       <textarea
                         value={formData.ending?.description || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, ending: { title: prev.ending?.title || '', description: e.target.value } }))}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          ending: { title: prev.ending?.title || '', description: e.target.value },
+                        }))}
                         placeholder="Tus respuestas han sido registradas exitosamente."
                         rows={2}
                         className={`w-full mb-8 rounded-lg border-2 border-transparent bg-transparent px-3 py-2 font-normal text-gray-600 placeholder-gray-400 transition-colors hover:border-gray-200 focus:border-primary focus:outline-none resize-none text-center ${

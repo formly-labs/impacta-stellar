@@ -23,6 +23,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         throw new Error('Formulario no encontrado');
       }
 
+      if (existingForm.isActive && isActive !== false) {
+        throw new Error('FORM_ACTIVE');
+      }
+
       await tx.form.update({
         where: { id: existingForm.id },
         data: {
@@ -62,6 +66,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     
     return NextResponse.json(updatedForm);
   } catch (error) {
+    if (error instanceof Error && error.message === 'FORM_ACTIVE') {
+      return NextResponse.json({ error: 'No se puede modificar un formulario activo' }, { status: 403 });
+    }
     console.error(error);
     return NextResponse.json({ error: 'Error al actualizar' }, { status: 500 });
   }

@@ -1,9 +1,12 @@
 import { FormUpdateInput } from '@/types';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { Bot, Send, User } from 'lucide-react';
+import { Bot, Send, Sparkles, User } from 'lucide-react';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useWallet } from 'stellar-wallet-kit';
+
+const FREE_LIMIT = 5;
 
 interface AIAssistantProps {
   formData: FormUpdateInput,
@@ -11,14 +14,28 @@ interface AIAssistantProps {
 }
 
 export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => {
-  
+  const { account } = useWallet();
+  const wallet = account?.address;
+
   const [ aiPrompt, setAiPrompt ] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const [ usageCount, setUsageCount ] = useState(0);
+  const [ checkingUsage, setCheckingUsage ] = useState(true);
+  const limitReached = usageCount >= FREE_LIMIT;
+
+  useEffect(() => {
+    if (!wallet) { setCheckingUsage(false); return; }
+    fetch(`/api/ai/usage?wallet=${wallet}`)
+      .then((res) => res.json())
+      .then((data: { usageCount: number }) => setUsageCount(data.usageCount))
+      .catch(() => {})
+      .finally(() => setCheckingUsage(false));
+  }, [ wallet ]);
+
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat/form-creator',
-      body: () => ({ formData }),
+      body: () => ({ formData, wallet }),
     }),
     onFinish: ({ message }) => {
       const parts = message.parts || [];
@@ -56,15 +73,13 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const userMessage = aiPrompt.trim();
-    
-    if (!userMessage) {
-      return;
-    }
-    
+    if (!userMessage || limitReached) return;
+
     setAiPrompt('');
-    
+    setUsageCount((prev) => prev + 1);
+
     await sendMessage({
       role: 'user',
       parts: [ { type: 'text', text: userMessage } ],
@@ -75,11 +90,18 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
     <aside className="flex h-full flex-col">
       {/* Header */}
       <div className="shrink-0 border-b border-gray-200 p-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Bot className="h-4 w-4 text-white" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <h3 className="font-semibold text-gray-900">AI Assistant</h3>
           </div>
-          <h3 className="font-semibold text-gray-900">AI Assistant</h3>
+          {!checkingUsage && (
+            <span className={`text-xs font-medium ${limitReached ? 'text-red-500' : 'text-gray-400'}`}>
+              {usageCount}/{FREE_LIMIT}
+            </span>
+          )}
         </div>
       </div>
       
@@ -147,29 +169,52 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
       
       {/* Input Area */}
       <div className="shrink-0 border-t border-gray-200 p-4">
-        <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-          <textarea
-            value={aiPrompt}
-            onChange={(e) => setAiPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            placeholder="Crear o editar campos..."
-            rows={1}
-            disabled={status === 'submitted' || status === 'streaming'}
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-32"
-          />
-          <button
-            type="submit"
-            disabled={status === 'submitted' || status === 'streaming' || !aiPrompt.trim()}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </form>
+        {limitReached ? (
+          <div className="rounded-lg border border-red-100 bg-red-50 p-4 text-center space-y-2">
+            <div className="flex justify-center">
+              <Sparkles className="h-5 w-5 text-red-400" />
+            </div>
+            <p className="text-sm font-medium text-red-700">
+              Límite gratuito alcanzado
+            </p>
+            <p className="text-xs text-red-500">
+              Usaste tus {FREE_LIMIT} consultas gratuitas. Para continuar usando el AI Assistant,{' '}
+              <a
+                href="https://formly.juki.ly/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline underline-offset-2 hover:text-red-700"
+              >
+                contáctanos
+              </a>
+              .
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+            <textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+              placeholder="Crear o editar campos..."
+              rows={1}
+              disabled={status === 'submitted' || status === 'streaming'}
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-32"
+            />
+            <button
+              type="submit"
+              disabled={status === 'submitted' || status === 'streaming' || !aiPrompt.trim()}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </form>
+        )}
       </div>
     </aside>
   );
