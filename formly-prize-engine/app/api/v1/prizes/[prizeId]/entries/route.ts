@@ -50,10 +50,10 @@ export async function GET(
       limit: searchParams.get("limit"),
       cursor: searchParams.get("cursor") ?? undefined,
     });
-    const opts = parsed.success ? parsed.data : { limit: 50 };
+    const opts = parsed.success ? parsed.data : { limit: 20 };
     const result = await listEntries(prizeId, opts);
     return jsonOk(
-      { items: result.items, nextCursor: result.nextCursor },
+      { items: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore },
       200,
       requestId
     );

@@ -1,25 +1,31 @@
 export interface CreatePrizeRequest {
-  formId: string;
-  creatorId: string;
+  formId?: string;
+  creatorId?: string;
   rewardType: "XLM" | "USDC" | "POINTS";
   distributionMode: "LOTTERY_SINGLE" | "SPLIT_EQUAL";
-  amount: string;
+  prizeAmount: string;
   feeBps?: number;
   closeAt: string;
   drawAt: string;
 }
 
 export interface PrizePublic {
-  id: string;
-  formId: string;
-  creatorId: string;
+  prizeId: string;
+  status: string;
   rewardType: "XLM" | "USDC" | "POINTS";
   distributionMode: "LOTTERY_SINGLE" | "SPLIT_EQUAL";
-  amount: string;
+  prizeAmount: string;
   feeBps: number;
-  status: string;
+  feeAmount: string;
+  prizeNet: string;
+  vaultAddress: string | null;
   closeAt: string;
   drawAt: string;
+  lockRef: string | null;
+  payoutRef: string | null;
+  ledgerBatchId: string | null;
+  lockedAt: string | null;
+  distributedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,10 +40,12 @@ export interface AddEntryRequest {
 }
 
 export interface EntryPublic {
-  id: string;
+  entryId: string;
   prizeId: string;
-  walletAddress: string;
-  sourceId: string | null;
+  userId: string;
+  formResponseId: string | null;
+  amount: string | null;
+  winner: boolean;
   createdAt: string;
 }
 
@@ -48,6 +56,21 @@ export interface AddEntryResponse {
 export interface ListEntriesResponse {
   items: EntryPublic[];
   nextCursor: string | null;
+  hasMore: boolean;
+}
+
+export interface DistributionResult {
+  prizeId: string;
+  status: string;
+  payoutRef: string | null;
+  ledgerBatchId: string | null;
+  distributedAt: string | null; // null when not yet distributed
+  winners: Array<{
+    entryId: string;
+    userId: string;
+    amount: string;
+    winner: boolean;
+  }>;
 }
 
 export interface ErrorResponse {

@@ -1,6 +1,11 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { ApiError } from "@/lib/errors";
+import * as prizeRepo from "@/domain/repositories/prizeRepo";
+import * as entryRepo from "@/domain/repositories/entryRepo";
+import * as resultRepo from "@/domain/repositories/resultRepo";
+import { toPrizePublic } from "@/domain/mappers/prizeMapper";
+import { toEntryPublic } from "@/domain/mappers/entryMapper";
 import type { CreatePrizeInput } from "@/validators/prizeValidators";
-import type { PrizePublic } from "@/types/dtos";
+import type { PrizePublic, DistributionResult } from "@/types/dtos";
 
 const PLACEHOLDER_VAULT = "GPLACEHOLDER_MVP";
 
@@ -8,88 +13,194 @@ function toExternalId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
 }
 
-function rowToPrizePublic(row: {
-  id: string;
-  external_id: string;
-  form_id: string | null;
-  creator_user_id: string | null;
-  reward_type: string;
-  distribution_mode: string;
-  amount_total: string;
-  fee_bps: number;
-  status: string;
-  close_at: string;
-  draw_at: string;
-  created_at: string;
-  updated_at: string;
-}): PrizePublic {
-  return {
-    id: row.external_id,
-    formId: row.form_id ?? "",
-    creatorId: row.creator_user_id ?? "",
-    rewardType: row.reward_type as PrizePublic["rewardType"],
-    distributionMode: row.distribution_mode as PrizePublic["distributionMode"],
-    amount: String(row.amount_total),
-    feeBps: row.fee_bps,
-    status: row.status,
-    closeAt: row.close_at,
-    drawAt: row.draw_at,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
 export async function createPrize(
   input: CreatePrizeInput,
   _requestId: string
 ): Promise<PrizePublic> {
   const feeBps = input.feeBps ?? 1000;
-  const amountNum = Number(input.amount);
-  const feeAmount = (amountNum * feeBps) / 10000;
+  const amountStr = input.amount || input.prizeAmount || "0";
+  const amountNum = Number(amountStr);
+  const feeAmount = Math.floor((amountNum * feeBps) / 10000);
   const prizeNet = amountNum - feeAmount;
 
-  const status =
-    input.rewardType === "POINTS" ? "LOCKED" : "PENDING";
+  const status = input.rewardType === "POINTS" ? "LOCKED" : "PENDING";
   const vaultPublicKey =
     input.rewardType === "XLM" || input.rewardType === "USDC"
       ? PLACEHOLDER_VAULT
       : null;
 
-  const { data, error } = await supabaseAdmin
-    .from("prizes")
-    .insert({
-      external_id: toExternalId("prize"),
-      form_id: input.formId,
-      creator_user_id: input.creatorId,
-      reward_type: input.rewardType,
-      distribution_mode: input.distributionMode,
-      amount_total: input.amount,
-      fee_bps: feeBps,
-      fee_amount: String(feeAmount.toFixed(7)),
-      prize_net: String(prizeNet.toFixed(7)),
-      close_at: input.closeAt,
-      draw_at: input.drawAt,
-      status,
-      vault_public_key: vaultPublicKey,
-    })
-    .select(
-      "id, external_id, form_id, creator_user_id, reward_type, distribution_mode, amount_total, fee_bps, status, close_at, draw_at, created_at, updated_at"
-    )
-    .single();
+  if (new Date(input.drawAt) <= new Date(input.closeAt)) {
+    throw new ApiError(422, "UNPROCESSABLE_ENTITY", "drawAt must be after closeAt", null);
+  }
 
-  if (error) throw error;
-  return rowToPrizePublic(data);
+  const row = await prizeRepo.insertPrize({
+    external_id: toExternalId("prize"),
+    form_id: input.formId ?? null,
+    creator_user_id: input.creatorId ?? null,
+    reward_type: input.rewardType,
+    distribution_mode: input.distributionMode,
+    amount_total: amountStr,
+    fee_bps: feeBps,
+    fee_amount: String(feeAmount.toFixed(7)),
+    prize_net: String(prizeNet.toFixed(7)),
+    close_at: input.closeAt,
+    draw_at: input.drawAt,
+    status,
+    vault_public_key: vaultPublicKey,
+  });
+  return toPrizePublic(row);
 }
 
 export async function getPrize(prizeId: string): Promise<PrizePublic | null> {
-  const { data, error } = await supabaseAdmin
-    .from("prizes")
-    .select(
-      "id, external_id, form_id, creator_user_id, reward_type, distribution_mode, amount_total, fee_bps, status, close_at, draw_at, created_at, updated_at"
-    )
-    .eq("external_id", prizeId)
-    .maybeSingle();
+  const row = await prizeRepo.findPrizeById(prizeId);
+  return row ? toPrizePublic(row) : null;
+}
 
-  if (error) throw error;
-  return data ? rowToPrizePublic(data) : null;
+export async function closePrize(prizeId: string): Promise<PrizePublic> {
+  const row = await prizeRepo.findPrizeById(prizeId);
+  if (!row) throw new ApiError(404, "NOT_FOUND", "Prize not found", null);
+  if (row.status !== "LOCKED") {
+    throw new ApiError(
+      409,
+      "CONFLICT",
+      "Prize must be LOCKED to close",
+      { currentStatus: row.status }
+    );
+  }
+  const updated = await prizeRepo.updatePrizeStatus(prizeId, "CLOSED");
+  return toPrizePublic(updated);
+}
+
+export async function getResult(prizeId: string): Promise<DistributionResult | null> {
+  const snapshot = await resultRepo.getResult(prizeId);
+  if (!snapshot) return null;
+  return {
+    prizeId: snapshot.prizeId,
+    status: snapshot.status,
+    payoutRef: snapshot.payoutRef,
+    ledgerBatchId: snapshot.ledgerBatchId,
+    distributedAt: snapshot.distributedAt,
+    winners: snapshot.winners ?? [],
+  };
+}
+
+export async function distributePrize(prizeId: string): Promise<DistributionResult> {
+  const row = await prizeRepo.findPrizeById(prizeId);
+  if (!row) throw new ApiError(404, "NOT_FOUND", "Prize not found", null);
+  if (row.status === "DISTRIBUTED") {
+    const existing = await resultRepo.getResult(prizeId);
+    if (existing) {
+      return {
+        prizeId: existing.prizeId,
+        status: existing.status,
+        payoutRef: existing.payoutRef,
+        ledgerBatchId: existing.ledgerBatchId,
+        distributedAt: existing.distributedAt,
+        winners: existing.winners ?? [],
+      };
+    }
+  }
+
+  if (row.status !== "CLOSED" && row.status !== "FAILED") {
+    throw new ApiError(
+      422,
+      "UNPROCESSABLE_ENTITY",
+      "Prize must be CLOSED or FAILED to distribute",
+      { currentStatus: row.status }
+    );
+  }
+  const now = new Date().toISOString();
+  if (new Date(row.draw_at) > new Date(now)) {
+    throw new ApiError(
+      422,
+      "UNPROCESSABLE_ENTITY",
+      "drawAt has not passed yet",
+      null
+    );
+  }
+
+  const prizeUuid = row.id;
+  const entriesResult = await entryRepo.listEntries(prizeUuid, { limit: 10000 });
+  const entries = entriesResult.items;
+  const N = entries.length;
+
+  if (N === 0) {
+    await prizeRepo.updatePrizeStatus(prizeId, "FAILED");
+    throw new ApiError(
+      422,
+      "UNPROCESSABLE_ENTITY",
+      "No entries to distribute",
+      { errorCode: "NO_ENTRIES_TO_DISTRIBUTE" }
+    );
+  }
+
+  const prizeNet = Number(row.prize_net);
+  const distributionMode = row.distribution_mode;
+  const winners: Array<{ entryId: string; userId: string; amount: string; winner: boolean }> = [];
+
+  if (distributionMode === "LOTTERY_SINGLE") {
+    const idx = Math.floor(Math.random() * N);
+    const winner = entries[idx];
+    winners.push({
+      entryId: winner.external_id,
+      userId: winner.wallet_address,
+      amount: String(prizeNet),
+      winner: true,
+    });
+  } else {
+    const amountPerWinner = Math.floor(prizeNet / N);
+    const remainder = prizeNet - amountPerWinner * N;
+    const sorted = [...entries].sort((a, b) => a.external_id.localeCompare(b.external_id));
+    sorted.forEach((entry, i) => {
+      const amount = i === 0 ? amountPerWinner + remainder : amountPerWinner;
+      winners.push({
+        entryId: entry.external_id,
+        userId: entry.wallet_address,
+        amount: String(amount.toFixed(7)),
+        winner: false,
+      });
+    });
+  }
+
+  const resultJson: DistributionResult = {
+    prizeId,
+    status: "DISTRIBUTED",
+    payoutRef: null,
+    ledgerBatchId: null,
+    distributedAt: now,
+    winners,
+  };
+
+  for (const w of winners) {
+    await entryRepo.updateEntryAmountAndWinner(prizeUuid, w.entryId, w.amount, w.winner);
+  }
+
+  if (row.reward_type === "POINTS") {
+    const batchId = `batch_${toExternalId("ledger")}`;
+    const { supabaseAdmin } = await import("@/lib/supabaseAdmin");
+    for (const w of winners) {
+      await supabaseAdmin.from("points_ledger").insert({
+        prize_id: prizeUuid,
+        wallet_address: w.userId,
+        delta_points: w.amount,
+        reason: "prize_distribution",
+        batch_id: batchId,
+      });
+    }
+    resultJson.ledgerBatchId = batchId;
+    await resultRepo.upsertResult(prizeId, { ...resultJson, distributedAt: now }, {
+      status: "DISTRIBUTED",
+      distributed_at: now,
+      ledger_batch_id: batchId,
+    });
+  } else {
+    resultJson.status = "DISTRIBUTING";
+    resultJson.payoutRef = null;
+    await resultRepo.upsertResult(prizeId, { ...resultJson, distributedAt: now }, {
+      status: "DISTRIBUTING",
+      distributed_at: now,
+    });
+  }
+
+  return resultJson;
 }

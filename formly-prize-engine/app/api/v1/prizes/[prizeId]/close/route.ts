@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { requireServiceAuth } from "@/lib/auth";
 import { normalizeError } from "@/lib/errors";
 import { newRequestId, jsonOk, jsonError } from "@/lib/http";
-import { distributePrize } from "@/domain/prizes/prizeService";
+import { closePrize } from "@/domain/prizes/prizeService";
 
 export async function POST(
   request: NextRequest,
@@ -12,8 +12,8 @@ export async function POST(
   try {
     requireServiceAuth(request);
     const { prizeId } = await params;
-    const result = await distributePrize(prizeId);
-    return jsonOk(result, 200, requestId);
+    const prize = await closePrize(prizeId);
+    return jsonOk({ prize }, 200, requestId);
   } catch (err) {
     const apiErr = normalizeError(err);
     return jsonError(
