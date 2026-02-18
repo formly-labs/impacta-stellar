@@ -79,3 +79,35 @@ export interface ErrorResponse {
   details: Record<string, unknown> | null;
   requestId: string;
 }
+
+export interface PaymentIntentRequest {
+  creatorPublicKey: string;
+}
+
+export interface ExpectedPayment {
+  asset: "XLM" | "USDC";
+  amount: string;
+  destination: string;
+  issuer?: string;
+}
+
+export interface PaymentIntentResponse {
+  paymentIntentId: string;
+  prizeId: string;
+  rewardType: "XLM" | "USDC";
+  amountTotal: string;
+  feeBps: number;
+  feeAmount: string;
+  prizeNet: string;
+  memo: string;
+  depositTarget: string;
+  feeTarget: string;
+  unsignedXdr: string;
+  networkPassphrase: string;
+  expiresAt: string;
+  expectedPayments: ExpectedPayment[];
+  hash: string;
+  horizonUrl?: string;
+  minTime?: string;
+  maxTime?: string;
+}

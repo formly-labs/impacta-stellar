@@ -33,3 +33,13 @@ export const createPrizeSchema = z
   }));
 
 export type CreatePrizeInput = z.infer<typeof createPrizeSchema>;
+
+export const paymentIntentSchema = z.object({
+  creatorPublicKey: z
+    .string()
+    .min(1, "creatorPublicKey is required")
+    .refine((v) => v.startsWith("G"), "creatorPublicKey must be a Stellar public key (G...)")
+    .refine((v) => v.length === 56, "creatorPublicKey must be 56 characters"),
+});
+
+export type PaymentIntentInput = z.infer<typeof paymentIntentSchema>;

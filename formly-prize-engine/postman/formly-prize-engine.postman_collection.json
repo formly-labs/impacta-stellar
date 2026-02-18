@@ -108,7 +108,7 @@
       }
     },
     {
-      "name": "9. Payment Intent (stub 501)",
+      "name": "9. Create Payment Intent",
       "request": {
         "method": "POST",
         "header": [
@@ -116,8 +116,9 @@
           { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
           { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
-        "body": { "mode": "raw", "raw": "{}" },
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent"
+        "body": { "mode": "raw", "raw": "{\n  \"creatorPublicKey\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent",
+        "description": "Genera un Payment Intent (unsigned XDR) para prize XLM/USDC en PENDING. Requiere creatorPublicKey (G...). El core firma y envía la XDR a Stellar."
       }
     },
     {

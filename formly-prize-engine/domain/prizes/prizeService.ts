@@ -1,4 +1,5 @@
 import { ApiError } from "@/lib/errors";
+import { env } from "@/lib/env";
 import { acquireLock } from "@/lib/locks";
 import * as prizeRepo from "@/domain/repositories/prizeRepo";
 import * as entryRepo from "@/domain/repositories/entryRepo";
@@ -9,8 +10,6 @@ import type { CreatePrizeInput } from "@/validators/prizeValidators";
 import type { PrizePublic, DistributionResult } from "@/types/dtos";
 
 const DISTRIBUTE_LOCK_TTL_SECONDS = 60;
-
-const PLACEHOLDER_VAULT = "GPLACEHOLDER_MVP";
 
 function toExternalId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
@@ -27,10 +26,20 @@ export async function createPrize(
   const prizeNet = amountNum - feeAmount;
 
   const status = input.rewardType === "POINTS" ? "LOCKED" : "PENDING";
-  const vaultPublicKey =
-    input.rewardType === "XLM" || input.rewardType === "USDC"
-      ? PLACEHOLDER_VAULT
-      : null;
+
+  let vaultPublicKey: string | null = null;
+  if (input.rewardType === "XLM" || input.rewardType === "USDC") {
+    const sharedVault = env.PRIZE_VAULT_PUBLIC_KEY;
+    if (!sharedVault) {
+      throw new ApiError(
+        500,
+        "INTERNAL_ERROR",
+        "PRIZE_VAULT_PUBLIC_KEY is not configured (required for XLM/USDC prizes)",
+        null
+      );
+    }
+    vaultPublicKey = sharedVault;
+  }
 
   if (new Date(input.drawAt) <= new Date(input.closeAt)) {
     throw new ApiError(422, "UNPROCESSABLE_ENTITY", "drawAt must be after closeAt", null);
