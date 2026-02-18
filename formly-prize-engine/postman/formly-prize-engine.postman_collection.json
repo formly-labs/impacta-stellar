@@ -1,13 +1,14 @@
 {
   "info": {
     "name": "formly-prize-engine",
-    "description": "API v1 — prizes, entries, close, distribute, result (reales). payment-intent y jobs/tick siguen stub 501.",
+    "description": "API v1. Flujo recomendado para un prize: 1 Create Prize → 2 Get Prize (copiar prizeId a variable) → 3 Add Entry → 4 List Entries → 5 Close Prize → 6 Distribute → 7 Result. Si Distribute devuelve LOCKED: otro request tiene el lock (esperar ~60s) o no ejecutaste Close antes. Idempotency-Key opcional en POST; Jobs Tick 200 (stub), payment-intent 501.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
     { "key": "serviceToken", "value": "" },
-    { "key": "prizeId", "value": "" }
+    { "key": "prizeId", "value": "" },
+    { "key": "idempotencyKey", "value": "550e8400-e29b-41d4-a716-446655440001" }
   ],
   "item": [
     {
@@ -16,42 +17,48 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"rewardType\": \"POINTS\",\n  \"distributionMode\": \"SPLIT_EQUAL\",\n  \"prizeAmount\": \"60.0000000\",\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}"
-        },
-        "url": "{{baseUrl}}/api/v1/prizes"
+        "body": { "mode": "raw", "raw": "{\n  \"rewardType\": \"POINTS\",\n  \"distributionMode\": \"SPLIT_EQUAL\",\n  \"prizeAmount\": \"60.0000000\",\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes",
+        "description": "Paso 1. Crea un prize POINTS (queda en estado LOCKED). De la respuesta copia prizeId a la variable de colección prizeId."
       }
     },
     {
-      "name": "2. Create Prize (USDC)",
+      "name": "2. Get Prize",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}",
+        "description": "Paso 2. Comprueba el prize. Asegúrate de tener prizeId en la variable (si no, cópialo del paso 1)."
+      }
+    },
+    {
+      "name": "3. Add Entry",
       "request": {
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"rewardType\": \"USDC\",\n  \"distributionMode\": \"LOTTERY_SINGLE\",\n  \"prizeAmount\": \"100.0000000\",\n  \"feeBps\": 1000,\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}"
-        },
-        "url": "{{baseUrl}}/api/v1/prizes"
+        "body": { "mode": "raw", "raw": "{\n  \"walletAddress\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n  \"sourceId\": \"resp_01\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/entries",
+        "description": "Paso 3. Añade una entry al prize (prize en PENDING o LOCKED)."
       }
     },
     {
-      "name": "3. Get Prize",
+      "name": "4. List Entries",
       "request": {
         "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
-        ],
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}"
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/entries?limit=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "prizes", "{{prizeId}}", "entries"], "query": [{ "key": "limit", "value": "20" }, { "key": "cursor", "value": "", "disabled": true }] },
+        "description": "Paso 4. Lista entries (opcional, para verificar)."
       }
     },
     {
-      "name": "6. Close Prize",
+      "name": "5. Close Prize",
       "request": {
         "method": "POST",
         "header": [
@@ -59,62 +66,45 @@
           { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{}" },
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/close"
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/close",
+        "description": "Paso 5. Obligatorio antes de Distribute. Pasa el prize de LOCKED → CLOSED. (Prize POINTS ya viene LOCKED al crear; si creaste USDC está PENDING y close fallará hasta que esté LOCKED.)"
       }
     },
     {
-      "name": "4. Add Entry",
+      "name": "6. Distribute",
       "request": {
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"walletAddress\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n  \"sourceId\": \"resp_01\"\n}"
-        },
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/entries"
-      }
-    },
-    {
-      "name": "5. List Entries",
-      "request": {
-        "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/entries?limit=20",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "v1", "prizes", "{{prizeId}}", "entries"],
-          "query": [
-            { "key": "limit", "value": "20" },
-            { "key": "cursor", "value": "", "disabled": true }
-          ]
-        }
-      }
-    },
-    {
-      "name": "7. Distribute",
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
         "body": { "mode": "raw", "raw": "{}" },
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/distribute"
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/distribute",
+        "description": "Paso 6. Ejecutar solo después de Close. El prize debe estar CLOSED y drawAt debe haber pasado. Si recibes 409 LOCKED: otro distribute tiene el lock (~60s) o no cerraste el prize; espera y reintenta o verifica que ejecutaste paso 5."
       }
     },
     {
-      "name": "8. Result",
+      "name": "7. Result",
       "request": {
         "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/result",
+        "description": "Paso 7. Ver resultado y ganadores después de Distribute."
+      }
+    },
+    {
+      "name": "8. Create Prize (USDC)",
+      "request": {
+        "method": "POST",
         "header": [
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
-        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/result"
+        "body": { "mode": "raw", "raw": "{\n  \"rewardType\": \"USDC\",\n  \"distributionMode\": \"LOTTERY_SINGLE\",\n  \"prizeAmount\": \"100.0000000\",\n  \"feeBps\": 1000,\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes",
+        "description": "Alternativa: crear prize USDC (queda PENDING; close solo permite LOCKED→CLOSED)."
       }
     },
     {
@@ -123,24 +113,23 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
         "body": { "mode": "raw", "raw": "{}" },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent"
       }
     },
     {
-      "name": "10. Jobs Tick (stub 501)",
+      "name": "10. Jobs Tick (200 stub)",
       "request": {
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
+          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"runMode\": \"execute\",\n  \"maxPrizes\": 50\n}"
-        },
+        "body": { "mode": "raw", "raw": "{\n  \"runMode\": \"execute\",\n  \"maxPrizes\": 50\n}" },
         "url": "{{baseUrl}}/api/v1/jobs/tick"
       }
     }

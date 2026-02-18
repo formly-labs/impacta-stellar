@@ -1,11 +1,14 @@
 import { ApiError } from "@/lib/errors";
+import { acquireLock } from "@/lib/locks";
 import * as prizeRepo from "@/domain/repositories/prizeRepo";
 import * as entryRepo from "@/domain/repositories/entryRepo";
 import * as resultRepo from "@/domain/repositories/resultRepo";
+import { assertTransition, transitionPrizeStatus } from "@/domain/state/stateMachine";
 import { toPrizePublic } from "@/domain/mappers/prizeMapper";
-import { toEntryPublic } from "@/domain/mappers/entryMapper";
 import type { CreatePrizeInput } from "@/validators/prizeValidators";
 import type { PrizePublic, DistributionResult } from "@/types/dtos";
+
+const DISTRIBUTE_LOCK_TTL_SECONDS = 60;
 
 const PLACEHOLDER_VAULT = "GPLACEHOLDER_MVP";
 
@@ -59,16 +62,10 @@ export async function getPrize(prizeId: string): Promise<PrizePublic | null> {
 export async function closePrize(prizeId: string): Promise<PrizePublic> {
   const row = await prizeRepo.findPrizeById(prizeId);
   if (!row) throw new ApiError(404, "NOT_FOUND", "Prize not found", null);
-  if (row.status !== "LOCKED") {
-    throw new ApiError(
-      409,
-      "CONFLICT",
-      "Prize must be LOCKED to close",
-      { currentStatus: row.status }
-    );
-  }
-  const updated = await prizeRepo.updatePrizeStatus(prizeId, "CLOSED");
-  return toPrizePublic(updated);
+  assertTransition(row.status, "CLOSED");
+  await transitionPrizeStatus(prizeId, "LOCKED", "CLOSED");
+  const updated = await prizeRepo.findPrizeById(prizeId);
+  return toPrizePublic(updated!);
 }
 
 export async function getResult(prizeId: string): Promise<DistributionResult | null> {
@@ -84,7 +81,17 @@ export async function getResult(prizeId: string): Promise<DistributionResult | n
   };
 }
 
-export async function distributePrize(prizeId: string): Promise<DistributionResult> {
+export async function distributePrize(
+  prizeId: string,
+  requestId: string
+): Promise<DistributionResult> {
+  await acquireLock({
+    scopeId: prizeId,
+    operation: "distribute",
+    ttlSeconds: DISTRIBUTE_LOCK_TTL_SECONDS,
+    ownerId: requestId,
+  });
+
   const row = await prizeRepo.findPrizeById(prizeId);
   if (!row) throw new ApiError(404, "NOT_FOUND", "Prize not found", null);
   if (row.status === "DISTRIBUTED") {
@@ -101,14 +108,6 @@ export async function distributePrize(prizeId: string): Promise<DistributionResu
     }
   }
 
-  if (row.status !== "CLOSED" && row.status !== "FAILED") {
-    throw new ApiError(
-      422,
-      "UNPROCESSABLE_ENTITY",
-      "Prize must be CLOSED or FAILED to distribute",
-      { currentStatus: row.status }
-    );
-  }
   const now = new Date().toISOString();
   if (new Date(row.draw_at) > new Date(now)) {
     throw new ApiError(
@@ -125,7 +124,7 @@ export async function distributePrize(prizeId: string): Promise<DistributionResu
   const N = entries.length;
 
   if (N === 0) {
-    await prizeRepo.updatePrizeStatus(prizeId, "FAILED");
+    await transitionPrizeStatus(prizeId, row.status, "FAILED");
     throw new ApiError(
       422,
       "UNPROCESSABLE_ENTITY",
@@ -133,6 +132,8 @@ export async function distributePrize(prizeId: string): Promise<DistributionResu
       { errorCode: "NO_ENTRIES_TO_DISTRIBUTE" }
     );
   }
+
+  assertTransition(row.status, row.reward_type === "POINTS" ? "DISTRIBUTED" : "DISTRIBUTING");
 
   const prizeNet = Number(row.prize_net);
   const distributionMode = row.distribution_mode;
@@ -188,17 +189,17 @@ export async function distributePrize(prizeId: string): Promise<DistributionResu
       });
     }
     resultJson.ledgerBatchId = batchId;
-    await resultRepo.upsertResult(prizeId, { ...resultJson, distributedAt: now }, {
-      status: "DISTRIBUTED",
+    await transitionPrizeStatus(prizeId, row.status, "DISTRIBUTED", {
       distributed_at: now,
       ledger_batch_id: batchId,
+      payout_result: resultJson,
     });
   } else {
     resultJson.status = "DISTRIBUTING";
     resultJson.payoutRef = null;
-    await resultRepo.upsertResult(prizeId, { ...resultJson, distributedAt: now }, {
-      status: "DISTRIBUTING",
+    await transitionPrizeStatus(prizeId, row.status, "DISTRIBUTING", {
       distributed_at: now,
+      payout_result: resultJson,
     });
   }
 
