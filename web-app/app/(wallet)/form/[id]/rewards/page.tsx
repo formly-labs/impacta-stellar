@@ -88,7 +88,9 @@ export default function RewardsPage() {
 
   const [addFundsAmount, setAddFundsAmount] = useState('');
   const [fundLoading, setFundLoading] = useState(false);
-  const [showEditToast, setShowEditToast] = useState(false);
+  const [editingParticipant, setEditingParticipant] = useState<string | null>(null);
+  const [editRewardValue, setEditRewardValue] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
   const [showAllParticipants, setShowAllParticipants] = useState(false);
 
   const fetchBudget = useCallback(async () => {
@@ -133,9 +135,37 @@ export default function RewardsPage() {
     fetchParticipants(participantsPage);
   }, [fetchParticipants, participantsPage]);
 
-  const handleEdit = () => {
-    setShowEditToast(true);
-    setTimeout(() => setShowEditToast(false), 2500);
+  const handleEditStart = (participant: Participant) => {
+    setEditingParticipant(participant.id);
+    setEditRewardValue(participant.reward.toString());
+  };
+
+  const handleEditSave = async (participantId: string) => {
+    const newReward = parseFloat(editRewardValue);
+    if (isNaN(newReward) || newReward < 0) return;
+    setEditLoading(true);
+    try {
+      const res = await fetch(
+        `/api/forms/${formId}/rewards/participants/${participantId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reward: newReward }),
+        },
+      );
+      if (res.ok) {
+        setEditingParticipant(null);
+        fetchParticipants(participantsPage);
+        fetchBudget();
+      }
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingParticipant(null);
+    setEditRewardValue('');
   };
 
   const handleFund = async () => {
@@ -185,17 +215,7 @@ export default function RewardsPage() {
     <div className="flex h-full flex-col bg-white">
       <FormEditNavigation formId={formId} activeTab="rewards" />
 
-      {/* Toast "Próximamente" */}
-      {showEditToast && (
-        <div className="fixed top-20 left-1/2 z-50 -translate-x-1/2 animate-fade-in">
-          <div className="flex items-center gap-2 rounded-xl border border-purple-200 bg-white px-5 py-3 shadow-lg">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-gray-800">
-              Próximamente — Edición de recompensas individuales
-            </span>
-          </div>
-        </div>
-      )}
+      {/* (inline editing is now in the participants table) */}
 
       <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
         <div className="mx-auto max-w-5xl space-y-6">
@@ -429,20 +449,56 @@ export default function RewardsPage() {
 
                     {/* Reward */}
                     <div className="flex items-center gap-1 text-sm text-gray-700">
-                      <DollarSign className="h-3.5 w-3.5 text-gray-400" />
-                      <span className="font-medium">
-                        {p.reward.toFixed(2)}
-                      </span>
+                      {editingParticipant === p.id ? (
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="h-3.5 w-3.5 text-gray-400" />
+                          <input
+                            type="number"
+                            value={editRewardValue}
+                            onChange={(e) => setEditRewardValue(e.target.value)}
+                            className="w-20 rounded border border-gray-300 px-2 py-0.5 text-sm focus:border-primary focus:outline-none"
+                            min="0"
+                            step="0.01"
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <DollarSign className="h-3.5 w-3.5 text-gray-400" />
+                          <span className="font-medium">
+                            {p.reward.toFixed(2)}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     {/* Actions */}
-                    <div className="text-right">
-                      <button
-                        onClick={handleEdit}
-                        className="text-sm font-medium text-primary transition-colors hover:text-primary-700"
-                      >
-                        Editar
-                      </button>
+                    <div className="flex items-center justify-end gap-2">
+                      {editingParticipant === p.id ? (
+                        <>
+                          <button
+                            onClick={() => handleEditSave(p.id)}
+                            disabled={editLoading}
+                            className="text-sm font-medium text-green-600 transition-colors hover:text-green-800 disabled:opacity-50"
+                          >
+                            {editLoading ? '...' : 'Guardar'}
+                          </button>
+                          <button
+                            onClick={handleEditCancel}
+                            className="text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleEditStart(p)}
+                          disabled={p.status === 'paid'}
+                          className="text-sm font-medium text-primary transition-colors hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Editar
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))

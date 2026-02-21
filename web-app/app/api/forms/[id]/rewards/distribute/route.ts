@@ -39,7 +39,10 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       }),
       prisma.rewardBudget.update({
         where: { formId: form.id },
-        data: { consumed: { increment: totalAmount } },
+        data: {
+          consumed: { increment: totalAmount },
+          pending: { decrement: totalAmount },
+        },
       }),
     ]);
 
