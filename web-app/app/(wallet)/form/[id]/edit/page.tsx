@@ -236,8 +236,12 @@ export default function CreateFormPage() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              {/* Mobile sidebar content — cloned below */}
+              {/* Mobile sidebar: Welcome (top), Questions, End screen (bottom) */}
               <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
+                <button onClick={() => { setSelectedScreen('welcome'); setShowMobileSidebar(false); }}
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                  Welcome screen <Plus className="h-4 w-4 text-gray-400" />
+                </button>
                 <div className="flex-1 space-y-0.5">
                   {formData.fields?.map((field, index) => (
                     <button
@@ -253,10 +257,6 @@ export default function CreateFormPage() {
                     <p className="py-6 text-center text-sm text-gray-400">No hay preguntas</p>
                   )}
                 </div>
-                <button onClick={() => { setSelectedScreen('welcome'); setShowMobileSidebar(false); }}
-                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
-                  Welcome screen <Plus className="h-4 w-4 text-gray-400" />
-                </button>
                 <button onClick={() => { setSelectedScreen('ending'); setShowMobileSidebar(false); }}
                   className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
                   <span className="flex items-center gap-2">
@@ -288,9 +288,22 @@ export default function CreateFormPage() {
           </div>
         )}
 
-        {/* Desktop sidebar */}
+        {/* Desktop sidebar: Welcome (top), Questions, End screen (bottom) */}
         <aside className="hidden w-64 shrink-0 flex-col gap-3 lg:flex">
-          {/* Lista de preguntas */}
+          {/* Welcome screen - at top */}
+          <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
+            <button
+              onClick={() => setSelectedScreen('welcome')}
+              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
+                selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'
+              }`}
+            >
+              <span className="text-sm font-medium text-gray-700">Welcome screen</span>
+              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
+            </button>
+          </div>
+
+          {/* Question section */}
           <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div className="flex-1 overflow-y-auto p-3">
               <div className="space-y-0.5">
@@ -385,20 +398,7 @@ export default function CreateFormPage() {
             </div>
           </div>
 
-          {/* Welcome screen */}
-          <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
-            <button
-              onClick={() => setSelectedScreen('welcome')}
-              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
-                selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'
-              }`}
-            >
-              <span className="text-sm font-medium text-gray-700">Welcome screen</span>
-              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
-            </button>
-          </div>
-
-          {/* Ending screen */}
+          {/* End screen - at bottom */}
           <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
             <button
               onClick={() => setSelectedScreen('ending')}
@@ -533,10 +533,15 @@ export default function CreateFormPage() {
                         }`}
                       />
                       
-                      {/* Botón Start */}
+                      {/* Botón Start: ir a la primera pregunta */}
                       <div className="flex items-center gap-3 mb-4">
                         <button
-                          className={`rounded-lg bg-primary px-6 py-3 font-medium text-white ${
+                          type="button"
+                          onClick={() => {
+                            setSelectedScreen('question');
+                            if (formData.fields?.length) setSelectedQuestionIndex(0);
+                          }}
+                          className={`rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90 ${
                             viewMode === 'mobile' ? 'text-sm' : 'text-base'
                           }`}
                         >
