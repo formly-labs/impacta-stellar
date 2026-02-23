@@ -93,9 +93,17 @@ export async function GET(req: Request) {
 
   const forms = await prisma.form.findMany({
     where: whereClause,
-    include: { fields: true },
+    include: {
+      fields: true,
+      _count: { select: { responses: true } },
+    },
     orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json(forms);
+  const serialized = forms.map(({ _count, ...form }) => ({
+    ...form,
+    responseCount: _count.responses,
+  }));
+
+  return NextResponse.json(serialized);
 }

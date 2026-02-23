@@ -238,35 +238,32 @@ export default function CreateFormPage() {
               </div>
               {/* Mobile sidebar content — cloned below */}
               <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-                <div className="flex-1 space-y-2">
-                  {formData.fields?.map((field, index) => {
-                    const fieldType = FIELD_TYPES.find((t) => t.value === field.type);
-                    const FieldIcon = fieldType?.icon || AlignLeft;
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => { setSelectedQuestionIndex(index); setSelectedScreen('question'); setShowMobileSidebar(false); }}
-                        className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all ${selectedQuestionIndex === index ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                      >
-                        <div className={`flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 ${fieldType?.bgColor || 'bg-gray-100'}`}>
-                          <FieldIcon className="h-3.5 w-3.5 text-gray-600" />
-                          <span className="text-xs font-semibold text-gray-600">{index + 1}</span>
-                        </div>
-                        <p className="min-w-0 truncate text-sm font-medium text-gray-900">{field.label || `Pregunta ${index + 1}`}</p>
-                      </button>
-                    );
-                  })}
+                <div className="flex-1 space-y-0.5">
+                  {formData.fields?.map((field, index) => (
+                    <button
+                      key={index}
+                      onClick={() => { setSelectedQuestionIndex(index); setSelectedScreen('question'); setShowMobileSidebar(false); }}
+                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all ${selectedQuestionIndex === index ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-semibold text-gray-600">{index + 1}</span>
+                      <p className="min-w-0 truncate text-sm font-medium text-gray-900">{field.label || `Pregunta ${index + 1}`}</p>
+                    </button>
+                  ))}
                   {(!formData.fields || formData.fields.length === 0) && (
-                    <p className="py-8 text-center text-sm text-gray-400">No hay preguntas</p>
+                    <p className="py-6 text-center text-sm text-gray-400">No hay preguntas</p>
                   )}
                 </div>
                 <button onClick={() => { setSelectedScreen('welcome'); setShowMobileSidebar(false); }}
-                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}>
-                  welcome screen <Plus className="h-4 w-4 text-gray-400" />
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                  Welcome screen <Plus className="h-4 w-4 text-gray-400" />
                 </button>
                 <button onClick={() => { setSelectedScreen('ending'); setShowMobileSidebar(false); }}
-                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}>
-                  ending screen <Plus className="h-4 w-4 text-gray-400" />
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                  <span className="flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">N</span>
+                    screen
+                  </span>
+                  <Plus className="h-4 w-4 text-gray-400" />
                 </button>
               </div>
             </aside>
@@ -292,23 +289,19 @@ export default function CreateFormPage() {
         )}
 
         {/* Desktop sidebar */}
-        <aside className="hidden w-64 shrink-0 flex-col gap-4 lg:flex">
-          {/* Caja 1: Lista de preguntas */}
-          <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-4">
-              {/* Lista de preguntas */}
-              <div className="space-y-2">
+        <aside className="hidden w-64 shrink-0 flex-col gap-3 lg:flex">
+          {/* Lista de preguntas */}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="space-y-0.5">
                 {formData.fields?.map((field, index) => {
                   const fieldType = FIELD_TYPES.find((t) => t.value === field.type);
-                  const FieldIcon = fieldType?.icon || AlignLeft;
-                  
+                  const isSelected = selectedQuestionIndex === index;
                   return (
                     <div key={index} className="relative">
                       <div
-                        className={`flex w-full items-center gap-3 rounded-lg p-3 transition-all overflow-hidden ${
-                          selectedQuestionIndex === index
-                            ? 'bg-gray-100'
-                            : 'bg-white hover:bg-gray-50'
+                        className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 transition-all ${
+                          isSelected ? 'bg-primary-50' : 'hover:bg-gray-50'
                         }`}
                       >
                         <button
@@ -317,32 +310,22 @@ export default function CreateFormPage() {
                             setSelectedScreen('question');
                             setShowActionsMenu(false);
                           }}
-                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
                         >
-                          {/* Icono + Número juntos en el mismo contenedor */}
-                          <div className={`flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 ${fieldType?.bgColor || 'bg-gray-100'}`}>
-                            <FieldIcon className="h-3.5 w-3.5 text-gray-600" />
-                            <span className="text-xs font-semibold text-gray-600">
-                              {index + 1}
-                            </span>
-                          </div>
-                          
-                          {/* Título de la pregunta */}
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-gray-900">
-                              {field.label || `Pregunta ${index + 1}`}
-                            </p>
-                          </div>
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-semibold text-gray-600">
+                            {index + 1}
+                          </span>
+                          <p className="min-w-0 truncate text-sm font-medium text-gray-900">
+                            {field.label || `Pregunta ${index + 1}`}
+                          </p>
                         </button>
-                        
-                        {/* Icono de 3 puntos - Solo cuando está seleccionada */}
-                        {selectedQuestionIndex === index && (
+                        {isSelected && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowActionsMenu(!showActionsMenu);
                             }}
-                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700"
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700"
                           >
                             <MoreVertical className="h-4 w-4" />
                           </button>
@@ -394,37 +377,40 @@ export default function CreateFormPage() {
               
               {/* Mensaje cuando no hay preguntas */}
               {(!formData.fields || formData.fields.length === 0) && (
-                <div className="mt-8 text-center">
+                <div className="mt-6 text-center">
                   <p className="text-sm text-gray-500">No hay preguntas</p>
-                  <p className="mt-1 text-xs text-gray-400">Crea tu primera pregunta</p>
+                  <p className="mt-1 text-xs text-gray-400">Añade tu primera pregunta</p>
                 </div>
               )}
             </div>
           </div>
-          
-          {/* Caja 2: Welcome Screen */}
+
+          {/* Welcome screen */}
           <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
             <button
               onClick={() => setSelectedScreen('welcome')}
-              className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
-                selectedScreen === 'welcome' ? 'bg-gray-100' : 'hover:bg-gray-50'
+              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
+                selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'
               }`}
             >
-              <span className="text-sm font-medium text-gray-700">welcome screen</span>
-              <Plus className="h-4 w-4 text-gray-400" />
+              <span className="text-sm font-medium text-gray-700">Welcome screen</span>
+              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
             </button>
           </div>
-          
-          {/* Caja 3: Ending Screen */}
+
+          {/* Ending screen */}
           <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
             <button
               onClick={() => setSelectedScreen('ending')}
-              className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
-                selectedScreen === 'ending' ? 'bg-gray-100' : 'hover:bg-gray-50'
+              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
+                selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'
               }`}
             >
-              <span className="text-sm font-medium text-gray-700">ending screen</span>
-              <Plus className="h-4 w-4 text-gray-400" />
+              <span className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">N</span>
+                screen
+              </span>
+              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
             </button>
           </div>
         </aside>
@@ -444,7 +430,7 @@ export default function CreateFormPage() {
 
             <button
               onClick={addField}
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-primary/90 sm:gap-2 sm:px-4 sm:text-sm"
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Añadir pregunta</span>
@@ -460,8 +446,8 @@ export default function CreateFormPage() {
                   onChange={(type) => updateField(selectedQuestionIndex!, { type })}
                 />
                 
-                <label className="ml-auto flex items-center gap-1.5 rounded-lg px-2 py-2 cursor-pointer transition-all hover:bg-gray-50 sm:gap-2 sm:px-3">
-                  <span className="text-xs font-medium uppercase text-gray-500 sm:text-sm sm:normal-case sm:text-gray-700">required</span>
+                <label className="ml-auto flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors hover:bg-gray-50">
+                  <span className="text-sm font-medium text-gray-700">required</span>
                   <button
                     type="button"
                     onClick={() => updateField(selectedQuestionIndex!, { required: !selectedField.required })}
@@ -752,13 +738,11 @@ export default function CreateFormPage() {
                           {selectedField.options?.map((option, optIndex) => (
                             <div
                               key={optIndex}
-                              className={`group flex items-center rounded-lg bg-gray-50/50 border border-gray-200 transition-all hover:border-primary/50 hover:bg-primary/5 ${viewMode === 'mobile' ? 'gap-3 p-3' : 'gap-4 p-4'
-                              }`}
+                              className="group flex items-stretch overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                             >
-                              {/* Letra en cuadro azul */}
+                              {/* Letra en recuadro morado claro */}
                               <div
-                                className={`flex items-center justify-center rounded bg-primary/10 border border-primary/20 font-semibold text-primary ${viewMode === 'mobile' ? 'h-7 w-7 text-xs' : 'h-9 w-9 text-sm'
-                                }`}
+                                className={`flex shrink-0 items-center justify-center bg-primary-50 font-semibold text-primary ${viewMode === 'mobile' ? 'w-10 text-sm' : 'w-12 text-base'}`}
                               >
                                 {String.fromCharCode(65 + optIndex)}
                               </div>
@@ -771,29 +755,29 @@ export default function CreateFormPage() {
                                   updateField(selectedQuestionIndex!, { options: newOptions });
                                 }}
                                 placeholder={`Opción ${optIndex + 1}`}
-                                className={`flex-1 border-none bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none ${viewMode === 'mobile' ? 'text-base' : 'text-lg'
-                                }`}
+                                className={`flex-1 border-0 bg-transparent px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 ${viewMode === 'mobile' ? 'text-base' : 'text-lg'}`}
                               />
                               <button
+                                type="button"
                                 onClick={() => {
                                   const newOptions = selectedField.options?.filter((_, i) => i !== optIndex);
                                   updateField(selectedQuestionIndex!, { options: newOptions });
                                 }}
-                                className="opacity-0 rounded p-1 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                                className="shrink-0 px-2 text-gray-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
                               >
-                                <Trash2 className={viewMode === 'mobile' ? 'h-4 w-4' : 'h-4 w-4'} />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                           ))}
                           <button
+                            type="button"
                             onClick={() => {
                               const newOptions = [ ...(selectedField.options || []), '' ];
                               updateField(selectedQuestionIndex!, { options: newOptions });
                             }}
-                            className={`text-primary hover:underline font-normal ${viewMode === 'mobile' ? 'text-sm' : 'text-base'
-                            }`}
+                            className={`font-medium text-primary hover:underline ${viewMode === 'mobile' ? 'text-sm' : 'text-base'}`}
                           >
-                            Add choice
+                            + Add choice
                           </button>
                         </div>
                       )}

@@ -94,4 +94,6 @@ export interface FormResponse extends FormCreateInput {
   welcomeDescription?: string | null;
   endingTitle?: string | null;
   endingDescription?: string | null;
+  /** Number of responses (from GET /api/forms). */
+  responseCount?: number;
 }

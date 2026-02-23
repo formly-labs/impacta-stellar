@@ -12,9 +12,10 @@ export function useWorkspace() {
     setRenameModalOpen(true);
   };
 
-  const handleRename = () => {
-    if (newWorkspaceName.trim()) {
-      setWorkspaceName(newWorkspaceName.trim());
+  const handleRename = (name?: string) => {
+    const value = (name ?? newWorkspaceName).trim();
+    if (value) {
+      setWorkspaceName(value);
       setRenameModalOpen(false);
       setNewWorkspaceName('');
     }
