@@ -1,21 +1,22 @@
 'use client';
 
-import { useWallet } from 'stellar-wallet-kit';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState, PropsWithChildren } from 'react';
+import { usePollar } from '@pollar/react';
+import { usePathname, useRouter } from 'next/navigation';
+import { PropsWithChildren, useEffect, useState } from 'react';
 
 export function WalletGuard({ children }: PropsWithChildren) {
-  const { isConnected } = useWallet();
+  const { walletAddress } = usePollar();
   const router = useRouter();
   const pathname = usePathname();
-  const [isChecking, setIsChecking] = useState(true);
-
+  const [ isChecking, setIsChecking ] = useState(true);
+  const isConnected = !!walletAddress;
+  const isLoginPage = pathname === '/login';
   useEffect(() => {
     // Pequeño delay para que el wallet provider inicialice
     const timer = setTimeout(() => {
       setIsChecking(false);
 
-      if (!isConnected) {
+      if (!isConnected && !isLoginPage) {
         // Guardar la ruta actual como query param para redirección
         const redirectUrl = encodeURIComponent(pathname || '/dashboard');
         router.push(`/login?redirectTo=${redirectUrl}`);
@@ -23,7 +24,7 @@ export function WalletGuard({ children }: PropsWithChildren) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [isConnected, router, pathname]);
+  }, [ isConnected, router, pathname, isLoginPage ]);
 
   // Mostrar loading mientras verifica la conexión
   if (isChecking) {
@@ -38,7 +39,7 @@ export function WalletGuard({ children }: PropsWithChildren) {
   }
 
   // Si está conectado, mostrar el contenido
-  if (isConnected) {
+  if (isConnected || isLoginPage) {
     return <>{children}</>;
   }
 

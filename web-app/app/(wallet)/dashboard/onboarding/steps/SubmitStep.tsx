@@ -1,19 +1,19 @@
 'use client';
 
+import { clearDraft, loadDraft, markOnboardingCompleted } from '@/lib/onboardingStorage';
+import { usePollar } from '@pollar/react';
 import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useWallet } from 'stellar-wallet-kit';
-import { loadDraft, markOnboardingCompleted, clearDraft } from '@/lib/onboardingStorage';
 
 export default function SubmitStep() {
   const router = useRouter();
-  const { account } = useWallet();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { walletAddress } = usePollar();
+  const [ submitting, setSubmitting ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
 
   const handleComplete = async () => {
-    if (!account?.address) {
+    if (!walletAddress) {
       setError('Wallet no conectada. Vuelve a conectar tu wallet.');
       return;
     }
@@ -28,7 +28,7 @@ export default function SubmitStep() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: account.address,
+          walletAddress,
           firstName: draft.firstName,
           lastName: draft.lastName,
           email: draft.email,

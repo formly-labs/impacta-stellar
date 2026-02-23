@@ -3,32 +3,32 @@
 import { useForms } from '@/hooks/useForms';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { isOnboardingCompleted } from '@/lib/onboardingStorage';
+import { usePollar } from '@pollar/react';
+import { AlertCircle, LayoutGrid, List, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useWallet } from 'stellar-wallet-kit';
 import { FormList } from './components/forms/FormList';
 import { DashboardHeaderV2 } from './components/header/DashboardHeaderV2';
 import { MobileControls } from './components/header/MobileControls';
-import { DashboardRightSidebar } from './components/right-sidebar/DashboardRightSidebar';
 import { DeleteModal } from './components/modals/DeleteModal';
 import { InviteModal } from './components/modals/InviteModal';
 import { LeaveModal } from './components/modals/LeaveModal';
 import { RenameModal } from './components/modals/RenameModal';
+import { DashboardRightSidebar } from './components/right-sidebar/DashboardRightSidebar';
 import { DashboardSidebarV2 } from './components/sidebar/DashboardSidebarV2';
-import { AlertCircle, LayoutGrid, List, X } from 'lucide-react';
 
 type Tab = 'active' | 'archived';
 type ViewMode = 'list' | 'grid';
 
 export default function CreatorDashboard() {
-  const { account } = useWallet();
+  const { walletAddress } = usePollar();
   const router = useRouter();
 
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | undefined>();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isCreatingForm, setIsCreatingForm] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [ selectedWorkspaceId, setSelectedWorkspaceId ] = useState<string | undefined>();
+  const [ searchQuery, setSearchQuery ] = useState('');
+  const [ isCreatingForm, setIsCreatingForm ] = useState(false);
+  const [ createError, setCreateError ] = useState<string | null>(null);
+  const [ mobileSidebarOpen, setMobileSidebarOpen ] = useState(false);
 
   const workspaceFilter = selectedWorkspaceId === 'default' ? null : selectedWorkspaceId;
 
@@ -40,7 +40,7 @@ export default function CreatorDashboard() {
     archivingId,
     fetchArchived,
     handleArchive,
-  } = useForms(account?.address, workspaceFilter);
+  } = useForms(walletAddress, workspaceFilter);
 
   const {
     workspaceName,
@@ -54,25 +54,25 @@ export default function CreatorDashboard() {
     handleRename: workspaceHandleRename,
   } = useWorkspace();
 
-  const [tab, setTab] = useState<Tab>('active');
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [ tab, setTab ] = useState<Tab>('active');
+  const [ viewMode, setViewMode ] = useState<ViewMode>('list');
+  const [ sortBy, setSortBy ] = useState<'date' | 'name'>('date');
+  const [ inviteModalOpen, setInviteModalOpen ] = useState(false);
 
   useEffect(() => {
     if (!isOnboardingCompleted()) {
       router.replace('/dashboard/onboarding?step=details');
     }
-  }, [router]);
+  }, [ router ]);
 
   useEffect(() => {
     if (tab === 'archived') {
       fetchArchived();
     }
-  }, [tab, fetchArchived]);
+  }, [ tab, fetchArchived ]);
 
   const handleCreateForm = async () => {
-    if (!account?.address) return;
+    if (!walletAddress) return;
     setCreateError(null);
     setIsCreatingForm(true);
     try {
@@ -81,7 +81,7 @@ export default function CreatorDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ownerAddress: account.address,
+          ownerAddress: walletAddress,
           workspaceId: workspaceIdToSend,
           title: 'Untitled Form',
           description: '',
@@ -119,10 +119,10 @@ export default function CreatorDashboard() {
 
   const filteredForms = searchQuery.trim()
     ? baseForms.filter(
-        (f) =>
-          f.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          f.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (f) =>
+        f.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
     : baseForms;
 
   return (
@@ -139,16 +139,16 @@ export default function CreatorDashboard() {
       <div className={`${mobileSidebarOpen ? 'fixed inset-y-0 left-0 z-50 w-64' : 'hidden lg:block'}`}>
         <DashboardSidebarV2
           activeTab={tab}
-        archivedCount={archivedForms.length}
-        onTabChange={setTab}
-        ownerAddress={account?.address || ''}
-        selectedWorkspaceId={selectedWorkspaceId}
-        onWorkspaceSelect={setSelectedWorkspaceId}
-        onCreateForm={handleCreateForm}
-        isCreatingForm={isCreatingForm}
-        onCloseMobile={() => setMobileSidebarOpen(false)}
-        isMobile={mobileSidebarOpen}
-      />
+          archivedCount={archivedForms.length}
+          onTabChange={setTab}
+          ownerAddress={walletAddress}
+          selectedWorkspaceId={selectedWorkspaceId}
+          onWorkspaceSelect={setSelectedWorkspaceId}
+          onCreateForm={handleCreateForm}
+          isCreatingForm={isCreatingForm}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
+          isMobile={mobileSidebarOpen}
+        />
       </div>
 
       {/* Center: header + main content */}
@@ -257,7 +257,7 @@ export default function CreatorDashboard() {
       <InviteModal
         isOpen={inviteModalOpen}
         workspaceName={workspaceName}
-        accountAddress={account?.address}
+        accountAddress={walletAddress}
         onClose={() => setInviteModalOpen(false)}
       />
       <RenameModal

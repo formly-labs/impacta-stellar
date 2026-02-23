@@ -46,26 +46,26 @@ export default function FormAnswersPage() {
   const { id } = useParams();
   const router = useRouter();
   const formId = id as string;
-  
+
   const { formData, isLoading, setFormData } = useFormData(formId);
   const [ responses, setResponses ] = useState<ResponseData[]>([]);
   const [ loadingResponses, setLoadingResponses ] = useState(true);
   const [ tab, setTab ] = useState<Tab>('insight');
   const [ currentResponse, setCurrentResponse ] = useState(0);
   const [ searchTerm, setSearchTerm ] = useState('');
-  
+
   useEffect(() => {
     if (!id) {
       router.push('/dashboard');
     }
   }, [ id, router ]);
-  
+
   useEffect(() => {
     if (!isLoading && !formData.isActive) {
       router.push(`/form/${formData.id}/edit`);
     }
   }, [ isLoading, id, router, formData.isActive, formData.id ]);
-  
+
   useEffect(() => {
     if (formId && !isLoading && formData.fields && formData.fields.length > 0) {
       setLoadingResponses(true);
@@ -81,7 +81,6 @@ export default function FormAnswersPage() {
           if (Array.isArray(data) && data.length > 0) {
             const formattedResponses: ResponseData[] = data.map((r: SurveyResponse) => {
               const responseData = r.responses || {};
-              console.log({ responseData, formData });
               const answersArray = formData.fields!.map((field) => {
                 const fieldId = (field as FieldInput & { id?: string }).id || field.label;
                 const answer = responseData[fieldId] || '';
@@ -90,7 +89,7 @@ export default function FormAnswersPage() {
                   answer: String(answer),
                 };
               });
-              
+
               return {
                 id: r.id,
                 respondent: {
@@ -120,15 +119,15 @@ export default function FormAnswersPage() {
         });
     }
   }, [ formId, isLoading, formData.fields ]);
-  
+
   const filteredResponses = responses.filter((response) =>
     response.respondent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     response.respondent.wallet.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  
+
   const totalResponses = filteredResponses.length;
   const response = filteredResponses[currentResponse];
-  
+
   if (isLoading) {
     return (
       <div className="flex h-full flex-col bg-white">
@@ -146,8 +145,7 @@ export default function FormAnswersPage() {
       </div>
     );
   }
-  
-  console.log({ response });
+
   return (
     <div className="flex h-full flex-col bg-white">
       <FormEditNavigation
@@ -155,7 +153,7 @@ export default function FormAnswersPage() {
         activeTab="responses"
         showPublishButton={false}
       />
-      
+
       <div className="flex flex-1 gap-4 overflow-hidden p-4">
         <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
           {/* Tabs internos */}
@@ -196,7 +194,7 @@ export default function FormAnswersPage() {
               </button>
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto p-6">
             {/* Loading responses */}
             {loadingResponses ? (
@@ -234,7 +232,7 @@ export default function FormAnswersPage() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* ── Resumen tab ── */}
                 {tab === 'resumen' && (
                   <div className="animate-fade-in space-y-4">
@@ -253,7 +251,7 @@ export default function FormAnswersPage() {
                         ))}
                       </div>
                     </div>
-                    
+
                     {/* Charts for each question */}
                     {formData.fields && formData.fields.map((field, fieldIndex) => {
                       const questionResponses = responses.map(r => r.answers[fieldIndex]?.answer).filter(Boolean);
@@ -261,16 +259,16 @@ export default function FormAnswersPage() {
                       questionResponses.forEach(answer => {
                         responseCounts[answer] = (responseCounts[answer] || 0) + 1;
                       });
-                      
+
                       const chartData = Object.entries(responseCounts).map(([ answer, count ]) => ({
                         name: answer,
                         respuestas: count,
                         value: count,
                         percentage: ((count / responses.length) * 100).toFixed(1),
                       }));
-                      
+
                       const colors = [ '#f97316', '#ef4444', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#14b8a6' ];
-                      
+
                       const questionLower = field.label.toLowerCase();
                       const usePieChart = questionLower.includes('edad') ||
                         questionLower.includes('rango') ||
@@ -279,7 +277,7 @@ export default function FormAnswersPage() {
                       const useVerticalBar = questionLower.includes('califica') ||
                         questionLower.includes('rating') ||
                         questionLower.includes('puntua');
-                      
+
                       return (
                         <div
                           key={fieldIndex}
@@ -299,7 +297,7 @@ export default function FormAnswersPage() {
                               Copy chart
                             </button>
                           </div>
-                          
+
                           <div className="p-6">
                             {usePieChart && (
                               <ResponsiveContainer width="100%" height={350}>
@@ -336,7 +334,7 @@ export default function FormAnswersPage() {
                                 </PieChart>
                               </ResponsiveContainer>
                             )}
-                            
+
                             {!usePieChart && useVerticalBar && (
                               <ResponsiveContainer width="100%" height={300}>
                                 <BarChart
@@ -369,7 +367,7 @@ export default function FormAnswersPage() {
                                 </BarChart>
                               </ResponsiveContainer>
                             )}
-                            
+
                             {!usePieChart && !useVerticalBar && (
                               <ResponsiveContainer width="100%" height={chartData.length * 60 + 40}>
                                 <BarChart
@@ -414,7 +412,7 @@ export default function FormAnswersPage() {
                     })}
                   </div>
                 )}
-                
+
                 {/* ── Individual tab ── */}
                 {tab === 'individual' && (
                   <div className="animate-fade-in space-y-4">
@@ -440,7 +438,7 @@ export default function FormAnswersPage() {
                         )}
                       </div>
                     </div>
-                    
+
                     {/* Response card */}
                     {totalResponses === 0 ? (
                       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-12">
@@ -475,7 +473,7 @@ export default function FormAnswersPage() {
                                 </p>
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
@@ -504,7 +502,7 @@ export default function FormAnswersPage() {
                               </button>
                             </div>
                           </div>
-                          
+
                           <div className="text-left">
                             <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                               Fecha
@@ -512,7 +510,7 @@ export default function FormAnswersPage() {
                             <p className="text-sm font-medium text-gray-700">{response.date}</p>
                           </div>
                         </div>
-                        
+
                         <div className="divide-y divide-gray-50 px-5 py-2">
                           {response.answers.map((a, i) => (
                             <div key={i} className="py-4">
@@ -533,7 +531,7 @@ export default function FormAnswersPage() {
                             </div>
                           ))}
                         </div>
-                        
+
                         {/* Footer actions */}
                         <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50 px-5 py-3">
                           <button
@@ -556,7 +554,7 @@ export default function FormAnswersPage() {
                     )}
                   </div>
                 )}
-                
+
                 {/* ── Insight tab ── */}
                 {tab === 'insight' && (
                   <div className="animate-fade-in space-y-4">
@@ -580,7 +578,7 @@ export default function FormAnswersPage() {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-500 text-white text-xs font-bold">
                             2
@@ -593,7 +591,7 @@ export default function FormAnswersPage() {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">
                             3
@@ -608,7 +606,7 @@ export default function FormAnswersPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Demographic Analysis */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -632,7 +630,7 @@ export default function FormAnswersPage() {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                         <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
                           <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
@@ -655,7 +653,7 @@ export default function FormAnswersPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Response Timeline */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                       <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
@@ -687,7 +685,7 @@ export default function FormAnswersPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Sentiment Analysis */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                       <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">

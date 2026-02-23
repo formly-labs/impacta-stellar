@@ -24,11 +24,15 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
   const limitReached = usageCount >= FREE_LIMIT;
 
   useEffect(() => {
-    if (!wallet) { setCheckingUsage(false); return; }
+    if (!wallet) {
+      setCheckingUsage(false);
+      return;
+    }
     fetch(`/api/ai/usage?wallet=${wallet}`)
       .then((res) => res.json())
       .then((data: { usageCount: number }) => setUsageCount(data.usageCount))
-      .catch(() => {})
+      .catch(() => {
+      })
       .finally(() => setCheckingUsage(false));
   }, [ wallet ]);
 
@@ -39,18 +43,18 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
     }),
     onFinish: ({ message }) => {
       const parts = message.parts || [];
-      
+
       for (const part of parts) {
         // Check if this is a tool result part
         if (part.type?.includes('updateFormFields') || (part as {
           toolName: string
         })?.toolName === 'updateFormFields') {
-          
+
           // Try to extract fields from different possible locations
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const anyPart = part as any;
           let fields = null;
-          
+
           if (anyPart.result?.fields) {
             fields = anyPart.result.fields;
           } else if (anyPart.args?.fields) {
@@ -58,7 +62,6 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
           } else if (anyPart.input?.fields) {
             fields = anyPart.input.fields;
           }
-          console.log({ fields });
           if (fields) {
             setFormData(prevState => ({ ...prevState, fields }));
           }
@@ -66,11 +69,11 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
       }
     },
   });
-  
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [ messages ]);
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -85,7 +88,7 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
       parts: [ { type: 'text', text: userMessage } ],
     });
   };
-  
+
   return (
     <aside className="flex h-full flex-col">
       {/* Header */}
@@ -104,13 +107,14 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
           )}
         </div>
       </div>
-      
+
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
             <p className="text-sm text-gray-600">
-              💡 <strong className="text-gray-900">Tip:</strong> Describe qué campos quieres agregar a tu formulario y la IA te ayudará a crearlos.
+              💡 <strong className="text-gray-900">Tip:</strong> Describe qué campos quieres agregar a tu formulario y la
+              IA te ayudará a crearlos.
             </p>
           </div>
         ) : (
@@ -120,9 +124,9 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
               ?.filter((part) => part.type === 'text')
               .map((part) => ('text' in part ? part.text : ''))
               .join('') || '';
-            
+
             if (!textContent) return null;
-            
+
             return (
               <div
                 key={index}
@@ -133,7 +137,7 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
                     <Bot className="h-4 w-4 text-white" />
                   </div>
                 )}
-                
+
                 <div
                   className={`rounded-lg px-4 py-3 max-w-[85%] text-sm ${
                     message.role === 'user'
@@ -154,7 +158,7 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
                     </ReactMarkdown>
                   </div>
                 </div>
-                
+
                 {message.role === 'user' && (
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-200">
                     <User className="h-4 w-4 text-gray-600" />
@@ -166,7 +170,7 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
         )}
         <div ref={messagesEndRef} />
       </div>
-      
+
       {/* Input Area */}
       <div className="shrink-0 border-t border-gray-200 p-4">
         {limitReached ? (
