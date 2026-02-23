@@ -18,8 +18,8 @@ export default function WalletLayout({ children }: PropsWithChildren) {
       >
         <PollarProvider
           config={{
-            baseUrl: 'https://sdk.local.pollar.xyz',
-            apiKey: 'cmlzd0ywd00010kks875mhbp0',
+            baseUrl: process.env.NEXT_PUBLIC_POLLAR_BASE_URL!,
+            apiKey: process.env.NEXT_PUBLIC_POLLAR_API_KEY!,
           }}
         >
           <WalletGuard>
