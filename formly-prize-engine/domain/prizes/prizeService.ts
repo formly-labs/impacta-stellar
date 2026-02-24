@@ -1,6 +1,7 @@
 import { ApiError } from "@/lib/errors";
 import { env } from "@/lib/env";
 import { acquireLock } from "@/lib/locks";
+import { buildMemo, toDecimalAmount, calcFeeAndNet } from "@/domain/intents/paymentIntentService";
 import * as prizeRepo from "@/domain/repositories/prizeRepo";
 import * as entryRepo from "@/domain/repositories/entryRepo";
 import * as resultRepo from "@/domain/repositories/resultRepo";
@@ -21,13 +22,15 @@ export async function createPrize(
 ): Promise<PrizePublic> {
   const feeBps = input.feeBps ?? 1000;
   const amountStr = input.amount || input.prizeAmount || "0";
-  const amountNum = Number(amountStr);
-  const feeAmount = Math.floor((amountNum * feeBps) / 10000);
-  const prizeNet = amountNum - feeAmount;
+  const amountTotalNorm = toDecimalAmount(amountStr);
+  const { feeAmount, prizeNet } = calcFeeAndNet(amountTotalNorm, feeBps);
 
-  const status = input.rewardType === "POINTS" ? "LOCKED" : "PENDING";
+  const status = input.rewardType === "POINTS" ? "LOCKED" : "AWAITING_PAYMENT_CONFIRMATION";
+  const externalId = toExternalId("prize");
 
   let vaultPublicKey: string | null = null;
+  let memo: string | null = null;
+  let memoType: string | null = "text";
   if (input.rewardType === "XLM" || input.rewardType === "USDC") {
     const sharedVault = env.PRIZE_VAULT_PUBLIC_KEY;
     if (!sharedVault) {
@@ -39,6 +42,7 @@ export async function createPrize(
       );
     }
     vaultPublicKey = sharedVault;
+    memo = buildMemo(externalId);
   }
 
   if (new Date(input.drawAt) <= new Date(input.closeAt)) {
@@ -46,19 +50,21 @@ export async function createPrize(
   }
 
   const row = await prizeRepo.insertPrize({
-    external_id: toExternalId("prize"),
+    external_id: externalId,
     form_id: input.formId ?? null,
     creator_user_id: input.creatorId ?? null,
     reward_type: input.rewardType,
     distribution_mode: input.distributionMode,
-    amount_total: amountStr,
+    amount_total: amountTotalNorm,
     fee_bps: feeBps,
-    fee_amount: String(feeAmount.toFixed(7)),
-    prize_net: String(prizeNet.toFixed(7)),
+    fee_amount: feeAmount,
+    prize_net: prizeNet,
     close_at: input.closeAt,
     draw_at: input.drawAt,
     status,
     vault_public_key: vaultPublicKey,
+    memo: memo ?? undefined,
+    memo_type: memoType ?? undefined,
   });
   return toPrizePublic(row);
 }

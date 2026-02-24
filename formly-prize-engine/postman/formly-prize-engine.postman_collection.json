@@ -1,14 +1,14 @@
 {
   "info": {
     "name": "formly-prize-engine",
-    "description": "API v1. Flujo recomendado para un prize: 1 Create Prize → 2 Get Prize (copiar prizeId a variable) → 3 Add Entry → 4 List Entries → 5 Close Prize → 6 Distribute → 7 Result. Si Distribute devuelve LOCKED: otro request tiene el lock (esperar ~60s) o no ejecutaste Close antes. Idempotency-Key opcional en POST; Jobs Tick 200 (stub), payment-intent 501.",
+    "description": "API v1. Flujo: 1 Create Prize → 2 Get Prize (copiar prizeId) → 3 Add Entry → 4 List Entries → 5 Close → 6 Distribute → 7 Result. USDC/XLM: 8–9 Payment Intent, 10–11 Jobs Tick, 12–12b Verify payment, 13 Pay to wallet. Deposits: 14 by payer, 15 did payer pay this prize. Variables: baseUrl, serviceToken, prizeId, payer.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
     { "key": "serviceToken", "value": "" },
     { "key": "prizeId", "value": "" },
-    { "key": "idempotencyKey", "value": "550e8400-e29b-41d4-a716-446655440001" }
+    { "key": "payer", "value": "GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E" }
   ],
   "item": [
     {
@@ -17,8 +17,7 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{\n  \"rewardType\": \"POINTS\",\n  \"distributionMode\": \"SPLIT_EQUAL\",\n  \"prizeAmount\": \"60.0000000\",\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}" },
         "url": "{{baseUrl}}/api/v1/prizes",
@@ -40,8 +39,7 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{\n  \"walletAddress\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n  \"sourceId\": \"resp_01\"\n}" },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/entries",
@@ -76,8 +74,7 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{}" },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/distribute",
@@ -99,8 +96,7 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{\n  \"rewardType\": \"USDC\",\n  \"distributionMode\": \"LOTTERY_SINGLE\",\n  \"prizeAmount\": \"100.0000000\",\n  \"feeBps\": 1000,\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}" },
         "url": "{{baseUrl}}/api/v1/prizes",
@@ -113,8 +109,7 @@
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{\n  \"creatorPublicKey\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n}" },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent",
@@ -122,17 +117,100 @@
       }
     },
     {
-      "name": "10. Jobs Tick (200 stub)",
+      "name": "10. Jobs Tick execute",
       "request": {
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Authorization", "value": "Bearer {{serviceToken}}" },
-          { "key": "Idempotency-Key", "value": "{{idempotencyKey}}" }
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
         "body": { "mode": "raw", "raw": "{\n  \"runMode\": \"execute\",\n  \"maxPrizes\": 50\n}" },
         "url": "{{baseUrl}}/api/v1/jobs/tick"
-      }
+      },
+      "description": "Job tick REAL: verifica depósitos Horizon (PRIZE_VAULT), memo+asset+amounts; marca LOCKED con lockRef."
+    },
+    {
+      "name": "11. Jobs Tick dry_run",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"runMode\": \"dry_run\",\n  \"maxPrizes\": 50\n}" },
+        "url": "{{baseUrl}}/api/v1/jobs/tick"
+      },
+      "description": "Misma lógica sin escribir DB (no markLocked)."
+    },
+    {
+      "name": "12. Verify payment (txHash)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"txHash\": \"76957cb068d6b9addc59dc41ca11c27680e16b703c92cb302ca000e555ef6fe3\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/verify-payment"
+      },
+      "description": "Verifica un pago por hash de transacción. Body: { txHash }. Si la tx tiene memo y montos correctos (prize_net + fee), marca el prize como LOCKED."
+    },
+    {
+      "name": "12b. Verify payment (scan vault)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/verify-payment"
+      },
+      "description": "Una verificación: lista txs recientes del vault y busca una que coincida con este prize. El caller hace polling a este endpoint. Body: {}."
+    },
+    {
+      "name": "13. Pay to wallet",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"destination\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n  \"amount\": \"9.0000000\",\n  \"asset\": \"USDC\"\n}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"
+      },
+      "description": "Envía desde el vault a una wallet. Body: destination (G...), amount, asset (XLM | USDC). asset debe coincidir con el rewardType del prize. Requiere PRIZE_VAULT_SECRET_KEY."
+    },
+    {
+      "name": "14. Deposits by payer",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/deposits?payer={{payer}}&limit=50",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "deposits"],
+          "query": [
+            { "key": "payer", "value": "{{payer}}" },
+            { "key": "limit", "value": "50" }
+          ]
+        }
+      },
+      "description": "Lista depósitos registrados para una wallet (quién pagó). Respuesta: paid, totalAmount, deposits[]. Variable: payer (G...)."
+    },
+    {
+      "name": "15. Did payer pay this prize?",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/deposits?payer={{payer}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "prizes", "{{prizeId}}", "deposits"],
+          "query": [{ "key": "payer", "value": "{{payer}}" }]
+        }
+      },
+      "description": "¿Esta wallet pagó este premio? Respuesta: paid, amount, amountTotal, txHash?, ledgerAt?. Si no: paid=false, amount=\"0\", amountTotal=\"0\"."
     }
   ]
 }

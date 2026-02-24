@@ -19,6 +19,31 @@ const envSchema = z.object({
       const n = parseInt(v, 10);
       return isNaN(n) ? 900 : Math.min(86400, Math.max(60, n));
     }),
+  WATCHER_BATCH_SIZE: z
+    .string()
+    .optional()
+    .default("25")
+    .transform((v) => Math.max(1, Math.min(100, parseInt(v, 10) || 25))),
+  WATCHER_TX_LOOKBACK_HOURS: z
+    .string()
+    .optional()
+    .default("72")
+    .transform((v) => Math.max(1, Math.min(168, parseInt(v, 10) || 72))),
+  WATCHER_TX_LIMIT: z
+    .string()
+    .optional()
+    .default("200")
+    .transform((v) => Math.max(10, Math.min(200, parseInt(v, 10) || 200))),
+  DEPOSIT_POLL_ENABLED: z
+    .string()
+    .optional()
+    .default("true")
+    .transform((v) => v === "true" || v === "1"),
+  DEPOSIT_POLL_INTERVAL_MS: z
+    .string()
+    .optional()
+    .default("60000")
+    .transform((v) => Math.max(10000, Math.min(300000, parseInt(v, 10) || 60000))),
 });
 
 let cached: z.infer<typeof envSchema> | null = null;
@@ -37,6 +62,11 @@ function getEnv(): z.infer<typeof envSchema> {
     FEE_VAULT_PUBLIC_KEY: process.env.FEE_VAULT_PUBLIC_KEY,
     PRIZE_VAULT_SECRET_KEY: process.env.PRIZE_VAULT_SECRET_KEY,
     INTENT_TTL_SECONDS: process.env.INTENT_TTL_SECONDS,
+    WATCHER_BATCH_SIZE: process.env.WATCHER_BATCH_SIZE,
+    WATCHER_TX_LOOKBACK_HOURS: process.env.WATCHER_TX_LOOKBACK_HOURS,
+    WATCHER_TX_LIMIT: process.env.WATCHER_TX_LIMIT,
+    DEPOSIT_POLL_ENABLED: process.env.DEPOSIT_POLL_ENABLED,
+    DEPOSIT_POLL_INTERVAL_MS: process.env.DEPOSIT_POLL_INTERVAL_MS,
   });
   if (!parsed.success) {
     throw new Error(

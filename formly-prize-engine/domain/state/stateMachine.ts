@@ -7,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
  */
 const ALLOWED_TRANSITIONS: Record<string, Set<string>> = {
   PENDING: new Set(["LOCKED", "EXPIRED", "CANCELLED"]),
+  AWAITING_PAYMENT_CONFIRMATION: new Set(["LOCKED", "EXPIRED", "CANCELLED"]),
   LOCKED: new Set(["CLOSED"]),
   CLOSED: new Set(["DISTRIBUTED", "FAILED", "DISTRIBUTING"]),
   FAILED: new Set(["DISTRIBUTED"]),

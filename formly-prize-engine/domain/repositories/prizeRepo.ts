@@ -15,6 +15,8 @@ export interface PrizeRow {
   draw_at: string;
   status: string;
   vault_public_key: string | null;
+  memo: string | null;
+  memo_type: string | null;
   lock_ref: string | null;
   payout_ref: string | null;
   payout_result: unknown;
@@ -26,7 +28,7 @@ export interface PrizeRow {
 }
 
 const PRIZE_COLUMNS =
-  "id, external_id, form_id, creator_user_id, reward_type, distribution_mode, amount_total, fee_bps, fee_amount, prize_net, close_at, draw_at, status, vault_public_key, lock_ref, payout_ref, payout_result, ledger_batch_id, locked_at, distributed_at, created_at, updated_at";
+  "id, external_id, form_id, creator_user_id, reward_type, distribution_mode, amount_total, fee_bps, fee_amount, prize_net, close_at, draw_at, status, vault_public_key, memo, memo_type, lock_ref, payout_ref, payout_result, ledger_batch_id, locked_at, distributed_at, created_at, updated_at";
 
 export interface InsertPrizeData {
   external_id: string;
@@ -42,6 +44,8 @@ export interface InsertPrizeData {
   draw_at: string;
   status: string;
   vault_public_key: string | null;
+  memo?: string | null;
+  memo_type?: string | null;
 }
 
 export async function insertPrize(data: InsertPrizeData): Promise<PrizeRow> {
@@ -109,4 +113,44 @@ export async function listPrizesByStatusForJobs(_opts: {
   limit: number;
 }): Promise<PrizeRow[]> {
   return [];
+}
+
+/**
+ * Premios esperando confirmación de depósito: status AWAITING_PAYMENT_CONFIRMATION,
+ * reward_type XLM o USDC, lock_ref null. Para el watcher.
+ */
+export async function listAwaitingPayment(opts: { limit: number }): Promise<PrizeRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from("prizes")
+    .select(PRIZE_COLUMNS)
+    .eq("status", "AWAITING_PAYMENT_CONFIRMATION")
+    .in("reward_type", ["XLM", "USDC"])
+    .is("lock_ref", null)
+    .limit(opts.limit);
+  if (error) throw error;
+  return (data ?? []) as PrizeRow[];
+}
+
+/**
+ * Marca prize como LOCKED con lockRef y lockedAt. Solo actualiza si status es
+ * AWAITING_PAYMENT_CONFIRMATION y lock_ref es null (guard idempotente).
+ */
+export async function markLocked(
+  prizeId: string,
+  params: { lockRef: string; lockedAt: string }
+): Promise<PrizeRow | null> {
+  const { data, error } = await supabaseAdmin
+    .from("prizes")
+    .update({
+      status: "LOCKED",
+      lock_ref: params.lockRef,
+      locked_at: params.lockedAt,
+    })
+    .eq("external_id", prizeId)
+    .eq("status", "AWAITING_PAYMENT_CONFIRMATION")
+    .is("lock_ref", null)
+    .select(PRIZE_COLUMNS)
+    .maybeSingle();
+  if (error) throw error;
+  return data as PrizeRow | null;
 }

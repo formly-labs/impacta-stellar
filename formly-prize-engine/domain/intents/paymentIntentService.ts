@@ -130,11 +130,11 @@ export async function createPaymentIntent(params: {
     );
   }
 
-  if (prize.status !== "PENDING") {
+  if (prize.status !== "PENDING" && prize.status !== "AWAITING_PAYMENT_CONFIRMATION") {
     throw new ApiError(
       409,
       "PRIZE_NOT_PAYABLE",
-      "Prize must be in PENDING status to create payment intent",
+      "Prize must be in PENDING or AWAITING_PAYMENT_CONFIRMATION status to create payment intent",
       null
     );
   }
