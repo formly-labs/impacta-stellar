@@ -187,6 +187,15 @@ export async function payToDestinations(params: {
     amount: amounts[i],
   }));
 
+  try {
+    await prizeRepo.updatePrizeStatus(prizeId, prize.status, {
+      payout_ref: result.hash,
+      payout_result: { payments },
+    });
+  } catch {
+    // no bloquear la respuesta si falla guardar el payout
+  }
+
   return {
     prizeId,
     txHash: result.hash,

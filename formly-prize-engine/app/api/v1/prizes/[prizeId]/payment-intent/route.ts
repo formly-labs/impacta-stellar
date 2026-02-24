@@ -23,7 +23,7 @@ export async function POST(
     }
     const intent = await createPaymentIntent({
       prizeId,
-      creatorPublicKey: parsed.data.creatorPublicKey,
+      payerPublicKey: parsed.data.payerPublicKey,
     });
     return jsonOk(intent, 200, requestId);
   } catch (err) {

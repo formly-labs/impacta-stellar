@@ -1,1 +1,100 @@
-{"info":{"name":"formly-prize-engine","description":"API v1. Flujo: 1 Create Prize → 2 Get Prize → 3 Create Prize USDC → 4 Payment Intent → 5 Verify payment (consulta vault_deposits; polling guarda datos) → 6-7 Pay. Variables: baseUrl, serviceToken, prizeId.","schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},"variable":[{"key":"baseUrl","value":"http://localhost:3000"},{"key":"serviceToken","value":""},{"key":"prizeId","value":""}],"item":[{"name":"1. Create Prize (POINTS)","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{\n  \"rewardType\": \"POINTS\",\n  \"distributionMode\": \"SPLIT_EQUAL\",\n  \"prizeAmount\": \"60.0000000\",\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}"},"url":"{{baseUrl}}/api/v1/prizes"},"description":"Crea un prize POINTS. Copia prizeId a la variable de colección."},{"name":"2. Get Prize","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"url":"{{baseUrl}}/api/v1/prizes/{{prizeId}}"},"description":"Obtiene el prize. Necesitas prizeId en la variable."},{"name":"3. Create Prize (USDC)","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{\n  \"rewardType\": \"USDC\",\n  \"distributionMode\": \"LOTTERY_SINGLE\",\n  \"prizeAmount\": \"100.0000000\",\n  \"feeBps\": 1000,\n  \"closeAt\": \"2025-03-01T12:00:00.000Z\",\n  \"drawAt\": \"2025-03-02T12:00:00.000Z\"\n}"},"url":"{{baseUrl}}/api/v1/prizes"},"description":"Crea prize USDC (queda AWAITING_PAYMENT_CONFIRMATION)."},{"name":"4. Create Payment Intent","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{\n  \"creatorPublicKey\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n}"},"url":"{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent"},"description":"Genera Payment Intent (unsigned XDR). El core firma y envía la XDR a Stellar."},{"name":"5. Verify payment","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{}"},"url":"{{baseUrl}}/api/v1/prizes/{{prizeId}}/verify-payment"},"description":"Consulta vault_deposits (rellenada por polling). Body {} o {\"txHash\":\"...\"}. Si hay depósito válido, marca LOCKED."},{"name":"6. Pay to wallet (LOTTERY_SINGLE)","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{\n  \"destinations\": [\n    \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n  ]\n}"},"url":"{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"},"description":"Una wallet: todo el prize_net a esa dirección. LOTTERY_SINGLE acepta solo 1 destino. Premio debe estar LOCKED o CLOSED."},{"name":"7. Pay to wallet (SPLIT_EQUAL)","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{serviceToken}}"}],"body":{"mode":"raw","raw":"{\n  \"destinations\": [\n    \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n    \"GDNTD6PR3P3Q7HYMJXFCJT75BQR2NXUGR3TUKMMLETUTHIMEWGF6TD3U\"\n  ]\n}"},"url":"{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"},"description":"Varias wallets: prize_net repartido a partes iguales. Requiere PRIZE_VAULT_SECRET_KEY."}]}
+{
+  "info": {
+    "name": "formly-prize-engine",
+    "description": "API v1. 1-2 Create Prize. 3 Get Prize. 4 Payment Intent. 5 Verify payment (solo prizeId). 6 Pay. Variables: baseUrl, serviceToken, prizeId.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "serviceToken", "value": "" },
+    { "key": "prizeId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Create Prize (USDC)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rewardType\": \"USDC\",\n  \"distributionMode\": \"LOTTERY_SINGLE\",\n  \"prizeAmount\": \"1.2000000\",\n  \"feePercent\": 10\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/prizes"
+      },
+      "description": "Crea un premio USDC. Body: rewardType, distributionMode, prizeAmount, feePercent opcional (0-100, default 10). Respuesta 201: { prize: { prizeId, status, rewardType, distributionMode, prizeAmount, feePercent, feeAmount, prizeNet, vaultAddress, createdAt, updatedAt } }. Copia prizeId a la variable de colección."
+    },
+    {
+      "name": "2. Create Prize (XLM)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rewardType\": \"XLM\",\n  \"distributionMode\": \"SPLIT_EQUAL\",\n  \"prizeAmount\": \"100\",\n  \"feePercent\": 10\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/prizes"
+      },
+      "description": "Crea un premio XLM. Mismo formato de body y respuesta."
+    },
+    {
+      "name": "3. Get Prize",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}"
+      },
+      "description": "Obtiene el premio. Si ya fue pagado, la respuesta incluye payments: [{ destination, amount }, ...]."
+    },
+    {
+      "name": "4. Create Payment Intent (XDR para firmar)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"payerPublicKey\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent"
+      },
+      "description": "Genera la XDR sin firmar. Body: payerPublicKey (wallet que pagará, G... 56 chars). Respuesta: unsignedXdr, memo, depositTarget, feeTarget, expiresAt, expectedPayments, feePercent. Requiere prizeId de un premio en AWAITING_PAYMENT_CONFIRMATION."
+    },
+    {
+      "name": "5. Verify payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/verify-payment"
+      },
+      "description": "Solo prizeId en la URL. Consulta vault_deposits (polling). Si hay depósito válido marca LOCKED. Body: {} o {\"txHash\":\"...\"}."
+    },
+    {
+      "name": "6. Pay",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"destinations\": [\"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"]\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"
+      },
+      "description": "Envía prize_net a las wallets. Body: destinations (array G...). Premio debe estar LOCKED o CLOSED."
+    }
+  ]
+}

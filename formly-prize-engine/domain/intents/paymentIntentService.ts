@@ -112,9 +112,9 @@ function computeIntentHash(params: {
 
 export async function createPaymentIntent(params: {
   prizeId: string;
-  creatorPublicKey: string;
+  payerPublicKey: string;
 }): Promise<PaymentIntentResponse> {
-  const { prizeId, creatorPublicKey } = params;
+  const { prizeId, payerPublicKey } = params;
 
   const prize = await prizeRepo.findPrizeById(prizeId);
   if (!prize) {
@@ -219,7 +219,7 @@ export async function createPaymentIntent(params: {
       prizeId,
       rewardType: prize.reward_type as "XLM" | "USDC",
       amountTotal,
-      feeBps,
+      feePercent: Math.round(feeBps / 100),
       feeAmount,
       prizeNet,
       memo: existing.memo ?? buildMemo(prizeId),
@@ -237,14 +237,14 @@ export async function createPaymentIntent(params: {
   const server = new Horizon.Server(horizonUrl, { allowHttp: horizonUrl.startsWith("http://") });
   let sourceAccount: Account;
   try {
-    const accountResponse = await server.loadAccount(creatorPublicKey);
+    const accountResponse = await server.loadAccount(payerPublicKey);
     sourceAccount = new Account(accountResponse.accountId(), accountResponse.sequenceNumber());
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     throw new ApiError(
       400,
       "VALIDATION_ERROR",
-      `Cannot load creator account from Horizon: ${msg}`,
+      `Cannot load payer account from Horizon: ${msg}`,
       null
     );
   }
@@ -329,7 +329,7 @@ export async function createPaymentIntent(params: {
     prizeId,
     rewardType: prize.reward_type as "XLM" | "USDC",
     amountTotal,
-    feeBps,
+    feePercent: Math.round(feeBps / 100),
     feeAmount,
     prizeNet,
     memo,

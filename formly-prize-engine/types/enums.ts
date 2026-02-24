@@ -1,4 +1,4 @@
-export const RewardType = ["XLM", "USDC", "POINTS"] as const;
+export const RewardType = ["XLM", "USDC"] as const;
 export type RewardType = (typeof RewardType)[number];
 
 export const DistributionMode = ["LOTTERY_SINGLE", "SPLIT_EQUAL"] as const;

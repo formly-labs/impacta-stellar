@@ -1,33 +1,30 @@
 export interface CreatePrizeRequest {
-  formId?: string;
-  creatorId?: string;
-  rewardType: "XLM" | "USDC" | "POINTS";
+  rewardType: "XLM" | "USDC";
   distributionMode: "LOTTERY_SINGLE" | "SPLIT_EQUAL";
   prizeAmount: string;
-  feeBps?: number;
-  closeAt: string;
-  drawAt: string;
+  /** Fee en porcentaje 0-100 (ej: 10 = 10%). */
+  feePercent?: number;
+}
+
+export interface PrizePayment {
+  destination: string;
+  amount: string;
 }
 
 export interface PrizePublic {
   prizeId: string;
   status: string;
-  rewardType: "XLM" | "USDC" | "POINTS";
+  rewardType: "XLM" | "USDC";
   distributionMode: "LOTTERY_SINGLE" | "SPLIT_EQUAL";
   prizeAmount: string;
-  feeBps: number;
+  feePercent: number;
   feeAmount: string;
   prizeNet: string;
   vaultAddress: string | null;
-  closeAt: string;
-  drawAt: string;
-  lockRef: string | null;
-  payoutRef: string | null;
-  ledgerBatchId: string | null;
-  lockedAt: string | null;
-  distributedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  /** Cuando el premio ya fue pagado, lista a quién se envió y cuánto. */
+  payments?: PrizePayment[];
 }
 
 export interface CreatePrizeResponse {
@@ -81,7 +78,8 @@ export interface ErrorResponse {
 }
 
 export interface PaymentIntentRequest {
-  creatorPublicKey: string;
+  /** Wallet que pagará (y firmará la XDR). */
+  payerPublicKey: string;
 }
 
 export interface ExpectedPayment {
@@ -96,7 +94,7 @@ export interface PaymentIntentResponse {
   prizeId: string;
   rewardType: "XLM" | "USDC";
   amountTotal: string;
-  feeBps: number;
+  feePercent: number;
   feeAmount: string;
   prizeNet: string;
   memo: string;

@@ -1,8 +1,8 @@
 -- =============================================================================
--- formly-prize-engine — Schema mínimo (solo tablas y columnas en uso)
+-- formly-prize-engine — Crear base de datos desde cero
 -- =============================================================================
--- Cómo aplicar: Supabase Dashboard → SQL Editor → pegar y ejecutar en orden.
--- Para borrar todo antes: ejecutar supabase/scripts/drop_all_tables.sql
+-- 1) Para reset total: ejecutar antes supabase/scripts/drop_everything.sql
+-- 2) Luego este archivo en Supabase Dashboard → SQL Editor → pegar y ejecutar
 -- =============================================================================
 
 -- 1) ENUMs
