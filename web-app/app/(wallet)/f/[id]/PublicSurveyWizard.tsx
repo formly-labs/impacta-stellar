@@ -180,7 +180,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   
   if (submittedId) {
     return (
-      <div className="flex h-full flex-col items-center justify-center px-4">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center px-4 sm:min-h-0 sm:h-full">
         <div className="w-full max-w-lg space-y-8 text-center animate-fade-in">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-50">
             <CheckCircle className="h-12 w-12 text-green-500" />
@@ -219,13 +219,13 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   
   if (survey.welcomeTitle && !started) {
     return (
-      <div className="flex h-full flex-col overflow-hidden">
-        <div className="flex flex-1 flex-col justify-center px-6 py-12 max-w-2xl w-full mx-auto animate-fade-in">
-          <h1 className="text-3xl font-normal italic text-gray-900 mb-4">
+      <div className="flex min-h-[100dvh] flex-col overflow-hidden sm:min-h-0 sm:h-full">
+        <div className="flex flex-1 flex-col justify-center px-4 py-10 max-w-2xl w-full mx-auto animate-fade-in sm:px-6 sm:py-12">
+          <h1 className="text-2xl font-normal italic text-gray-900 mb-4 sm:text-3xl">
             {survey.welcomeTitle}
           </h1>
           {survey.welcomeDescription && (
-            <p className="text-base text-gray-500 mb-12">
+            <p className="text-sm text-gray-500 mb-8 sm:text-base sm:mb-12">
               {survey.welcomeDescription}
             </p>
           )}
@@ -237,7 +237,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
             >
               Start
             </button>
-            <span className="text-sm text-gray-400">
+            <span className="hidden text-sm text-gray-400 sm:inline">
               presiona <kbd className="rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-semibold text-gray-500">ENTER</kbd>
             </span>
           </div>
@@ -247,11 +247,11 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   }
   
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 overflow-hidden">
+    <div className="flex min-h-[100dvh] flex-col sm:min-h-0 sm:h-full">
+      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-6 sm:py-12">
         <div className="w-full max-w-2xl animate-fade-in" key={step}>
           {/* Step indicator */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <p className="text-sm font-bold uppercase tracking-wider text-blue-500">
               Pregunta {step + 1}{' '}
               <span className="text-gray-300">&gt;</span>
@@ -270,15 +270,15 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         </div>
       </div>
       
-      <footer className="border-t border-gray-100 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
+      <footer className="shrink-0 border-t border-gray-100 bg-white px-4 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto max-w-2xl space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
           {/* Progress */}
           <div className="flex items-center gap-3">
             <p className="text-xs font-medium text-gray-400">
-              Pregunta {step + 1} de {total}
+              {step + 1} / {total}
             </p>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-24 overflow-hidden rounded-full bg-gray-100">
+            <div className="flex flex-1 items-center gap-2 sm:flex-none">
+              <div className="h-1.5 w-full max-w-[6rem] overflow-hidden rounded-full bg-gray-100 sm:w-24">
                 <div
                   className="h-full rounded-full bg-blue-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
@@ -288,15 +288,15 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-end gap-2 sm:gap-3">
             {!isFirst && (
               <button
                 type="button"
                 onClick={handleBack}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700"
+                className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Atrás
+                <span className="hidden sm:inline">Atrás</span>
               </button>
             )}
             
@@ -305,12 +305,13 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:px-6"
               >
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Enviando…
+                    <span className="hidden sm:inline">Enviando…</span>
+                    <span className="sm:hidden">...</span>
                   </>
                 ) : (
                   <>
@@ -324,7 +325,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:px-6"
                 >
                   Siguiente
                   <ArrowRight className="h-4 w-4" />

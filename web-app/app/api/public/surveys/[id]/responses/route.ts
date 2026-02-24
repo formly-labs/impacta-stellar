@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { scoreAndAssignReward } from '@/lib/rewards/scoreResponse';
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -134,7 +135,7 @@ export async function POST(
       }
     }
     
-    // Create response
+    // Create the response first so the user isn't blocked
     const response = await prisma.response.create({
       data: {
         formId: id,
@@ -142,7 +143,28 @@ export async function POST(
         walletAddress: body.walletAddress,
       },
     });
-    
+
+    // Score and assign reward in the background if rewards are enabled
+    if (form.rewardPerGoodAnswer && form.rewardPerGoodAnswer > 0) {
+      scoreAndAssignReward(form.fields, answers, form.rewardPerGoodAnswer)
+        .then(async ({ aiScore, reward, rewardStatus }) => {
+          await prisma.$transaction([
+            prisma.response.update({
+              where: { id: response.id },
+              data: { aiScore, reward, rewardStatus },
+            }),
+            prisma.rewardBudget.upsert({
+              where: { formId: form.id },
+              create: { formId: form.id, pending: reward },
+              update: { pending: { increment: reward } },
+            }),
+          ]);
+        })
+        .catch((err) => {
+          console.error('Background scoring failed for response', response.id, err);
+        });
+    }
+
     return NextResponse.json(
       { id: response.id, message: 'Respuesta registrada correctamente' },
       { status: 201 },

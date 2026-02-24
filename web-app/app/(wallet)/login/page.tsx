@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { Suspense, useEffect } from "react";
-import { Sparkles, Zap, Shield } from "lucide-react";
-import { ConnectButton, useWallet, WalletProvider, NetworkType } from "stellar-wallet-kit";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePollar, WalletButton } from '@pollar/react';
+import { Shield, Sparkles, Zap } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
+import { NetworkType, WalletProvider } from 'stellar-wallet-kit';
 
 function LoginContent() {
-  const { account, isConnected } = useWallet();
+  const { walletAddress } = usePollar();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const isConnected = !!walletAddress;
   useEffect(() => {
     if (isConnected) {
       // Obtener la URL de redirección del query param
@@ -21,17 +22,17 @@ function LoginContent() {
       if (redirectTo) {
         router.push(decodeURIComponent(redirectTo));
       } else {
-        router.push("/dashboard");
+        router.push('/dashboard');
       }
     }
-  }, [isConnected, router, searchParams]);
+  }, [ isConnected, router, searchParams ]);
 
   return (
     <div className="flex min-h-screen">
       {/* Left side - Branding */}
       <div className="relative hidden w-1/2 flex-col overflow-hidden bg-linear-to-br from-primary via-primary-600 to-primary-700 p-12 lg:flex">
         <div className="relative z-10 mb-auto">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/web-app/public" className="flex items-center gap-2">
             <Image
               src="/logo.png"
               alt="Formly"
@@ -52,7 +53,7 @@ function LoginContent() {
           <p className="mt-6 text-lg leading-relaxed text-white/90">
             Connect your wallet to start creating forms or earning from contributions.
           </p>
-          
+
           {/* Features */}
           <div className="mt-12 space-y-4">
             <div className="flex items-start gap-3">
@@ -64,7 +65,7 @@ function LoginContent() {
                 <div className="mt-0.5 text-white/80">AI-powered fraud detection</div>
               </div>
             </div>
-            
+
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10">
                 <Zap className="h-5 w-5 text-white" />
@@ -74,7 +75,7 @@ function LoginContent() {
                 <div className="mt-0.5 text-white/80">Get paid in seconds</div>
               </div>
             </div>
-            
+
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10">
                 <Sparkles className="h-5 w-5 text-white" />
@@ -98,7 +99,7 @@ function LoginContent() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="mb-8 lg:hidden">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/web-app/public" className="flex items-center gap-2">
               <Image
                 src="/logo.png"
                 alt="Formly"
@@ -123,7 +124,7 @@ function LoginContent() {
           <div className="w-full">
             {!isConnected ? (
               <div className="w-full [&>button]:w-full [&>button]:rounded-lg [&>button]:px-6 [&>button]:py-3 [&>button]:font-semibold [&>button]:transition-all">
-                <ConnectButton />
+                <WalletButton />
               </div>
             ) : (
               <div className="space-y-3">
@@ -132,11 +133,11 @@ function LoginContent() {
                     Conexión exitosa
                   </p>
                   <p className="text-gray-500 text-xs truncate mt-1">
-                    {account?.address}
+                    {walletAddress}
                   </p>
                 </div>
                 <Link
-                  href={searchParams.get('redirectTo') ? decodeURIComponent(searchParams.get('redirectTo')!) : "/dashboard"}
+                  href={searchParams.get('redirectTo') ? decodeURIComponent(searchParams.get('redirectTo')!) : '/dashboard'}
                   className="block w-full rounded-lg bg-primary px-6 py-3 text-center font-semibold text-white transition-all hover:bg-primary-600"
                 >
                   Continuar
@@ -147,11 +148,11 @@ function LoginContent() {
 
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              Al conectar, aceptas nuestros{" "}
+              Al conectar, aceptas nuestros{' '}
               <Link href="#" className="font-medium text-primary underline-offset-2 hover:underline">
                 Términos
-              </Link>{" "}
-              y{" "}
+              </Link>{' '}
+              y{' '}
               <Link href="#" className="font-medium text-primary underline-offset-2 hover:underline">
                 Política de privacidad
               </Link>
@@ -160,7 +161,10 @@ function LoginContent() {
 
           {/* Back link */}
           <div className="mt-6 text-center">
-            <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-primary">
+            <Link
+              href="/web-app/public"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-primary"
+            >
               ← Volver al inicio
             </Link>
           </div>

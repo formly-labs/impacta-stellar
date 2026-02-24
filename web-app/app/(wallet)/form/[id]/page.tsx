@@ -21,12 +21,11 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function FormOverviewPage() {
-  
+
   const params = useParams();
   const router = useRouter();
   const formId = params.id as string;
   const { formData, isLoading, refetch } = useFormData(formId);
-  console.log({ formData });
   const [ isDeactivating, setIsDeactivating ] = useState(false);
   const [ copied, setCopied ] = useState(false);
   const [ hasRewards, setHasRewards ] = useState(false);
@@ -35,12 +34,12 @@ export default function FormOverviewPage() {
   const [ deadline, setDeadline ] = useState('');
   const [ distributionType, setDistributionType ] = useState<'all' | 'raffle'>('all');
   const [ maxResponses, setMaxResponses ] = useState('100');
-  
+
   const shareLink =
     typeof window !== 'undefined'
       ? `${window.location.origin}/f/${formData.slug}`
       : '';
-  
+
   const handleCopyLink = async () => {
     if (!shareLink) return;
     try {
@@ -58,7 +57,7 @@ export default function FormOverviewPage() {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-  
+
   const handleDeactivate = async () => {
     if (!formData) return;
     setIsDeactivating(true);
@@ -74,7 +73,7 @@ export default function FormOverviewPage() {
       setIsDeactivating(false);
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f8f9fb]">
@@ -82,7 +81,7 @@ export default function FormOverviewPage() {
       </div>
     );
   }
-  
+
   return (
     <div className="h-full overflow-y-auto bg-[#fafafa]">
       <div className="mx-auto max-w-5xl px-4 py-6 pb-24 sm:px-6">
@@ -135,7 +134,7 @@ export default function FormOverviewPage() {
               </button>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-100 bg-primary-50 px-5 py-3">
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500">
@@ -171,7 +170,7 @@ export default function FormOverviewPage() {
             </div>
           </div>
         </header>
-        
+
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md hover:border-primary-300">
             <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
@@ -205,7 +204,7 @@ export default function FormOverviewPage() {
             </p>
           </div>
         </div>
-        
+
         {formData.description && (
           <div className="mt-4 rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
@@ -218,7 +217,7 @@ export default function FormOverviewPage() {
             </div>
           </div>
         )}
-        
+
         <div className="mt-4 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <div className="border-b border-gray-100 px-6 py-4 bg-white">
             <div className="flex items-center gap-3">
@@ -235,7 +234,7 @@ export default function FormOverviewPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between p-5 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center gap-3">
@@ -265,7 +264,7 @@ export default function FormOverviewPage() {
                 />
               </button>
             </div>
-            
+
             {hasRewards && (
               <div className="space-y-6 animate-fade-in">
                 <div>
@@ -303,7 +302,7 @@ export default function FormOverviewPage() {
                         </div>
                       )}
                     </button>
-                    
+
                     {/* Raffle/Lottery */}
                     <button
                       type="button"
@@ -337,7 +336,7 @@ export default function FormOverviewPage() {
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Reward Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Tipo de Recompensa */}
@@ -355,7 +354,7 @@ export default function FormOverviewPage() {
                       <option value="Points">Puntos</option>
                     </select>
                   </div>
-                  
+
                   {/* Monto de Recompensa */}
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -377,7 +376,7 @@ export default function FormOverviewPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Max Responses (para calcular presupuesto) */}
                 {distributionType === 'all' && (
                   <div>
@@ -394,7 +393,7 @@ export default function FormOverviewPage() {
                     />
                   </div>
                 )}
-                
+
                 <div className="rounded-lg bg-blue-50 border border-blue-200 p-5">
                   <div className="flex items-start gap-4">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-100 border border-blue-200">
@@ -418,7 +417,7 @@ export default function FormOverviewPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="rounded-lg bg-green-50 border border-green-200 p-5">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div className="flex items-center gap-3 flex-1">
@@ -446,7 +445,7 @@ export default function FormOverviewPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Deadline */}
             <div className="border-t border-gray-200 pt-6">
               <div className="flex items-center gap-2 mb-3">
@@ -465,7 +464,7 @@ export default function FormOverviewPage() {
                 className="w-full md:w-auto rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all"
               />
             </div>
-            
+
             {/* Save Button */}
             <div className="border-t border-gray-200 pt-6">
               <button
@@ -482,7 +481,7 @@ export default function FormOverviewPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Moon icon */}
       <button
         type="button"

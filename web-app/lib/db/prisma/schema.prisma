@@ -33,26 +33,38 @@ model WorkspaceMember {
 }
 
 model Form {
-  id                  String     @id @default(cuid())
+  id                  String        @id @default(cuid())
   slug                String
   title               String
   description         String?
   ownerAddress        String
-  budget              Float      @default(0) // En XLM
-  isActive            Boolean    @default(true)
-  isArchived          Boolean    @default(false)
+  budget              Float         @default(0) // En XLM
+  isActive            Boolean       @default(true)
+  isArchived          Boolean       @default(false)
   theme               String? // "Product UX", "Segmentation", "Sales"
   rewardPerGoodAnswer Float? // XLM por respuesta válida
   workspaceId         String?
-  workspace           Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  workspace           Workspace?    @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   fields              Field[]
   responses           Response[]
+  rewardBudget        RewardBudget?
   welcomeTitle        String?
   welcomeDescription  String?
   endingTitle         String?
   endingDescription   String?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model RewardBudget {
+  id        String   @id @default(cuid())
+  formId    String   @unique
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  total     Float    @default(0)
+  consumed  Float    @default(0)
+  pending   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Response {
@@ -61,6 +73,10 @@ model Response {
   form          Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers       Json // { [fieldId: string]: string | string[] }
   walletAddress String?
+  aiScore       Float?
+  reward        Float?
+  rewardStatus  String?  // "pending" | "paid"
+  rewardTxHash  String?
   createdAt     DateTime @default(now())
 }
 

@@ -15,6 +15,7 @@ import {
   Copy,
   FileText,
   Hash,
+  List,
   Lock,
   Mail,
   Monitor,
@@ -22,7 +23,9 @@ import {
   Phone,
   Plus,
   Smartphone,
+  Sparkles,
   Trash2,
+  X,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -91,6 +94,8 @@ export default function CreateFormPage() {
   const [ showRewardsModal, setShowRewardsModal ] = useState(false);
   const [ showSuccessModal, setShowSuccessModal ] = useState(false);
   const [ selectedScreen, setSelectedScreen ] = useState<'question' | 'welcome' | 'ending'>('question');
+  const [ showMobileSidebar, setShowMobileSidebar ] = useState(false);
+  const [ showMobileAI, setShowMobileAI ] = useState(false);
   
   useEffect(() => {
     if (!formId) {
@@ -219,25 +224,97 @@ export default function CreateFormPage() {
         onComplete={handleSuccessComplete}
       />
       
-      <div className={`flex flex-1 gap-4 overflow-hidden p-4 ${isReadOnly ? 'pointer-events-none select-none opacity-50' : ''}`}>
-        {/* Sidebar izquierdo - Columna con 3 cajas */}
-        <aside className="flex w-64 shrink-0 flex-col gap-4">
-          {/* Caja 1: Lista de preguntas */}
-          <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-4">
-              {/* Lista de preguntas */}
-              <div className="space-y-2">
+      <div className={`flex flex-1 gap-0 overflow-hidden p-0 lg:gap-4 lg:p-4 ${isReadOnly ? 'pointer-events-none select-none opacity-50' : ''}`}>
+        {/* Mobile sidebar overlay */}
+        {showMobileSidebar && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileSidebar(false)} />
+            <aside className="absolute left-0 top-0 flex h-full w-72 flex-col gap-3 bg-white p-4 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-900">Preguntas</h3>
+                <button onClick={() => setShowMobileSidebar(false)} className="rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              {/* Mobile sidebar: Welcome (top), Questions, End screen (bottom) */}
+              <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
+                <button onClick={() => { setSelectedScreen('welcome'); setShowMobileSidebar(false); }}
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                  Welcome screen <Plus className="h-4 w-4 text-gray-400" />
+                </button>
+                <div className="flex-1 space-y-0.5">
+                  {formData.fields?.map((field, index) => (
+                    <button
+                      key={index}
+                      onClick={() => { setSelectedQuestionIndex(index); setSelectedScreen('question'); setShowMobileSidebar(false); }}
+                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all ${selectedQuestionIndex === index ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-semibold text-gray-600">{index + 1}</span>
+                      <p className="min-w-0 truncate text-sm font-medium text-gray-900">{field.label || `Pregunta ${index + 1}`}</p>
+                    </button>
+                  ))}
+                  {(!formData.fields || formData.fields.length === 0) && (
+                    <p className="py-6 text-center text-sm text-gray-400">No hay preguntas</p>
+                  )}
+                </div>
+                <button onClick={() => { setSelectedScreen('ending'); setShowMobileSidebar(false); }}
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                  <span className="flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">N</span>
+                    screen
+                  </span>
+                  <Plus className="h-4 w-4 text-gray-400" />
+                </button>
+              </div>
+            </aside>
+          </div>
+        )}
+
+        {/* Mobile AI overlay */}
+        {showMobileAI && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileAI(false)} />
+            <div className="absolute bottom-0 left-0 right-0 flex h-[75dvh] flex-col rounded-t-2xl bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                <span className="text-sm font-bold text-gray-900">AI Assistant</span>
+                <button onClick={() => setShowMobileAI(false)} className="rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <AIAssistantForm formData={formData} setFormData={setFormData} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop sidebar: Welcome (top), Questions, End screen (bottom) */}
+        <aside className="hidden w-64 shrink-0 flex-col gap-3 lg:flex">
+          {/* Welcome screen - at top */}
+          <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
+            <button
+              onClick={() => setSelectedScreen('welcome')}
+              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
+                selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'
+              }`}
+            >
+              <span className="text-sm font-medium text-gray-700">Welcome screen</span>
+              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
+            </button>
+          </div>
+
+          {/* Question section */}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="space-y-0.5">
                 {formData.fields?.map((field, index) => {
                   const fieldType = FIELD_TYPES.find((t) => t.value === field.type);
-                  const FieldIcon = fieldType?.icon || AlignLeft;
-                  
+                  const isSelected = selectedQuestionIndex === index;
                   return (
                     <div key={index} className="relative">
                       <div
-                        className={`flex w-full items-center gap-3 rounded-lg p-3 transition-all overflow-hidden ${
-                          selectedQuestionIndex === index
-                            ? 'bg-gray-100'
-                            : 'bg-white hover:bg-gray-50'
+                        className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 transition-all ${
+                          isSelected ? 'bg-primary-50' : 'hover:bg-gray-50'
                         }`}
                       >
                         <button
@@ -246,32 +323,22 @@ export default function CreateFormPage() {
                             setSelectedScreen('question');
                             setShowActionsMenu(false);
                           }}
-                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
                         >
-                          {/* Icono + Número juntos en el mismo contenedor */}
-                          <div className={`flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 ${fieldType?.bgColor || 'bg-gray-100'}`}>
-                            <FieldIcon className="h-3.5 w-3.5 text-gray-600" />
-                            <span className="text-xs font-semibold text-gray-600">
-                              {index + 1}
-                            </span>
-                          </div>
-                          
-                          {/* Título de la pregunta */}
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-gray-900">
-                              {field.label || `Pregunta ${index + 1}`}
-                            </p>
-                          </div>
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-semibold text-gray-600">
+                            {index + 1}
+                          </span>
+                          <p className="min-w-0 truncate text-sm font-medium text-gray-900">
+                            {field.label || `Pregunta ${index + 1}`}
+                          </p>
                         </button>
-                        
-                        {/* Icono de 3 puntos - Solo cuando está seleccionada */}
-                        {selectedQuestionIndex === index && (
+                        {isSelected && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowActionsMenu(!showActionsMenu);
                             }}
-                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700"
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700"
                           >
                             <MoreVertical className="h-4 w-4" />
                           </button>
@@ -323,120 +390,101 @@ export default function CreateFormPage() {
               
               {/* Mensaje cuando no hay preguntas */}
               {(!formData.fields || formData.fields.length === 0) && (
-                <div className="mt-8 text-center">
+                <div className="mt-6 text-center">
                   <p className="text-sm text-gray-500">No hay preguntas</p>
-                  <p className="mt-1 text-xs text-gray-400">Crea tu primera pregunta</p>
+                  <p className="mt-1 text-xs text-gray-400">Añade tu primera pregunta</p>
                 </div>
               )}
             </div>
           </div>
-          
-          {/* Caja 2: Welcome Screen */}
-          <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
-            <button
-              onClick={() => setSelectedScreen('welcome')}
-              className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
-                selectedScreen === 'welcome' ? 'bg-gray-100' : 'hover:bg-gray-50'
-              }`}
-            >
-              <span className="text-sm font-medium text-gray-700">welcome screen</span>
-              <Plus className="h-4 w-4 text-gray-400" />
-            </button>
-          </div>
-          
-          {/* Caja 3: Ending Screen */}
+
+          {/* End screen - at bottom */}
           <div className="shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm">
             <button
               onClick={() => setSelectedScreen('ending')}
-              className={`flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
-                selectedScreen === 'ending' ? 'bg-gray-100' : 'hover:bg-gray-50'
+              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${
+                selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'
               }`}
             >
-              <span className="text-sm font-medium text-gray-700">ending screen</span>
-              <Plus className="h-4 w-4 text-gray-400" />
+              <span className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">N</span>
+                screen
+              </span>
+              <Plus className="h-4 w-4 shrink-0 text-gray-400" />
             </button>
           </div>
         </aside>
         
         {/* Área central - Toolbar + Contenido */}
-        <main className="flex flex-1 flex-col gap-4 overflow-hidden">
+        <main className="flex flex-1 flex-col gap-0 overflow-hidden lg:gap-4">
           {/* Toolbar superior con controles */}
-          <div className="shrink-0 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-6 py-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              {/* Botón añadir pregunta */}
-              <button
-                onClick={addField}
-                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-              >
-                <Plus className="h-4 w-4" />
-                añadir pregunta
-              </button>
-              
-              {selectedScreen === 'question' && selectedField && (
-                <>
-                  <div className="h-6 w-px bg-gray-300" />
-                  
-                  {/* Type pregunta con selector personalizado */}
-                  <QuestionTypeSelector
-                    value={selectedField.type}
-                    onChange={(type) => updateField(selectedQuestionIndex!, { type })}
-                  />
-                  
-                  {/* Required switch */}
-                  <label className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-all hover:bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">required</span>
-                    <button
-                      type="button"
-                      onClick={() => updateField(selectedQuestionIndex!, { required: !selectedField.required })}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        selectedField.required ? 'bg-primary' : 'bg-gray-300'
+          <div className="shrink-0 flex flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-3 py-2 lg:gap-3 lg:rounded-lg lg:border lg:px-6 lg:py-3 lg:shadow-sm">
+            {/* Mobile sidebar toggle */}
+            <button
+              onClick={() => setShowMobileSidebar(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 lg:hidden"
+              title="Ver preguntas"
+            >
+              <List className="h-5 w-5" />
+            </button>
+
+            <button
+              onClick={addField}
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Añadir pregunta</span>
+              <span className="sm:hidden">Añadir</span>
+            </button>
+            
+            {selectedScreen === 'question' && selectedField && (
+              <>
+                <div className="hidden h-6 w-px bg-gray-300 sm:block" />
+                
+                <QuestionTypeSelector
+                  value={selectedField.type}
+                  onChange={(type) => updateField(selectedQuestionIndex!, { type })}
+                />
+                
+                <label className="ml-auto flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors hover:bg-gray-50">
+                  <span className="text-sm font-medium text-gray-700">required</span>
+                  <button
+                    type="button"
+                    onClick={() => updateField(selectedQuestionIndex!, { required: !selectedField.required })}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors sm:h-6 sm:w-11 ${
+                      selectedField.required ? 'bg-primary' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform sm:h-4 sm:w-4 ${
+                        selectedField.required ? 'translate-x-[18px] sm:translate-x-6' : 'translate-x-0.5 sm:translate-x-1'
                       }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          selectedField.required ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </label>
-                  
-                  {/* Botón único para cambiar vista */}
-                  <button
-                    onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
-                    className="flex items-center justify-center rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                    title={viewMode === 'desktop' ? 'Cambiar a vista mobile' : 'Cambiar a vista desktop'}
-                  >
-                    {viewMode === 'desktop' ? (
-                      <Monitor className="h-5 w-5" />
-                    ) : (
-                      <Smartphone className="h-5 w-5" />
-                    )}
+                    />
                   </button>
-                </>
-              )}
-              
-              {/* Botón de vista cuando está en welcome o ending screen */}
-              {(selectedScreen === 'welcome' || selectedScreen === 'ending') && (
-                <>
-                  <div className="h-6 w-px bg-gray-300" />
-                  <button
-                    onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
-                    className="flex items-center justify-center rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                    title={viewMode === 'desktop' ? 'Cambiar a vista mobile' : 'Cambiar a vista desktop'}
-                  >
-                    {viewMode === 'desktop' ? (
-                      <Monitor className="h-5 w-5" />
-                    ) : (
-                      <Smartphone className="h-5 w-5" />
-                    )}
-                  </button>
-                </>
-              )}
-            </div>
+                </label>
+                
+                <button
+                  onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
+                  className="hidden items-center justify-center rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 sm:flex"
+                  title={viewMode === 'desktop' ? 'Cambiar a vista mobile' : 'Cambiar a vista desktop'}
+                >
+                  {viewMode === 'desktop' ? <Monitor className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}
+                </button>
+              </>
+            )}
+            
+            {(selectedScreen === 'welcome' || selectedScreen === 'ending') && (
+              <button
+                onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
+                className="ml-auto hidden items-center justify-center rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 sm:flex"
+              >
+                {viewMode === 'desktop' ? <Monitor className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}
+              </button>
+            )}
           </div>
           
           {/* Editor de pregunta o screens */}
-          <div className="flex-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+          <div className="flex-1 overflow-hidden bg-white lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-sm">
             {/* Welcome Screen */}
             {selectedScreen === 'welcome' && (
               <div
@@ -485,10 +533,15 @@ export default function CreateFormPage() {
                         }`}
                       />
                       
-                      {/* Botón Start */}
+                      {/* Botón Start: ir a la primera pregunta */}
                       <div className="flex items-center gap-3 mb-4">
                         <button
-                          className={`rounded-lg bg-primary px-6 py-3 font-medium text-white ${
+                          type="button"
+                          onClick={() => {
+                            setSelectedScreen('question');
+                            if (formData.fields?.length) setSelectedQuestionIndex(0);
+                          }}
+                          className={`rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90 ${
                             viewMode === 'mobile' ? 'text-sm' : 'text-base'
                           }`}
                         >
@@ -690,13 +743,11 @@ export default function CreateFormPage() {
                           {selectedField.options?.map((option, optIndex) => (
                             <div
                               key={optIndex}
-                              className={`group flex items-center rounded-lg bg-gray-50/50 border border-gray-200 transition-all hover:border-primary/50 hover:bg-primary/5 ${viewMode === 'mobile' ? 'gap-3 p-3' : 'gap-4 p-4'
-                              }`}
+                              className="group flex items-stretch overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                             >
-                              {/* Letra en cuadro azul */}
+                              {/* Letra en recuadro morado claro */}
                               <div
-                                className={`flex items-center justify-center rounded bg-primary/10 border border-primary/20 font-semibold text-primary ${viewMode === 'mobile' ? 'h-7 w-7 text-xs' : 'h-9 w-9 text-sm'
-                                }`}
+                                className={`flex shrink-0 items-center justify-center bg-primary-50 font-semibold text-primary ${viewMode === 'mobile' ? 'w-10 text-sm' : 'w-12 text-base'}`}
                               >
                                 {String.fromCharCode(65 + optIndex)}
                               </div>
@@ -709,29 +760,29 @@ export default function CreateFormPage() {
                                   updateField(selectedQuestionIndex!, { options: newOptions });
                                 }}
                                 placeholder={`Opción ${optIndex + 1}`}
-                                className={`flex-1 border-none bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none ${viewMode === 'mobile' ? 'text-base' : 'text-lg'
-                                }`}
+                                className={`flex-1 border-0 bg-transparent px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 ${viewMode === 'mobile' ? 'text-base' : 'text-lg'}`}
                               />
                               <button
+                                type="button"
                                 onClick={() => {
                                   const newOptions = selectedField.options?.filter((_, i) => i !== optIndex);
                                   updateField(selectedQuestionIndex!, { options: newOptions });
                                 }}
-                                className="opacity-0 rounded p-1 text-gray-400 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                                className="shrink-0 px-2 text-gray-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
                               >
-                                <Trash2 className={viewMode === 'mobile' ? 'h-4 w-4' : 'h-4 w-4'} />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                           ))}
                           <button
+                            type="button"
                             onClick={() => {
                               const newOptions = [ ...(selectedField.options || []), '' ];
                               updateField(selectedQuestionIndex!, { options: newOptions });
                             }}
-                            className={`text-primary hover:underline font-normal ${viewMode === 'mobile' ? 'text-sm' : 'text-base'
-                            }`}
+                            className={`font-medium text-primary hover:underline ${viewMode === 'mobile' ? 'text-sm' : 'text-base'}`}
                           >
-                            Add choice
+                            + Add choice
                           </button>
                         </div>
                       )}
@@ -760,10 +811,28 @@ export default function CreateFormPage() {
           </div>
         </main>
         
-        {/* AI Assistant a la DERECHA - mismo nivel que sidebar */}
-        <div className="w-80 shrink-0 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+        {/* AI Assistant — desktop only */}
+        <div className="hidden w-80 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm lg:block">
           <AIAssistantForm formData={formData} setFormData={setFormData} />
         </div>
+      </div>
+
+      {/* Mobile floating buttons */}
+      <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-3 lg:hidden">
+        <button
+          onClick={() => setShowMobileSidebar(true)}
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg transition-colors hover:bg-gray-50"
+          title="Ver preguntas"
+        >
+          <List className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => setShowMobileAI(true)}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-colors hover:bg-primary-600"
+          title="AI Assistant"
+        >
+          <Sparkles className="h-5 w-5" />
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/db';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import PublicSurveyWizard from './PublicSurveyWizard';
 
@@ -45,8 +44,6 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       },
     },
   });
-
-  console.log(form);
 
   // Not found
   if (!form) {

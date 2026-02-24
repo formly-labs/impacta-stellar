@@ -1,11 +1,11 @@
 'use client';
 
-import { useWallet } from 'stellar-wallet-kit';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { useRef, useEffect, useState } from 'react';
-import { LogOut, Wallet, ChevronDown } from 'lucide-react';
+import { usePollar } from '@pollar/react';
+import { ChevronDown, LogOut, Wallet } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 function truncateAddress(address: string, start = 6, end = 4) {
   if (!address || address.length <= start + end) return address;
@@ -18,10 +18,11 @@ function getInitials(address: string) {
 }
 
 export function WalletHeader() {
-  const { account, isConnected, disconnect } = useWallet();
+  const { walletAddress, logout } = usePollar();
+  const isConnected = !!walletAddress;
   const router = useRouter();
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [ open, setOpen ] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,33 +31,34 @@ export function WalletHeader() {
         setOpen(false);
       }
     }
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleLogout = async () => {
     setOpen(false);
-    await disconnect();
+    await logout();
     router.push('/');
   };
 
   // No mostrar header en login (login está fuera de (wallet), pero por si acaso)
   if (pathname === '/login') return null;
-  
+
   // No mostrar header en las páginas de formulario con navegación propia
   if (pathname?.includes('/form/') && (pathname?.includes('/edit') || pathname?.includes('/rewards') || pathname?.includes('/share') || pathname?.includes('/answers'))) return null;
 
   return (
     <header className="shrink-0 border-b border-gray-200 bg-white">
       <div className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link 
-          href="/dashboard" 
+        <Link
+          href="/dashboard"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
-          <Image 
-            src="/logo.png" 
-            alt="Formly" 
-            width={28} 
+          <Image
+            src="/logo.png"
+            alt="Formly"
+            width={28}
             height={28}
             className="rounded-lg"
           />
@@ -83,12 +85,12 @@ export function WalletHeader() {
                 aria-haspopup="true"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                  {getInitials(account?.address ?? '')}
+                  {getInitials(walletAddress ?? '')}
                 </div>
                 <span className="hidden max-w-[100px] truncate text-sm font-medium text-gray-700 sm:block">
-                  {account?.address ? truncateAddress(account.address, 6, 4) : 'Usuario'}
+                  {walletAddress ? truncateAddress(walletAddress, 6, 4) : 'Usuario'}
                 </span>
-                <ChevronDown 
+                <ChevronDown
                   className={`h-3.5 w-3.5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
                 />
               </button>
@@ -97,8 +99,8 @@ export function WalletHeader() {
                 <div className="absolute right-0 mt-2 w-64 rounded-lg border border-gray-200 bg-white shadow-lg">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-xs text-gray-500">Cuenta</p>
-                    <p className="mt-1 truncate font-mono text-sm text-gray-900" title={account?.address}>
-                      {account?.address}
+                    <p className="mt-1 truncate font-mono text-sm text-gray-900" title={walletAddress}>
+                      {walletAddress}
                     </p>
                   </div>
                   <div className="py-1">
