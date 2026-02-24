@@ -1,24 +1,11 @@
 'use client';
 
-import {
-  ArrowLeft,
-  CheckCircle,
-  Copy,
-  FileText,
-  Coins,
-  HelpCircle,
-  Loader2,
-  PartyPopper,
-} from 'lucide-react';
+import { clearQuestionnaireDraft, loadQuestionnaireDraft, type QuestionnaireDraft } from '@/lib/newQuestionnaireDraft';
+import type { FieldInput } from '@/types';
+import { usePollar } from '@pollar/react';
+import { ArrowLeft, CheckCircle, Coins, Copy, FileText, HelpCircle, Loader2, PartyPopper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useWallet } from 'stellar-wallet-kit';
-import {
-  loadQuestionnaireDraft,
-  clearQuestionnaireDraft,
-  type QuestionnaireDraft,
-} from '@/lib/newQuestionnaireDraft';
-import type { FieldInput } from '@/types';
 
 const THEME_LABELS: Record<string, string> = {
   'Product UX': 'Experiencia de producto',
@@ -36,13 +23,13 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function FinalizeStep() {
   const router = useRouter();
-  const { account } = useWallet();
-  const [draft, setDraft] = useState<QuestionnaireDraft>({});
-  const [published, setPublished] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formId, setFormId] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const { walletAddress } = usePollar();
+  const [ draft, setDraft ] = useState<QuestionnaireDraft>({});
+  const [ published, setPublished ] = useState(false);
+  const [ publishing, setPublishing ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
+  const [ formId, setFormId ] = useState<string | null>(null);
+  const [ copied, setCopied ] = useState(false);
 
   useEffect(() => {
     setDraft(loadQuestionnaireDraft());
@@ -53,7 +40,7 @@ export default function FinalizeStep() {
   const themeLabel = draft.theme ? (THEME_LABELS[draft.theme] ?? draft.theme) : '—';
 
   const handlePublish = async () => {
-    if (!account?.address) {
+    if (!walletAddress) {
       setError('Wallet no conectada. Vuelve a conectar tu wallet.');
       return;
     }
@@ -79,7 +66,7 @@ export default function FinalizeStep() {
         description: draft.theme
           ? `Cuestionario de ${THEME_LABELS[draft.theme] || draft.theme}`
           : 'Cuestionario general',
-        ownerAddress: account.address,
+        ownerAddress: walletAddress,
         fields,
         theme: draft.theme,
         rewardPerGoodAnswer: draft.rewardPerGoodAnswer,
