@@ -8,22 +8,61 @@ import {
 import { ApiError } from "@/lib/errors";
 import { env } from "@/lib/env";
 import * as prizeRepo from "@/domain/repositories/prizeRepo";
-import { assetForRewardType, toDecimalAmount } from "@/domain/intents/paymentIntentService";
+import {
+  assetForRewardType,
+  toDecimalAmount,
+  amountToStroops,
+  stroopsToAmount,
+} from "@/domain/intents/paymentIntentService";
 
 const BASE_FEE_FALLBACK = 100;
 
+function isValidStellarPublicKey(s: string): boolean {
+  const t = s.trim();
+  return t.startsWith("G") && t.length === 56;
+}
+
 /**
- * Envía desde el prize vault a una wallet. Prize debe estar LOCKED o CLOSED, XLM/USDC.
- * Firma con PRIZE_VAULT_SECRET_KEY y envía la tx a Horizon.
- * asset debe coincidir con el reward_type del prize.
+ * Reparte prize_net en N montos (SPLIT_EQUAL): stroops / N por persona, resto al primero.
  */
-export async function payToWallet(params: {
-  prizeId: string;
+function splitAmounts(prizeNetStr: string, count: number): string[] {
+  if (count <= 0) return [];
+  if (count === 1) return [toDecimalAmount(prizeNetStr)];
+  const totalStroops = amountToStroops(prizeNetStr);
+  const perStroops = totalStroops / BigInt(count);
+  const remainder = totalStroops - perStroops * BigInt(count);
+  const amounts: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const stroops = i === 0 ? perStroops + remainder : perStroops;
+    amounts.push(stroopsToAmount(stroops));
+  }
+  return amounts;
+}
+
+export interface PayToDestinationsPayment {
   destination: string;
   amount: string;
-  asset: "XLM" | "USDC";
-}): Promise<{ prizeId: string; txHash: string; destination: string; amount: string; asset: string }> {
-  const { prizeId, destination, amount, asset } = params;
+}
+
+export interface PayToDestinationsResult {
+  prizeId: string;
+  txHash: string;
+  asset: string;
+  distributionMode: string;
+  payments: PayToDestinationsPayment[];
+}
+
+/**
+ * Envía desde el prize vault a una o más wallets según distribution_mode.
+ * - LOTTERY_SINGLE: todo el prize_net a la primera wallet (si mandan más, se ignora el resto).
+ * - SPLIT_EQUAL: prize_net repartido a partes iguales entre todas las wallets (resto al primero).
+ * No se pide amount ni asset; se obtienen del prize.
+ */
+export async function payToDestinations(params: {
+  prizeId: string;
+  destinations: string[];
+}): Promise<PayToDestinationsResult> {
+  const { prizeId, destinations } = params;
   const horizonUrl = env.HORIZON_URL;
   const networkPassphrase = env.STELLAR_NETWORK_PASSPHRASE;
   const vaultSecret = env.PRIZE_VAULT_SECRET_KEY;
@@ -46,18 +85,6 @@ export async function payToWallet(params: {
   if (prize.reward_type !== "XLM" && prize.reward_type !== "USDC") {
     throw new ApiError(422, "UNPROCESSABLE_ENTITY", "Prize must be XLM or USDC to pay out", null);
   }
-  const assetNorm = (asset ?? "").toUpperCase().trim();
-  if (assetNorm !== "XLM" && assetNorm !== "USDC") {
-    throw new ApiError(400, "VALIDATION_ERROR", "asset is required and must be XLM or USDC", null);
-  }
-  if (assetNorm !== prize.reward_type) {
-    throw new ApiError(
-      422,
-      "UNPROCESSABLE_ENTITY",
-      `Prize is ${prize.reward_type}; asset must match (use "${prize.reward_type}")`,
-      null
-    );
-  }
   if (prize.status !== "LOCKED" && prize.status !== "CLOSED") {
     throw new ApiError(
       409,
@@ -70,13 +97,42 @@ export async function payToWallet(params: {
     throw new ApiError(503, "SERVICE_UNAVAILABLE", "Prize vault does not match configured vault", null);
   }
 
-  const destTrimmed = destination.trim();
-  if (!destTrimmed.startsWith("G") || destTrimmed.length !== 56) {
-    throw new ApiError(400, "VALIDATION_ERROR", "destination must be a Stellar public key (G..., 56 chars)", null);
+  if (!Array.isArray(destinations) || destinations.length === 0) {
+    throw new ApiError(400, "VALIDATION_ERROR", "destinations is required (non-empty array of G...)", null);
   }
-  const amountStr = toDecimalAmount(amount);
-  if (parseFloat(amountStr) <= 0) {
-    throw new ApiError(400, "VALIDATION_ERROR", "amount must be positive", null);
+  const validDests = destinations
+    .filter((d) => typeof d === "string" && d.trim())
+    .map((d) => (d as string).trim());
+  if (validDests.length === 0) {
+    throw new ApiError(400, "VALIDATION_ERROR", "destinations must contain at least one Stellar address (G..., 56 chars)", null);
+  }
+  for (const d of validDests) {
+    if (!isValidStellarPublicKey(d)) {
+      throw new ApiError(400, "VALIDATION_ERROR", `Invalid destination: ${d.slice(0, 8)}... (must be G..., 56 chars)`, null);
+    }
+  }
+
+  const mode = (prize.distribution_mode ?? "LOTTERY_SINGLE").toUpperCase();
+  const prizeNet = toDecimalAmount(prize.prize_net);
+  const asset = prize.reward_type as "XLM" | "USDC";
+
+  if (mode === "LOTTERY_SINGLE" && validDests.length > 1) {
+    throw new ApiError(
+      400,
+      "VALIDATION_ERROR",
+      "LOTTERY_SINGLE accepts exactly one destination; received " + validDests.length,
+      null
+    );
+  }
+
+  let effectiveDests: string[];
+  let amounts: string[];
+  if (mode === "LOTTERY_SINGLE") {
+    effectiveDests = [validDests[0]];
+    amounts = [prizeNet];
+  } else {
+    effectiveDests = validDests;
+    amounts = splitAmounts(prizeNet, validDests.length);
   }
 
   const server = new Horizon.Server(horizonUrl, { allowHttp: horizonUrl.startsWith("http://") });
@@ -97,20 +153,23 @@ export async function payToWallet(params: {
   }
 
   const timebounds = await server.fetchTimebounds(300);
-  const paymentAsset = assetForRewardType(assetNorm as "XLM" | "USDC", usdcIssuer);
+  const paymentAsset = assetForRewardType(asset, usdcIssuer);
   const keypair = Keypair.fromSecret(vaultSecret);
-  const builder = new TransactionBuilder(sourceAccount, {
+  let builder = new TransactionBuilder(sourceAccount, {
     fee: String(baseFee),
     networkPassphrase,
     timebounds: { minTime: timebounds.minTime, maxTime: timebounds.maxTime },
-  })
-    .addOperation(
+  });
+
+  for (let i = 0; i < effectiveDests.length; i++) {
+    builder = builder.addOperation(
       Operation.payment({
-        destination: destTrimmed,
+        destination: effectiveDests[i],
         asset: paymentAsset,
-        amount: amountStr,
+        amount: amounts[i],
       })
     );
+  }
 
   const transaction = builder.build();
   transaction.sign(keypair);
@@ -123,11 +182,16 @@ export async function payToWallet(params: {
     throw new ApiError(502, "BAD_GATEWAY", `Stellar submit failed: ${msg}`, null);
   }
 
+  const payments: PayToDestinationsPayment[] = effectiveDests.map((dest, i) => ({
+    destination: dest,
+    amount: amounts[i],
+  }));
+
   return {
     prizeId,
     txHash: result.hash,
-    destination: destTrimmed,
-    amount: amountStr,
-    asset: assetNorm,
+    asset,
+    distributionMode: mode,
+    payments,
   };
 }

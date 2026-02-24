@@ -2,21 +2,22 @@ import { NextRequest } from "next/server";
 import { requireServiceAuth } from "@/lib/auth";
 import { normalizeError } from "@/lib/errors";
 import { newRequestId, jsonOk, jsonError } from "@/lib/http";
-import { payToWallet } from "@/domain/payouts/payoutService";
+import { payToDestinations } from "@/domain/payouts/payoutService";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   return Response.json(
-    { errorCode: "METHOD_NOT_ALLOWED", message: "Use POST with body: { destination, amount, asset } (asset: XLM | USDC)" },
+    { errorCode: "METHOD_NOT_ALLOWED", message: "Use POST with body: { destinations: [\"G...\", ...] }" },
     { status: 405 }
   );
 }
 
 /**
  * POST /api/v1/prizes/:prizeId/pay
- * Body: { "destination": "G...", "amount": "9.0000000", "asset": "USDC" }
- * Envía desde el prize vault a la wallet indicada. asset debe coincidir con el rewardType del prize.
+ * Body: { "destinations": ["G..."] } o ["G...", "G..."] para SPLIT_EQUAL.
+ * Montos y asset se obtienen del prize (prize_net, reward_type, distribution_mode).
+ * LOTTERY_SINGLE: todo a la primera wallet. SPLIT_EQUAL: reparto igual entre todas.
  */
 export async function POST(
   request: NextRequest,
@@ -26,32 +27,19 @@ export async function POST(
   try {
     requireServiceAuth(request);
     const { prizeId } = await params;
-    const body = await request.json().catch(() => ({})) as { destination?: string; amount?: string; asset?: string };
-    const destination = typeof body.destination === "string" ? body.destination.trim() : "";
-    const amount = typeof body.amount === "string" ? body.amount.trim() : "";
-    const asset = typeof body.asset === "string" ? body.asset.trim() : "";
-    if (!destination) {
+    const body = await request.json().catch(() => ({})) as { destinations?: unknown };
+    const raw = body.destinations;
+    const destinations = Array.isArray(raw)
+      ? (raw as string[]).filter((d) => typeof d === "string")
+      : [];
+    if (destinations.length === 0) {
       return jsonError(
-        { errorCode: "VALIDATION_ERROR", message: "destination is required (Stellar G...)", details: null },
+        { errorCode: "VALIDATION_ERROR", message: "destinations is required (non-empty array of Stellar G...)", details: null },
         400,
         requestId
       );
     }
-    if (!amount) {
-      return jsonError(
-        { errorCode: "VALIDATION_ERROR", message: "amount is required", details: null },
-        400,
-        requestId
-      );
-    }
-    if (!asset) {
-      return jsonError(
-        { errorCode: "VALIDATION_ERROR", message: "asset is required (XLM or USDC)", details: null },
-        400,
-        requestId
-      );
-    }
-    const result = await payToWallet({ prizeId, destination, amount, asset: asset as "XLM" | "USDC" });
+    const result = await payToDestinations({ prizeId, destinations });
     return jsonOk(result, 200, requestId);
   } catch (err) {
     const apiErr = normalizeError(err);

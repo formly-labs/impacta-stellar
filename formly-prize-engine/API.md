@@ -9,7 +9,7 @@ Contrato REST para el microservicio backend-only. Consumido por el servicio core
 - **Base URL:** `/api/v1`
 - **Content-Type:** `application/json`
 - **Respuestas:** JSON. Fechas en ISO 8601 UTC. Montos como string decimal (ej: `"20.0000000"`).
-- **rewardType:** `XLM` | `USDC` | `POINTS`
+-   
 - **distributionMode:** `LOTTERY_SINGLE` | `SPLIT_EQUAL`
 - **feeBps:** 0–10000; default 1000 (10%)
 - XLM/USDC: pago/lock on-chain (Payment Intent → depósito detectado por engine → distribución en drawAt).
@@ -412,6 +412,15 @@ Devuelve el resultado de la distribución.
 - **Auth:** core.
 - **Response:** `200` + DistributionResult. Si aún no distribuido: `404` o `200` con status distinto de DISTRIBUTED y campos de resultado vacíos (definir uno: se recomienda `200` + objeto con `status` y `winners: []` si no distribuido).
 
+#### POST /prizes/{prizeId}/pay
+
+Envía desde el prize vault a una o más wallets. Los montos y el asset se obtienen del prize (prize_net, reward_type, distribution_mode); no se envían en el body.
+
+- **Auth:** core.
+- **Body:** `{ "destinations": ["G..."] }` o `["G...", "G..."]`. Array de direcciones Stellar (G..., 56 chars). LOTTERY_SINGLE: exactamente una wallet (si mandan más de una → 400). SPLIT_EQUAL: se reparte prize_net a partes iguales entre todas (resto al primero).
+- **Validaciones:** prize existe; rewardType XLM o USDC; status LOCKED o CLOSED; destinations no vacío; cada elemento G... 56 chars; si distribution_mode es LOTTERY_SINGLE, destinations debe tener exactamente un elemento.
+- **Response:** `200` + `{ prizeId, txHash, asset, distributionMode, payments: [{ destination, amount }, ...] }`. Requiere PRIZE_VAULT_SECRET_KEY en el servidor.
+
 ---
 
 ### Jobs
@@ -438,6 +447,7 @@ Ejecuta una pasada del job: verificar depósitos (Horizon), cerrar prizes en clo
 | POST /prizes/{id}/close | — | — | status LOCKED |
 | POST /prizes/{id}/cancel | — | — | rewardType POINTS; status PENDING |
 | POST /prizes/{id}/lock | — | — | rewardType POINTS; status PENDING |
+| POST /prizes/{id}/pay | destinations (array) | — | rewardType XLM\|USDC; status LOCKED\|CLOSED |
 | POST /jobs/tick | runMode | runMode | maxPrizes >= 1; nowOverride opcional |
 
 ---

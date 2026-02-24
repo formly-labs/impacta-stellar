@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "formly-prize-engine",
-    "description": "API v1. Flujo: 1 Create Prize → 2 Get Prize (copiar prizeId) → 3 Add Entry → 4 List Entries → 5 Close → 6 Distribute → 7 Result. USDC/XLM: 8–9 Payment Intent, 10–11 Jobs Tick, 12–12b Verify payment, 13 Pay to wallet. Deposits: 14 by payer, 15 did payer pay this prize. Variables: baseUrl, serviceToken, prizeId, payer.",
+    "description": "API v1. Flujo: 1 Create Prize → 2 Get Prize (copiar prizeId) → 3 Add Entry → 4 List Entries → 5 Close → 6 Distribute → 7 Result. USDC/XLM: 8–9 Payment Intent, 10–11 Jobs Tick, 12–12b Verify payment, 13 Pay (LOTTERY_SINGLE), 13b Pay (SPLIT_EQUAL). Deposits: 14 by payer, 15 did payer pay this prize. Variables: baseUrl, serviceToken, prizeId, payer.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -169,17 +169,36 @@
       "description": "Una verificación: lista txs recientes del vault y busca una que coincida con este prize. El caller hace polling a este endpoint. Body: {}."
     },
     {
-      "name": "13. Pay to wallet",
+      "name": "13. Pay to wallet (LOTTERY_SINGLE)",
       "request": {
         "method": "POST",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
           { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
         ],
-        "body": { "mode": "raw", "raw": "{\n  \"destination\": \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n  \"amount\": \"9.0000000\",\n  \"asset\": \"USDC\"\n}" },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"destinations\": [\n    \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\"\n  ]\n}"
+        },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"
       },
-      "description": "Envía desde el vault a una wallet. Body: destination (G...), amount, asset (XLM | USDC). asset debe coincidir con el rewardType del prize. Requiere PRIZE_VAULT_SECRET_KEY."
+      "description": "Una sola wallet: todo el prize_net va a la primera. Body: destinations (array). Montos y asset del prize. Requiere PRIZE_VAULT_SECRET_KEY."
+    },
+    {
+      "name": "13b. Pay to wallet (SPLIT_EQUAL)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{serviceToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"destinations\": [\n    \"GCT7D6S5VTFGEURS6ZYIO33YZRPQMA3LNWB4GEOHDFDXZGWTA4EPIM5E\",\n    \"GDNTD6PR3P3Q7HYMJXFCJT75BQR2NXUGR3TUKMMLETUTHIMEWGF6TD3U\"\n  ]\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"
+      },
+      "description": "Varias wallets: prize_net repartido a partes iguales. Body: destinations (array de G...). Requiere PRIZE_VAULT_SECRET_KEY."
     },
     {
       "name": "14. Deposits by payer",
