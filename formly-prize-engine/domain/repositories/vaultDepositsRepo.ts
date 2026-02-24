@@ -117,3 +117,50 @@ export async function existsByTxHash(txHash: string): Promise<boolean> {
   if (error) throw error;
   return data != null;
 }
+
+/**
+ * Devuelve el depósito por tx_hash (para verify-payment con txHash en body).
+ */
+export async function getByTxHash(txHash: string): Promise<VaultDepositRow | null> {
+  const { data, error } = await supabaseAdmin
+    .from("vault_deposits")
+    .select(COLUMNS)
+    .eq("tx_hash", txHash.trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data as VaultDepositRow | null;
+}
+
+/**
+ * Devuelve el depósito más reciente cuyo memo coincide exactamente con prizeMemo.
+ */
+export async function findLatestByMemo(prizeMemo: string): Promise<VaultDepositRow | null> {
+  const { data, error } = await supabaseAdmin
+    .from("vault_deposits")
+    .select(COLUMNS)
+    .eq("memo", prizeMemo.trim())
+    .order("ledger_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data as VaultDepositRow | null;
+}
+
+/**
+ * Devuelve el depósito más reciente cuyo memo contiene el texto (ej: prizeId).
+ * Útil cuando el memo guardado es "PRIZE:prize_xxx" y buscamos por "prize_xxx".
+ */
+export async function findLatestByMemoContains(substring: string): Promise<VaultDepositRow | null> {
+  const term = substring.trim();
+  if (!term) return null;
+  const escaped = term.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+  const { data, error } = await supabaseAdmin
+    .from("vault_deposits")
+    .select(COLUMNS)
+    .ilike("memo", `%${escaped}%`)
+    .order("ledger_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data as VaultDepositRow | null;
+}

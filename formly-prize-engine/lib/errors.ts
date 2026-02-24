@@ -22,15 +22,20 @@ export function assert(
   }
 }
 
+function messageFromUnknown(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err != null && typeof err === "object") {
+    const o = err as Record<string, unknown>;
+    if (typeof o.message === "string") return o.message;
+    if (o.error != null && typeof o.error === "object" && typeof (o.error as Record<string, unknown>).message === "string") {
+      return (o.error as Record<string, unknown>).message as string;
+    }
+  }
+  return "An unexpected error occurred";
+}
+
 export function normalizeError(err: unknown): ApiError {
   if (err instanceof ApiError) return err;
-  if (err instanceof Error) {
-    return new ApiError(500, "INTERNAL_ERROR", err.message, undefined);
-  }
-  return new ApiError(
-    500,
-    "INTERNAL_ERROR",
-    "An unexpected error occurred",
-    undefined
-  );
+  const message = messageFromUnknown(err);
+  return new ApiError(500, "INTERNAL_ERROR", message, undefined);
 }

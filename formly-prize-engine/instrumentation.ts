@@ -1,6 +1,7 @@
 /**
- * Next.js instrumentation: se ejecuta al iniciar el proceso Node.
- * Arranca el polling de depósitos al vault (cada DEPOSIT_POLL_INTERVAL_MS).
+ * Next.js instrumentation: arranca el polling de depósitos al vault.
+ * Cada DEPOSIT_POLL_INTERVAL_MS consulta Horizon y guarda en vault_deposits;
+ * el endpoint verify-payment consulta esa tabla (no Horizon) para responder.
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;

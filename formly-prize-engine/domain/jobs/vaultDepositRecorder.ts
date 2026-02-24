@@ -107,9 +107,18 @@ export async function runVaultDepositRecorder(opts?: {
     const assetCode = firstPayment?.asset_code ?? null;
     const assetIssuer = firstPayment?.asset_issuer ?? null;
 
-    const txMemo = tx.memo ?? tx.memo_bytes ?? null;
-    const memoStr = typeof txMemo === "string" ? txMemo : null;
     const memoType = tx.memo_type ?? null;
+    let memoStr: string | null = null;
+    if (typeof tx.memo === "string" && tx.memo.length > 0) {
+      memoStr = tx.memo;
+    } else if (typeof tx.memo_bytes === "string" && tx.memo_bytes.length > 0) {
+      try {
+        const decoded = Buffer.from(tx.memo_bytes, "base64").toString("utf8");
+        if (decoded.length > 0) memoStr = decoded;
+      } catch {
+        memoStr = tx.memo_bytes;
+      }
+    }
 
     try {
       const inserted = await vaultDepositsRepo.insertDeposit({
