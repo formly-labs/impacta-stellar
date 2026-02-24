@@ -1,9 +1,9 @@
 'use client';
 
 import { Loader } from '@/components/Loader';
+import { usePollar } from '@pollar/react';
 import { ArrowLeft, ArrowRight, Check, CheckCircle, Copy, Loader2, Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useWallet } from 'stellar-wallet-kit';
 import QuestionRenderer, { type PublicField } from './QuestionRenderer';
 
 interface SurveyData {
@@ -25,8 +25,8 @@ interface PublicSurveyWizardProps {
 export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) {
   const { fields } = survey;
   const total = fields.length;
-  const { account } = useWallet();
-  
+  const { walletAddress } = usePollar();
+
   const [ step, setStep ] = useState(0);
   const [ answers, setAnswers ] = useState<Record<string, string | string[]>>({});
   const [ error, setError ] = useState<string | null>(null);
@@ -35,14 +35,14 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   const [ copiedAnswer, setCopiedAnswer ] = useState(false);
   const [ checkingPrevious, setCheckingPrevious ] = useState(true);
   const [ started, setStarted ] = useState(false);
-  
+
   useEffect(() => {
-    if (!account?.address) {
+    if (!walletAddress) {
       setCheckingPrevious(false);
       return;
     }
     setCheckingPrevious(true);
-    fetch(`/api/public/surveys/${survey.id}/responses?wallet=${account.address}`)
+    fetch(`/api/public/surveys/${survey.id}/responses?wallet=${walletAddress}`)
       .then((res) => res.json())
       .then((data: { id: string | null }) => {
         if (data.id) setSubmittedId(data.id);
@@ -50,17 +50,17 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       .catch(() => {
       })
       .finally(() => setCheckingPrevious(false));
-  }, [ survey.id, account?.address ]);
-  
+  }, [ survey.id, walletAddress ]);
+
   const currentField = fields[step];
   const isFirst = step === 0;
   const isLast = step === total - 1;
   const progress = Math.round(((step + 1) / total) * 100);
-  
+
   // Validate current question
   const validateCurrent = useCallback((): boolean => {
     if (!currentField) return true;
-    
+
     if (currentField.required) {
       const val = answers[currentField.id];
       const isEmpty =
@@ -68,17 +68,17 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         val === null ||
         val === '' ||
         (Array.isArray(val) && val.length === 0);
-      
+
       if (isEmpty) {
         setError('Esta pregunta es obligatoria');
         return false;
       }
     }
-    
+
     setError(null);
     return true;
   }, [ currentField, answers ]);
-  
+
   // Handle next
   const handleNext = useCallback(() => {
     if (!validateCurrent()) return;
@@ -87,7 +87,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       setError(null);
     }
   }, [ validateCurrent, isLast ]);
-  
+
   // Handle back
   const handleBack = useCallback(() => {
     if (!isFirst) {
@@ -95,27 +95,27 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       setError(null);
     }
   }, [ isFirst ]);
-  
+
   // Handle submit
   const handleSubmit = useCallback(async () => {
     if (!validateCurrent()) return;
-    
+
     setSubmitting(true);
     setError(null);
-    
+
     try {
       const res = await fetch(`/api/public/surveys/${survey.id}/responses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, walletAddress: account?.address || '' }),
+        body: JSON.stringify({ answers, walletAddress }),
       });
-      
+
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error || 'Error al enviar la respuesta');
       }
       const data = await res.json();
-      
+
       setSubmittedId(data.id);
     } catch (err) {
       setError(
@@ -125,18 +125,18 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       setSubmitting(false);
     }
   }, [ validateCurrent, survey.id, answers ]);
-  
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
-      
+
       if (e.key === 'Enter' && !isTyping && survey.welcomeTitle && !started) {
         e.preventDefault();
         setStarted(true);
         return;
       }
-      
+
       if (e.key === 'Enter' && !isTyping) {
         e.preventDefault();
         if (isLast) {
@@ -145,7 +145,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
           handleNext();
         }
       }
-      
+
       if (
         currentField?.type === 'radio' &&
         !isTyping &&
@@ -162,22 +162,22 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
         }
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [ handleNext, handleSubmit, isLast, currentField ]);
-  
+
   const handleCopyAnswerLink = async () => {
     const link = `${window.location.origin}/f/${survey.slug}/answer/${submittedId}`;
     await navigator.clipboard.writeText(link);
     setCopiedAnswer(true);
     setTimeout(() => setCopiedAnswer(false), 2000);
   };
-  
+
   if (checkingPrevious) {
     return <Loader />;
   }
-  
+
   if (submittedId) {
     return (
       <div className="flex min-h-[100dvh] flex-col items-center justify-center px-4 sm:min-h-0 sm:h-full">
@@ -216,7 +216,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       </div>
     );
   }
-  
+
   if (survey.welcomeTitle && !started) {
     return (
       <div className="flex min-h-[100dvh] flex-col overflow-hidden sm:min-h-0 sm:h-full">
@@ -245,7 +245,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
       </div>
     );
   }
-  
+
   return (
     <div className="flex min-h-[100dvh] flex-col sm:min-h-0 sm:h-full">
       <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-6 sm:py-12">
@@ -257,7 +257,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               <span className="text-gray-300">&gt;</span>
             </p>
           </div>
-          
+
           <QuestionRenderer
             question={currentField}
             value={answers[currentField.id] ?? (currentField.type === 'checkbox' ? [] : '')}
@@ -269,7 +269,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
           />
         </div>
       </div>
-      
+
       <footer className="shrink-0 border-t border-gray-100 bg-white px-4 py-3 sm:px-6 sm:py-4">
         <div className="mx-auto max-w-2xl space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
           {/* Progress */}
@@ -287,7 +287,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
               <span className="text-xs font-semibold text-blue-500">{progress}%</span>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-end gap-2 sm:gap-3">
             {!isFirst && (
               <button
@@ -299,7 +299,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
                 <span className="hidden sm:inline">Atrás</span>
               </button>
             )}
-            
+
             {isLast ? (
               <button
                 type="button"
