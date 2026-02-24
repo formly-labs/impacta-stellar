@@ -1,5 +1,6 @@
 import type { PrizeRow } from "@/domain/repositories/prizeRepo";
 import type { PrizePublic, PrizePayment } from "@/types/dtos";
+import type { PrizeStatus } from "@/types/enums";
 
 /** Formats amount to string without trailing zeros (e.g. "1.2000000" -> "1.2"). */
 function formatAmount(s: string | number | null | undefined): string {
@@ -28,6 +29,31 @@ function bpsToPercent(bps: number): number {
   return Math.round(bps / 100);
 }
 
+function statusDisplay(status: PrizeStatus): string {
+  switch (status) {
+    case "DISTRIBUTED":
+      return "Paid";
+    case "AWAITING_PAYMENT_CONFIRMATION":
+      return "Awaiting payment";
+    case "LOCKED":
+      return "Locked";
+    case "CLOSED":
+      return "Closed";
+    case "PENDING":
+      return "Pending";
+    case "FAILED":
+      return "Failed";
+    case "EXPIRED":
+      return "Expired";
+    case "CANCELLED":
+      return "Cancelled";
+    case "DISTRIBUTING":
+      return "Distributing";
+    default:
+      return status;
+  }
+}
+
 export function toPrizePublic(row: PrizeRow): PrizePublic {
   const feeBps = row.fee_bps ?? 1000;
   const payments = paymentsFromPayoutResult(row.payout_result);
@@ -35,8 +61,9 @@ export function toPrizePublic(row: PrizeRow): PrizePublic {
   return {
     prizeId: row.external_id,
     status: row.status,
-    rewardType: row.reward_type as PrizePublic["rewardType"],
-    distributionMode: row.distribution_mode as PrizePublic["distributionMode"],
+    statusDisplay: statusDisplay(row.status),
+    rewardType: row.reward_type,
+    distributionMode: row.distribution_mode,
     prizeAmount: formatAmount(row.amount_total),
     feePercent: bpsToPercent(feeBps),
     feeAmount: formatAmount(row.fee_amount),

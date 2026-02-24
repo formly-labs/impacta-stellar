@@ -17,6 +17,31 @@ import {
 
 const BASE_FEE_FALLBACK = 100;
 
+/**
+ * Builds a readable message from Stellar/Horizon submit errors (e.g. 400 bad request).
+ */
+function formatStellarSubmitError(err: unknown): string {
+  const anyErr = err as {
+    response?: { data?: { extras?: { result_codes?: { transaction?: string; operations?: string[] }; result_xdr?: string }; detail?: string; title?: string }; status?: number };
+    message?: string;
+  };
+  const msg = anyErr instanceof Error ? anyErr.message : String(err);
+  const data = anyErr.response?.data;
+  if (data) {
+    const parts: string[] = [];
+    if (data.title) parts.push(data.title);
+    if (data.detail) parts.push(data.detail);
+    const codes = data.extras?.result_codes;
+    if (codes?.transaction) parts.push(`Transaction: ${codes.transaction}`);
+    if (codes?.operations?.length) parts.push(`Operations: ${codes.operations.join(", ")}`);
+    if (parts.length > 0) return parts.join(". ");
+  }
+  if (anyErr.response?.status === 400) {
+    return `Stellar transaction rejected (bad request). ${msg}`;
+  }
+  return `Stellar submit failed: ${msg}`;
+}
+
 function isValidStellarPublicKey(s: string): boolean {
   const t = s.trim();
   return t.startsWith("G") && t.length === 56;
@@ -84,6 +109,14 @@ export async function payToDestinations(params: {
   }
   if (prize.reward_type !== "XLM" && prize.reward_type !== "USDC") {
     throw new ApiError(422, "UNPROCESSABLE_ENTITY", "Prize must be XLM or USDC to pay out", null);
+  }
+  if (prize.status === "DISTRIBUTED") {
+    throw new ApiError(
+      409,
+      "ALREADY_PAID",
+      "Prize has already been paid. It cannot be paid again.",
+      { status: prize.status }
+    );
   }
   if (prize.status !== "LOCKED" && prize.status !== "CLOSED") {
     throw new ApiError(
@@ -178,8 +211,8 @@ export async function payToDestinations(params: {
   try {
     result = await server.submitTransaction(transaction);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new ApiError(502, "BAD_GATEWAY", `Stellar submit failed: ${msg}`, null);
+    const msg = formatStellarSubmitError(err);
+    throw new ApiError(502, "BAD_GATEWAY", msg, null);
   }
 
   const payments: PayToDestinationsPayment[] = effectiveDests.map((dest, i) => ({
@@ -187,13 +220,15 @@ export async function payToDestinations(params: {
     amount: amounts[i],
   }));
 
+  const nowIso = new Date().toISOString();
   try {
-    await prizeRepo.updatePrizeStatus(prizeId, prize.status, {
+    await prizeRepo.updatePrizeStatus(prizeId, "DISTRIBUTED", {
       payout_ref: result.hash,
       payout_result: { payments },
+      distributed_at: nowIso,
     });
   } catch {
-    // no bloquear la respuesta si falla guardar el payout
+    // do not block response if saving payout fails
   }
 
   return {

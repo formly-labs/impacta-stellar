@@ -1,19 +1,20 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import type { PrizeStatus, RewardType, DistributionMode } from "@/types/enums";
 
 export interface PrizeRow {
   id: string;
   external_id: string;
   form_id: string | null;
   creator_user_id: string | null;
-  reward_type: string;
-  distribution_mode: string;
+  reward_type: RewardType;
+  distribution_mode: DistributionMode;
   amount_total: string;
   fee_bps: number;
   fee_amount: string;
   prize_net: string;
   close_at: string;
   draw_at: string;
-  status: string;
+  status: PrizeStatus;
   vault_public_key: string | null;
   memo: string | null;
   memo_type: string | null;
@@ -34,18 +35,27 @@ export interface InsertPrizeData {
   external_id: string;
   form_id: string | null;
   creator_user_id: string | null;
-  reward_type: string;
-  distribution_mode: string;
+  reward_type: RewardType;
+  distribution_mode: DistributionMode;
   amount_total: string;
   fee_bps: number;
   fee_amount: string;
   prize_net: string;
   close_at: string;
   draw_at: string;
-  status: string;
+  status: PrizeStatus;
   vault_public_key: string | null;
   memo?: string | null;
   memo_type?: string | null;
+}
+
+export interface UpdatePrizeStatusPatch {
+  locked_at?: string;
+  distributed_at?: string;
+  lock_ref?: string;
+  payout_ref?: string;
+  ledger_batch_id?: string;
+  payout_result?: unknown;
 }
 
 export async function insertPrize(data: InsertPrizeData): Promise<PrizeRow> {
@@ -80,8 +90,8 @@ export async function findPrizeByUuid(uuid: string): Promise<PrizeRow | null> {
 
 export async function updatePrizeStatus(
   externalId: string,
-  status: string,
-  patch?: { locked_at?: string; distributed_at?: string; lock_ref?: string; payout_ref?: string; ledger_batch_id?: string; payout_result?: unknown }
+  status: PrizeStatus,
+  patch?: UpdatePrizeStatusPatch
 ): Promise<PrizeRow> {
   const body: Record<string, unknown> = { status, ...patch };
   const { data, error } = await supabaseAdmin
@@ -96,7 +106,7 @@ export async function updatePrizeStatus(
 
 export async function updatePrize(
   externalId: string,
-  patch: Partial<InsertPrizeData> & Record<string, unknown>
+  patch: Partial<InsertPrizeData>
 ): Promise<PrizeRow> {
   const { data, error } = await supabaseAdmin
     .from("prizes")
@@ -109,7 +119,7 @@ export async function updatePrize(
 }
 
 export async function listPrizesByStatusForJobs(_opts: {
-  statuses: string[];
+  statuses: PrizeStatus[];
   limit: number;
 }): Promise<PrizeRow[]> {
   return [];

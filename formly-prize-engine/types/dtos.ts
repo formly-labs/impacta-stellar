@@ -11,11 +11,15 @@ export interface PrizePayment {
   amount: string;
 }
 
+import type { PrizeStatus, RewardType, DistributionMode } from "./enums";
+
 export interface PrizePublic {
   prizeId: string;
-  status: string;
-  rewardType: "XLM" | "USDC";
-  distributionMode: "LOTTERY_SINGLE" | "SPLIT_EQUAL";
+  status: PrizeStatus;
+  /** Human-readable status for display (e.g. "Paid" when status is DISTRIBUTED). */
+  statusDisplay?: string;
+  rewardType: RewardType;
+  distributionMode: DistributionMode;
   prizeAmount: string;
   feePercent: number;
   feeAmount: string;
