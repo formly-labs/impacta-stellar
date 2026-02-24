@@ -2,8 +2,8 @@ import { ApiError } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 /**
- * Transiciones permitidas según STATE.md.
- * (FROM, TO) -> true si está permitido.
+ * Allowed transitions per STATE.md.
+ * (FROM, TO) -> true if allowed.
  */
 const ALLOWED_TRANSITIONS: Record<string, Set<string>> = {
   PENDING: new Set(["LOCKED", "EXPIRED", "CANCELLED"]),

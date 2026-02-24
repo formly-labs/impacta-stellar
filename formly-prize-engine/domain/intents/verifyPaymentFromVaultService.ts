@@ -16,8 +16,8 @@ export interface VerifyPaymentResult {
 }
 
 /**
- * Verifica el pago consultando vault_deposits (rellenado por el polling).
- * Si hay depósito válido para el premio, opcionalmente marca el prize como LOCKED.
+ * Verifies payment by querying vault_deposits (filled by polling).
+ * If a valid deposit exists for the prize, optionally marks the prize as LOCKED.
  */
 export async function verifyPaymentFromVault(
   prizeId: string,

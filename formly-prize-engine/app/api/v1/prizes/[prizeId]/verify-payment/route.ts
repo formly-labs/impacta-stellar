@@ -19,8 +19,8 @@ export async function GET() {
 
 /**
  * POST /api/v1/prizes/:prizeId/verify-payment
- * Consulta vault_deposits (rellenada por el polling). No llama a Horizon.
- * Body: {} o { "txHash": "..." }. Si hay depósito válido, marca el prize como LOCKED.
+ * Queries vault_deposits (filled by polling). Does not call Horizon.
+ * Body: {} or { "txHash": "..." }. If valid deposit found, marks the prize as LOCKED.
  */
 export async function POST(
   request: NextRequest,

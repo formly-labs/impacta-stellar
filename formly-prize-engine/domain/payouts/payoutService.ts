@@ -53,10 +53,10 @@ export interface PayToDestinationsResult {
 }
 
 /**
- * Envía desde el prize vault a una o más wallets según distribution_mode.
- * - LOTTERY_SINGLE: todo el prize_net a la primera wallet (si mandan más, se ignora el resto).
- * - SPLIT_EQUAL: prize_net repartido a partes iguales entre todas las wallets (resto al primero).
- * No se pide amount ni asset; se obtienen del prize.
+ * Sends from the prize vault to one or more wallets according to distribution_mode.
+ * - LOTTERY_SINGLE: full prize_net to the first wallet (extra destinations ignored).
+ * - SPLIT_EQUAL: prize_net split equally across all wallets (remainder to first).
+ * Amount and asset are taken from the prize, not from the request.
  */
 export async function payToDestinations(params: {
   prizeId: string;

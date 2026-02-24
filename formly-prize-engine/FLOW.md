@@ -1,34 +1,34 @@
-# Flujo del engine
+# Engine flow
 
-## 1. Crear premio
-`POST /api/v1/prizes` — body: `rewardType`, `distributionMode`, `prizeAmount`, `feePercent` (opcional).  
-Respuesta: `{ prize: { prizeId, status: "AWAITING_PAYMENT_CONFIRMATION", ... } }`.
+## 1. Create prize
+`POST /api/v1/prizes` — body: `rewardType`, `distributionMode`, `prizeAmount`, `feePercent` (optional).  
+Response: `{ prize: { prizeId, status: "AWAITING_PAYMENT_CONFIRMATION", ... } }`.
 
-## 2. Obtener XDR para firmar
-`POST /api/v1/prizes/:prizeId/payment-intent` — body: `payerPublicKey` (wallet que pagará).  
-Respuesta: `unsignedXdr`, `memo`, `depositTarget`, `feeTarget`, `expiresAt`, `expectedPayments`, etc.  
-El cliente firma la XDR con esa wallet y envía la transacción a Stellar.
+## 2. Get XDR to sign
+`POST /api/v1/prizes/:prizeId/payment-intent` — body: `payerPublicKey` (wallet that will pay).  
+Response: `unsignedXdr`, `memo`, `depositTarget`, `feeTarget`, `expiresAt`, `expectedPayments`, etc.  
+The client signs the XDR with that wallet and submits the transaction to Stellar.
 
-## 3. Polling (automático)
-Un **solo** proceso de polling (config: `DEPOSIT_POLL_ENABLED`, `DEPOSIT_POLL_INTERVAL_MS`):
+## 3. Polling (automatic)
+A **single** polling process (config: `DEPOSIT_POLL_ENABLED`, `DEPOSIT_POLL_INTERVAL_MS`):
 
-- Escucha las transacciones que llegan a **PRIZE_VAULT_PUBLIC_KEY** (y en la misma tx a **FEE_VAULT_PUBLIC_KEY**).
-- Por cada tx guarda en **vault_deposits**: quién pagó, montos al prize vault y al fee vault, token (XLM/USDC), memo, tiempo.
-- Idempotente por `tx_hash`.
+- Listens for transactions to **PRIZE_VAULT_PUBLIC_KEY** (and in the same tx to **FEE_VAULT_PUBLIC_KEY**).
+- For each tx stores in **vault_deposits**: who paid, amounts to prize vault and fee vault, token (XLM/USDC), memo, time.
+- Idempotent by `tx_hash`.
 
-No se llama por API; corre en background al iniciar el servidor.
+Not called via API; runs in the background when the server starts.
 
-## 4. Verificar pago
-`POST /api/v1/prizes/:prizeId/verify-payment` — **solo prizeId en la URL**. Body opcional: `{}` o `{ "txHash": "..." }`.
+## 4. Verify payment
+`POST /api/v1/prizes/:prizeId/verify-payment` — **only prizeId in the URL**. Optional body: `{}` or `{ "txHash": "..." }`.
 
-- Consulta **solo la base de datos** (`vault_deposits`). No llama a Horizon.
-- El premio ya tiene en BD cuánto debía llegar y en qué token; se busca un depósito con memo coincidente y monto ≥ prize_net.
-- Si hay depósito válido, marca el premio como **LOCKED**.
+- Queries **only the database** (`vault_deposits`). Does not call Horizon.
+- The prize already has in DB how much was expected and which token; we look for a deposit with matching memo and amount ≥ prize_net.
+- If a valid deposit exists, the prize is marked **LOCKED**.
 
-## 5. Pagar a destinatarios
+## 5. Pay to destinations
 `POST /api/v1/prizes/:prizeId/pay` — body: `destinations: ["G...", ...]`.  
-El premio debe estar **LOCKED** o **CLOSED**. Envía `prize_net` desde el prize vault a las wallets indicadas.
+The prize must be **LOCKED** or **CLOSED**. Sends `prize_net` from the prize vault to the given wallets.
 
 ---
 
-**Resumen:** Polling rellena `vault_deposits`; verify-payment solo lee esa tabla por `prizeId` y, si aplica, marca LOCKED.
+**Summary:** Polling fills `vault_deposits`; verify-payment only reads that table by `prizeId` and, when applicable, marks LOCKED.

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "formly-prize-engine",
-    "description": "API v1. 1-2 Create Prize. 3 Get Prize. 4 Payment Intent. 5 Verify payment (solo prizeId). 6 Pay. Variables: baseUrl, serviceToken, prizeId.",
+    "description": "API v1. 1-2 Create Prize. 3 Get Prize. 4 Payment Intent. 5 Verify payment (prizeId only). 6 Pay. Variables: baseUrl, serviceToken, prizeId.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -24,7 +24,7 @@
         },
         "url": "{{baseUrl}}/api/v1/prizes"
       },
-      "description": "Crea un premio USDC. Body: rewardType, distributionMode, prizeAmount, feePercent opcional (0-100, default 10). Respuesta 201: { prize: { prizeId, status, rewardType, distributionMode, prizeAmount, feePercent, feeAmount, prizeNet, vaultAddress, createdAt, updatedAt } }. Copia prizeId a la variable de colección."
+      "description": "Create a USDC prize. Body: rewardType, distributionMode, prizeAmount, optional feePercent (0-100, default 10). Response 201: { prize: { prizeId, status, rewardType, distributionMode, prizeAmount, feePercent, feeAmount, prizeNet, vaultAddress, createdAt, updatedAt } }. Copy prizeId to collection variable."
     },
     {
       "name": "2. Create Prize (XLM)",
@@ -40,7 +40,7 @@
         },
         "url": "{{baseUrl}}/api/v1/prizes"
       },
-      "description": "Crea un premio XLM. Mismo formato de body y respuesta."
+      "description": "Create an XLM prize. Same body and response format."
     },
     {
       "name": "3. Get Prize",
@@ -49,10 +49,10 @@
         "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}"
       },
-      "description": "Obtiene el premio. Si ya fue pagado, la respuesta incluye payments: [{ destination, amount }, ...]."
+      "description": "Get the prize. If already paid, response includes payments: [{ destination, amount }, ...]."
     },
     {
-      "name": "4. Create Payment Intent (XDR para firmar)",
+      "name": "4. Create Payment Intent (XDR to sign)",
       "request": {
         "method": "POST",
         "header": [
@@ -65,7 +65,7 @@
         },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/payment-intent"
       },
-      "description": "Genera la XDR sin firmar. Body: payerPublicKey (wallet que pagará, G... 56 chars). Respuesta: unsignedXdr, memo, depositTarget, feeTarget, expiresAt, expectedPayments, feePercent. Requiere prizeId de un premio en AWAITING_PAYMENT_CONFIRMATION."
+      "description": "Generate unsigned XDR. Body: payerPublicKey (wallet that will pay, G... 56 chars). Response: unsignedXdr, memo, depositTarget, feeTarget, expiresAt, expectedPayments, feePercent. Requires prizeId of a prize in AWAITING_PAYMENT_CONFIRMATION."
     },
     {
       "name": "5. Verify payment",
@@ -78,7 +78,7 @@
         "body": { "mode": "raw", "raw": "{}" },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/verify-payment"
       },
-      "description": "Solo prizeId en la URL. Consulta vault_deposits (polling). Si hay depósito válido marca LOCKED. Body: {} o {\"txHash\":\"...\"}."
+      "description": "Only prizeId in URL. Queries vault_deposits (filled by polling). If valid deposit found, marks LOCKED. Body: {} or {\"txHash\":\"...\"}."
     },
     {
       "name": "6. Pay",
@@ -94,7 +94,7 @@
         },
         "url": "{{baseUrl}}/api/v1/prizes/{{prizeId}}/pay"
       },
-      "description": "Envía prize_net a las wallets. Body: destinations (array G...). Premio debe estar LOCKED o CLOSED."
+      "description": "Sends prize_net to wallets. Body: destinations (array of G...). Prize must be LOCKED or CLOSED."
     }
   ]
 }

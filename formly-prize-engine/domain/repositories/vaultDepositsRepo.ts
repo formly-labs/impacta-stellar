@@ -20,7 +20,7 @@ const COLUMNS =
   "id, tx_hash, payer_public_key, amount_prize_vault, amount_fee_vault, amount_total, asset_type, asset_code, asset_issuer, memo, memo_type, ledger_at, recorded_at";
 
 /**
- * Inserta un depósito. Idempotente por tx_hash (ignora si ya existe).
+ * Inserts a deposit. Idempotent by tx_hash (skips if already exists).
  */
 export async function insertDeposit(data: {
   tx_hash: string;
@@ -54,7 +54,7 @@ export async function insertDeposit(data: {
 }
 
 /**
- * Lista depósitos por payer (quién pagó). Orden por ledger_at desc.
+ * Lists deposits by payer (who paid). Ordered by ledger_at desc.
  */
 export async function findByPayer(payerPublicKey: string, limit = 100): Promise<VaultDepositRow[]> {
   const { data, error } = await supabaseAdmin
@@ -68,7 +68,7 @@ export async function findByPayer(payerPublicKey: string, limit = 100): Promise<
 }
 
 /**
- * Busca depósitos de un payer cuyo memo coincide con el premio (para "¿pagó este premio?").
+ * Finds deposits from a payer whose memo matches the prize ("did they pay for this prize?").
  */
 export async function findByPayerAndPrizeMemo(
   payerPublicKey: string,
@@ -119,7 +119,7 @@ export async function existsByTxHash(txHash: string): Promise<boolean> {
 }
 
 /**
- * Devuelve el depósito por tx_hash (para verify-payment con txHash en body).
+ * Returns the deposit by tx_hash (for verify-payment with txHash in body).
  */
 export async function getByTxHash(txHash: string): Promise<VaultDepositRow | null> {
   const { data, error } = await supabaseAdmin
@@ -132,7 +132,7 @@ export async function getByTxHash(txHash: string): Promise<VaultDepositRow | nul
 }
 
 /**
- * Devuelve el depósito más reciente cuyo memo coincide exactamente con prizeMemo.
+ * Returns the latest deposit whose memo matches prizeMemo exactly.
  */
 export async function findLatestByMemo(prizeMemo: string): Promise<VaultDepositRow | null> {
   const { data, error } = await supabaseAdmin
@@ -147,8 +147,8 @@ export async function findLatestByMemo(prizeMemo: string): Promise<VaultDepositR
 }
 
 /**
- * Devuelve el depósito más reciente cuyo memo contiene el texto (ej: prizeId).
- * Útil cuando el memo guardado es "PRIZE:prize_xxx" y buscamos por "prize_xxx".
+ * Returns the latest deposit whose memo contains the given text (e.g. prizeId).
+ * Useful when stored memo is "PRIZE:prize_xxx" and we search by "prize_xxx".
  */
 export async function findLatestByMemoContains(substring: string): Promise<VaultDepositRow | null> {
   const term = substring.trim();

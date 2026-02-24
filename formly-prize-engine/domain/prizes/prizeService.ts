@@ -10,7 +10,7 @@ function toExternalId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
 }
 
-/** Convierte FEE_PERCENT (0-100) a bps (0-10000). Ej: 10 -> 1000. */
+/** Converts FEE_PERCENT (0-100) to bps (0-10000). E.g. 10 -> 1000. */
 function feePercentToBps(percent: number): number {
   return Math.round(percent * 100);
 }

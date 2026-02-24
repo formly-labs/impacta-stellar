@@ -23,7 +23,7 @@ export interface PrizePublic {
   vaultAddress: string | null;
   createdAt: string;
   updatedAt: string;
-  /** Cuando el premio ya fue pagado, lista a quién se envió y cuánto. */
+  /** When the prize has been paid, lists who received and how much. */
   payments?: PrizePayment[];
 }
 
@@ -78,7 +78,7 @@ export interface ErrorResponse {
 }
 
 export interface PaymentIntentRequest {
-  /** Wallet que pagará (y firmará la XDR). */
+  /** Wallet that will pay (and sign the XDR). */
   payerPublicKey: string;
 }
 

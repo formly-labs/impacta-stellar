@@ -1,5 +1,5 @@
 /**
- * Representación de assets Stellar en DTOs.
+ * Stellar asset representation in DTOs.
  */
 
 export type StellarAssetNative = {

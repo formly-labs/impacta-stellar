@@ -13,8 +13,8 @@ export interface VaultDepositRecorderResult {
 }
 
 /**
- * Recorre las últimas transacciones del prize vault, parsea cada tx (pago al vault + pago al fee vault)
- * y guarda en vault_deposits. Idempotente por tx_hash.
+ * Fetches the latest transactions for the prize vault, parses each tx (payment to vault + payment to fee vault)
+ * and stores in vault_deposits. Idempotent by tx_hash.
  */
 export async function runVaultDepositRecorder(opts?: {
   txLimit?: number;

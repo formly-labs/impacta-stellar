@@ -1,7 +1,7 @@
 import type { PrizeRow } from "@/domain/repositories/prizeRepo";
 import type { PrizePublic, PrizePayment } from "@/types/dtos";
 
-/** Formatea monto a string sin ceros trailing innecesarios (ej: "1.2000000" -> "1.2"). */
+/** Formats amount to string without trailing zeros (e.g. "1.2000000" -> "1.2"). */
 function formatAmount(s: string | number | null | undefined): string {
   if (s == null) return "0";
   const str = String(s);
@@ -23,7 +23,7 @@ function paymentsFromPayoutResult(payoutResult: unknown): PrizePayment[] | undef
   return list.length ? list : undefined;
 }
 
-/** Convierte bps a porcentaje (1000 -> 10). */
+/** Converts bps to percent (1000 -> 10). */
 function bpsToPercent(bps: number): number {
   return Math.round(bps / 100);
 }

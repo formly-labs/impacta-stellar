@@ -1,7 +1,7 @@
 /**
- * Next.js instrumentation: arranca el polling de depósitos al vault.
- * Cada DEPOSIT_POLL_INTERVAL_MS consulta Horizon y guarda en vault_deposits;
- * el endpoint verify-payment consulta esa tabla (no Horizon) para responder.
+ * Next.js instrumentation: starts vault deposit polling.
+ * Every DEPOSIT_POLL_INTERVAL_MS it queries Horizon and stores in vault_deposits;
+ * the verify-payment endpoint reads that table (not Horizon) to respond.
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;

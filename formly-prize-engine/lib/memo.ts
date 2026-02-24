@@ -1,7 +1,7 @@
 /**
- * Compara memo de transacción con memo esperado del prize.
- * prizeMemoType "hash": comparar normalizado a hex (Horizon puede devolver base64).
- * default "text": comparación exacta de texto.
+ * Compares transaction memo with expected prize memo.
+ * prizeMemoType "hash": compare normalized to hex (Horizon may return base64).
+ * default "text": exact string comparison.
  */
 export function memoMatches(params: {
   txMemoType: string | null;

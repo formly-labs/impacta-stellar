@@ -116,8 +116,8 @@ export async function listPrizesByStatusForJobs(_opts: {
 }
 
 /**
- * Premios esperando confirmación de depósito: status AWAITING_PAYMENT_CONFIRMATION,
- * reward_type XLM o USDC, lock_ref null. Para el watcher.
+ * Prizes awaiting deposit confirmation: status AWAITING_PAYMENT_CONFIRMATION,
+ * reward_type XLM or USDC, lock_ref null. Used by the watcher.
  */
 export async function listAwaitingPayment(opts: { limit: number }): Promise<PrizeRow[]> {
   const { data, error } = await supabaseAdmin
@@ -132,8 +132,8 @@ export async function listAwaitingPayment(opts: { limit: number }): Promise<Priz
 }
 
 /**
- * Marca prize como LOCKED con lockRef y lockedAt. Solo actualiza si status es
- * AWAITING_PAYMENT_CONFIRMATION y lock_ref es null (guard idempotente).
+ * Marks prize as LOCKED with lockRef and lockedAt. Only updates if status is
+ * AWAITING_PAYMENT_CONFIRMATION and lock_ref is null (idempotent guard).
  */
 export async function markLocked(
   prizeId: string,

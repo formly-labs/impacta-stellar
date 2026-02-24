@@ -15,9 +15,9 @@ export async function GET() {
 
 /**
  * POST /api/v1/prizes/:prizeId/pay
- * Body: { "destinations": ["G..."] } o ["G...", "G..."] para SPLIT_EQUAL.
- * Montos y asset se obtienen del prize (prize_net, reward_type, distribution_mode).
- * LOTTERY_SINGLE: todo a la primera wallet. SPLIT_EQUAL: reparto igual entre todas.
+ * Body: { "destinations": ["G..."] } or ["G...", "G..."] for SPLIT_EQUAL.
+ * Amounts and asset come from the prize (prize_net, reward_type, distribution_mode).
+ * LOTTERY_SINGLE: full amount to first wallet. SPLIT_EQUAL: equal split across all.
  */
 export async function POST(
   request: NextRequest,

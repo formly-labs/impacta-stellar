@@ -1,8 +1,8 @@
 -- =============================================================================
--- formly-prize-engine — Crear base de datos desde cero
+-- formly-prize-engine — Create database from scratch
 -- =============================================================================
--- 1) Para reset total: ejecutar antes supabase/scripts/drop_everything.sql
--- 2) Luego este archivo en Supabase Dashboard → SQL Editor → pegar y ejecutar
+-- 1) For full reset: run supabase/scripts/drop_everything.sql first
+-- 2) Then run this file in Supabase Dashboard → SQL Editor
 -- =============================================================================
 
 -- 1) ENUMs
@@ -20,7 +20,7 @@ CREATE TYPE prize_status AS ENUM (
   'DISTRIBUTING'
 );
 
--- 2) Función updated_at
+-- 2) updated_at trigger function
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -29,7 +29,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 3) Tabla prizes (sin vault_secret_encrypted ni fee_vault_public_key)
+-- 3) prizes table (no vault_secret_encrypted or fee_vault_public_key)
 CREATE TABLE prizes (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id       TEXT NOT NULL UNIQUE,
@@ -73,7 +73,7 @@ CREATE INDEX idx_prizes_status_close_draw ON prizes(status, close_at, draw_at)
 CREATE INDEX idx_prizes_pending_stellar ON prizes(status, draw_at)
   WHERE reward_type IN ('XLM', 'USDC') AND status = 'AWAITING_PAYMENT_CONFIRMATION';
 
--- 4) Tabla prize_payment_intents (con intent_hash)
+-- 4) prize_payment_intents table (with intent_hash)
 CREATE TABLE prize_payment_intents (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id         TEXT NOT NULL UNIQUE,
@@ -87,7 +87,7 @@ CREATE TABLE prize_payment_intents (
   CONSTRAINT uq_one_active_intent_per_prize UNIQUE (prize_id)
 );
 
--- 5) Tabla operation_locks (para jobs / concurrencia)
+-- 5) operation_locks table (for jobs / concurrency)
 CREATE TABLE operation_locks (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   scope_id     TEXT NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE operation_locks (
 
 CREATE INDEX idx_operation_locks_scope_operation ON operation_locks(scope_id, operation);
 
--- 6) Tabla vault_deposits (polling del vault guarda aquí; verify-payment consulta)
+-- 6) vault_deposits table (polling writes here; verify-payment reads)
 CREATE TABLE vault_deposits (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tx_hash             TEXT NOT NULL UNIQUE,
@@ -120,7 +120,7 @@ CREATE INDEX idx_vault_deposits_tx_hash ON vault_deposits(tx_hash);
 CREATE INDEX idx_vault_deposits_memo ON vault_deposits(memo) WHERE memo IS NOT NULL;
 CREATE INDEX idx_vault_deposits_ledger_at ON vault_deposits(ledger_at DESC);
 
--- 7) RLS (sin políticas: solo service_role accede)
+-- 7) RLS (no policies: only service_role accesses)
 ALTER TABLE prizes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE prize_payment_intents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE operation_locks ENABLE ROW LEVEL SECURITY;
