@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "formly-prize-engine",
-    "description": "API v1. 1-2 Create Prize. 3 Get Prize. 4 Payment Intent. 5 Verify payment (prizeId only). 6 Pay. Variables: baseUrl, serviceToken, prizeId.",
+    "description": "Root + Health + API v1. 0 Root. 1 Health. 2-3 Create Prize. 4 Get Prize. 5 Payment Intent. 6 Verify payment. 7 Pay. Variables: baseUrl, serviceToken, prizeId.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -11,7 +11,25 @@
   ],
   "item": [
     {
-      "name": "1. Create Prize (USDC)",
+      "name": "0. Root (up)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/"
+      },
+      "description": "GET /. Response: { status, message, up }."
+    },
+    {
+      "name": "1. Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      },
+      "description": "GET /api/health. Polling / load balancer. Response: { status, service, timestamp }."
+    },
+    {
+      "name": "2. Create Prize (USDC)",
       "request": {
         "method": "POST",
         "header": [
@@ -27,7 +45,7 @@
       "description": "Create a USDC prize. Body: rewardType, distributionMode, prizeAmount, optional feePercent (0-100, default 10). Response 201: { prize: { prizeId, status, rewardType, distributionMode, prizeAmount, feePercent, feeAmount, prizeNet, vaultAddress, createdAt, updatedAt } }. Copy prizeId to collection variable."
     },
     {
-      "name": "2. Create Prize (XLM)",
+      "name": "3. Create Prize (XLM)",
       "request": {
         "method": "POST",
         "header": [
@@ -43,7 +61,7 @@
       "description": "Create an XLM prize. Same body and response format."
     },
     {
-      "name": "3. Get Prize",
+      "name": "4. Get Prize",
       "request": {
         "method": "GET",
         "header": [{ "key": "Authorization", "value": "Bearer {{serviceToken}}" }],
@@ -52,7 +70,7 @@
       "description": "Get the prize. If already paid, response includes payments: [{ destination, amount }, ...]."
     },
     {
-      "name": "4. Create Payment Intent (XDR to sign)",
+      "name": "5. Create Payment Intent (XDR to sign)",
       "request": {
         "method": "POST",
         "header": [
@@ -68,7 +86,7 @@
       "description": "Generate unsigned XDR. Body: payerPublicKey (wallet that will pay, G... 56 chars). Response: unsignedXdr, memo, depositTarget, feeTarget, expiresAt, expectedPayments, feePercent. Requires prizeId of a prize in AWAITING_PAYMENT_CONFIRMATION."
     },
     {
-      "name": "5. Verify payment",
+      "name": "6. Verify payment",
       "request": {
         "method": "POST",
         "header": [
@@ -81,7 +99,7 @@
       "description": "Only prizeId in URL. Queries vault_deposits (filled by polling). If valid deposit found, marks LOCKED. Body: {} or {\"txHash\":\"...\"}."
     },
     {
-      "name": "6. Pay",
+      "name": "7. Pay",
       "request": {
         "method": "POST",
         "header": [
