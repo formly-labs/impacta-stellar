@@ -1,20 +1,10 @@
 'use client';
 
-import {
-  Archive,
-  BarChart3,
-  FileText,
-  Gift,
-  Loader2,
-  Plus,
-  Settings,
-  Users,
-  X,
-} from 'lucide-react';
+import { usePollar } from '@pollar/react';
+import { Archive, BarChart3, FileText, Gift, Loader2, Plus, Settings, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useWallet } from 'stellar-wallet-kit';
 
 interface DashboardSidebarV2Props {
   activeTab: 'active' | 'archived';
@@ -33,36 +23,36 @@ interface DashboardSidebarV2Props {
 }
 
 export function DashboardSidebarV2({
-  activeTab,
-  archivedCount,
-  onTabChange,
-  onCreateForm,
-  isCreatingForm,
-  onCloseMobile,
-  isMobile,
-}: DashboardSidebarV2Props) {
+                                     activeTab,
+                                     archivedCount,
+                                     onTabChange,
+                                     onCreateForm,
+                                     isCreatingForm,
+                                     onCloseMobile,
+                                     isMobile,
+                                   }: DashboardSidebarV2Props) {
   const pathname = usePathname();
-  const { account } = useWallet();
-  const [profile, setProfile] = useState<{ firstName?: string; lastName?: string } | null>(null);
+  const { walletAddress } = usePollar();
+  const [ profile, setProfile ] = useState<{ firstName?: string; lastName?: string } | null>(null);
 
   const isFormsPage = pathname === '/dashboard' || pathname?.startsWith('/dashboard');
 
   useEffect(() => {
-    if (!account?.address) return;
-    fetch(`/api/profile?address=${account.address}`)
+    if (!walletAddress) return;
+    fetch(`/api/profile?address=${walletAddress}`)
       .then((res) => res.json())
       .then((data) => setProfile(data))
       .catch(() => setProfile(null));
-  }, [account?.address]);
+  }, [ walletAddress ]);
 
   const displayName =
     profile?.firstName || profile?.lastName
-      ? [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim()
+      ? [ profile.firstName, profile.lastName ].filter(Boolean).join(' ').trim()
       : null;
   const initials = displayName
     ? displayName.split(/\s+/).map((s) => s[0]).slice(0, 2).join('').toUpperCase()
-    : account?.address
-      ? account.address.slice(1, 3).toUpperCase()
+    : walletAddress
+      ? walletAddress.slice(1, 3).toUpperCase()
       : '?';
 
   return (
@@ -72,7 +62,12 @@ export function DashboardSidebarV2({
           {/* Mobile close only; main Formly logo stays in top header */}
           {isMobile && onCloseMobile && (
             <div className="flex items-center justify-end border-b border-gray-100 px-4 py-3">
-              <button type="button" onClick={onCloseMobile} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100" aria-label="Cerrar menú">
+              <button
+                type="button"
+                onClick={onCloseMobile}
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+                aria-label="Cerrar menú"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>

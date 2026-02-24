@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
-import { NetworkType, WalletProvider } from 'stellar-wallet-kit';
 
 function LoginContent() {
   const { walletAddress } = usePollar();
@@ -177,14 +176,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense>
-      <WalletProvider
-        config={{
-          network: NetworkType.TESTNET,
-          autoConnect: true,
-        }}
-      >
-        <LoginContent />
-      </WalletProvider>
+      <LoginContent />
     </Suspense>
   );
 }

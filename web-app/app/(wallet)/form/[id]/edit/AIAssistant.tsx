@@ -1,10 +1,10 @@
 import { FormUpdateInput } from '@/types';
 import { useChat } from '@ai-sdk/react';
+import { usePollar } from '@pollar/react';
 import { DefaultChatTransport } from 'ai';
 import { Bot, Send, Sparkles, User } from 'lucide-react';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useWallet } from 'stellar-wallet-kit';
 
 const FREE_LIMIT = 5;
 
@@ -14,8 +14,8 @@ interface AIAssistantProps {
 }
 
 export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => {
-  const { account } = useWallet();
-  const wallet = account?.address;
+  const { walletAddress } = usePollar();
+  const wallet = walletAddress;
 
   const [ aiPrompt, setAiPrompt ] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
