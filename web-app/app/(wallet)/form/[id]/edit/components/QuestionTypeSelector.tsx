@@ -1,7 +1,7 @@
 'use client';
 
 import { FieldInput } from '@/types';
-import { AlignLeft, FileText, Mail, Phone, Hash, CheckSquare, Circle, ChevronDown, Check } from 'lucide-react';
+import { AlignLeft, FileText, Mail, Phone, Hash, CheckSquare, Circle, ChevronDown, Check, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const QUESTION_TYPES = [
@@ -53,6 +53,13 @@ const QUESTION_TYPES = [
     icon: CheckSquare,
     bgColor: 'bg-purple-100',
     textColor: 'text-purple-700'
+  },
+  { 
+    value: 'nps_stars', 
+    label: 'NPS (1-10 estrellas)', 
+    icon: Star,
+    bgColor: 'bg-amber-100',
+    textColor: 'text-amber-700'
   },
 ];
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePollar } from '@pollar/react';
-import { Archive, BarChart3, FileText, Gift, Loader2, Plus, Settings, Users, X } from 'lucide-react';
+import { Archive, Award, BarChart3, FileText, Loader2, Plus, Settings, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -35,7 +35,8 @@ export function DashboardSidebarV2({
   const { walletAddress } = usePollar();
   const [ profile, setProfile ] = useState<{ firstName?: string; lastName?: string } | null>(null);
 
-  const isFormsPage = pathname === '/dashboard' || pathname?.startsWith('/dashboard');
+  const isFormsPage = pathname === '/dashboard' || (pathname?.startsWith('/dashboard') && pathname !== '/dashboard/rewards');
+  const isRewardsPage = pathname === '/dashboard/rewards';
 
   useEffect(() => {
     if (!walletAddress) return;
@@ -137,11 +138,15 @@ export function DashboardSidebarV2({
                 )}
               </Link>
               <Link
-                href="/dashboard"
+                href="/dashboard/rewards"
                 onClick={isMobile ? onCloseMobile : undefined}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isRewardsPage
+                    ? 'border-l-4 border-primary bg-primary-50 py-2.5 pl-[calc(0.75rem-4px)] text-primary'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
               >
-                <Gift className="h-4 w-4 shrink-0" />
+                <Award className="h-4 w-4 shrink-0" />
                 Recompensas
               </Link>
               <Link

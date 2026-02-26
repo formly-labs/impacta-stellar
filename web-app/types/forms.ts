@@ -46,7 +46,7 @@ export interface AddMemberInput {
 // ============== Form Types ==============
 
 export interface FieldInput {
-  type: 'text' | 'email' | 'phone' | 'number' | 'radio' | 'checkbox' | 'short_text' | 'long_text';
+  type: 'text' | 'email' | 'phone' | 'number' | 'radio' | 'checkbox' | 'short_text' | 'long_text' | 'nps_stars';
   label: string;
   placeholder?: string;
   required?: boolean;

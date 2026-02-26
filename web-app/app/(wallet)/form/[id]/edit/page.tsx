@@ -24,6 +24,7 @@ import {
   Plus,
   Smartphone,
   Sparkles,
+  Star,
   Trash2,
   X,
 } from 'lucide-react';
@@ -79,6 +80,13 @@ const FIELD_TYPES = [
     color: 'bg-purple-100 text-purple-700 border-purple-200',
     icon: CheckSquare,
     bgColor: 'bg-purple-100',
+  },
+  {
+    value: 'nps_stars',
+    label: 'NPS (1-10 estrellas)',
+    color: 'bg-amber-100 text-amber-700 border-amber-200',
+    icon: Star,
+    bgColor: 'bg-amber-100',
   },
 ];
 
@@ -735,7 +743,21 @@ export default function CreateFormPage() {
                           }`}
                         />
                       )}
-                      
+
+                      {/* NPS 1-10 estrellas */}
+                      {selectedField.type === 'nps_stars' && (
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                            <span
+                              key={n}
+                              className={`${viewMode === 'mobile' ? 'h-8 w-8' : 'h-10 w-10'} flex shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-amber-50`}
+                            >
+                              <Star className="h-4 w-4 fill-amber-400 text-amber-400 sm:h-5 sm:w-5" />
+                            </span>
+                          ))}
+                          <span className="ml-2 text-sm text-gray-500">1 → 10</span>
+                        </div>
+                      )}
                       
                       {/* Opciones para radio y checkbox */}
                       {(selectedField.type === 'radio' || selectedField.type === 'checkbox') && (

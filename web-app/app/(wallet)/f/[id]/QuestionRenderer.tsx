@@ -1,6 +1,6 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
 
 export interface PublicField {
   id: string;
@@ -136,6 +136,35 @@ export default function QuestionRenderer({
           placeholder={placeholder || '0'}
           className={inputClasses}
         />
+      ) : type === 'nps_stars' ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
+              const numStr = String(n);
+              const selected = value === numStr;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => onChange(numStr)}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 transition-all sm:h-12 sm:w-12 ${
+                    selected
+                      ? 'border-blue-500 bg-blue-50 text-amber-500'
+                      : 'border-gray-200 bg-white text-gray-300 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                  aria-label={`Valorar ${n} de 10`}
+                >
+                  <Star
+                    className={`h-5 w-5 sm:h-6 sm:w-6 ${selected ? 'fill-amber-400 text-amber-400' : ''}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-center text-sm text-gray-500">
+            1 (muy insatisfecho) — 10 (muy satisfecho)
+          </p>
+        </div>
       ) : (
         <input
           type="text"
