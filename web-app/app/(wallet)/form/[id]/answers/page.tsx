@@ -8,19 +8,29 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Copy,
   FileDown,
   FileSpreadsheet,
+  MapPin,
+  Monitor,
   Printer,
   Search,
   Smile,
+  Sparkles,
   Trash2,
   TrendingUp,
   User,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getKeyInsights, type KeyInsight } from '@/lib/insightHelpers';
+import {
+  getKeyInsights,
+  getDatasetQuality,
+  getDemographics,
+  getTrends,
+  type KeyInsight,
+} from '@/lib/insightHelpers';
 import {
   Bar,
   BarChart,
@@ -28,6 +38,11 @@ import {
   Cell,
   Pie,
   PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -52,6 +67,7 @@ interface ResponseData {
     wallet: string;
   };
   date: string;
+  createdAt?: string;
   answers: Array<{
     question: string;
     answer: string;
@@ -153,6 +169,7 @@ export default function FormAnswersPage() {
                   hour: '2-digit',
                   minute: '2-digit',
                 }),
+                createdAt: r.createdAt,
                 answers: answersArray,
                 aiScore: (r as SurveyResponse).aiScore ?? null,
               };
@@ -638,52 +655,146 @@ export default function FormAnswersPage() {
                       </div>
                     </div>
 
-                    {/* Demographic Analysis */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                        <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                            👥 Análisis Demográfico
-                          </p>
+                    {/* Section 2.1: Calidad del Dataset */}
+                    {(() => {
+                      const quality = getDatasetQuality(responses, formData.fields?.length ?? 0);
+                      const radarData = [
+                        { subject: 'Integridad', value: quality.integrity, fullMark: 100 },
+                        { subject: 'Coherencia', value: quality.coherence, fullMark: 100 },
+                        { subject: 'Diversidad', value: quality.diversity, fullMark: 100 },
+                      ];
+                      return (
+                        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                          <div className="border-b border-gray-100 px-5 py-3 bg-primary-50 flex items-center justify-between">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                              Calidad del Dataset
+                            </p>
+                            <Sparkles className="h-4 w-4 text-primary-500" />
+                          </div>
+                          <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
+                            <div className="flex-1 min-h-[240px]">
+                              <ResponsiveContainer width="100%" height={240}>
+                                <RadarChart data={radarData}>
+                                  <PolarGrid />
+                                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                                  <Radar name="Calidad" dataKey="value" stroke="var(--color-primary, #7c3aed)" fill="var(--color-primary, #7c3aed)" fillOpacity={0.3} />
+                                </RadarChart>
+                              </ResponsiveContainer>
+                            </div>
+                            <div className="flex flex-col items-center justify-center md:w-32">
+                              <p className="text-2xl font-bold text-primary-600">
+                                {quality.aiScore != null ? quality.aiScore.toFixed(1) : '—'}
+                              </p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Score IA</p>
+                            </div>
+                          </div>
+                          <div className="border-t border-gray-100 px-5 py-3 flex flex-wrap gap-4 text-sm">
+                            <span className="text-gray-600">Integridad <strong className="text-gray-900">{quality.integrity}%</strong></span>
+                            <span className="text-gray-600">Coherencia <strong className="text-gray-900">{quality.coherence}%</strong></span>
+                            <span className="text-gray-600">Diversidad <strong className="text-gray-900">{quality.diversity}%</strong></span>
+                          </div>
                         </div>
-                        <div className="p-5 space-y-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Edad promedio</span>
-                            <span className="text-sm font-bold text-primary-600">25-29 años</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Total participantes</span>
-                            <span className="text-sm font-bold text-primary-600">{totalResponses}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Tasa de finalización</span>
-                            <span className="text-sm font-bold text-success">100%</span>
-                          </div>
-                        </div>
-                      </div>
+                      );
+                    })()}
 
-                      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                        <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                            📈 Tendencias
-                          </p>
+                    {/* Section 2.2: Análisis demográfico */}
+                    {(() => {
+                      const demo = getDemographics(responses, formData.fields ?? []);
+                      return (
+                        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                          <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                              Análisis demográfico
+                            </p>
+                          </div>
+                          <div className="p-5 space-y-4">
+                            {demo.ageDistribution && demo.ageDistribution.length > 0 ? (
+                              <>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Rango de edad</p>
+                                <ResponsiveContainer width="100%" height={demo.ageDistribution.length * 36 + 24}>
+                                  <BarChart data={demo.ageDistribution} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
+                                    <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                                    <YAxis type="category" dataKey="name" width={72} tick={{ fontSize: 11 }} />
+                                    <Bar dataKey="percent" fill="var(--color-primary, #7c3aed)" radius={[0, 4, 4, 0]} />
+                                    <Tooltip
+                                      content={({ active, payload }) => active && payload?.[0] ? (
+                                        <div className="bg-white border border-gray-200 rounded-lg shadow px-3 py-2 text-xs">
+                                          <span className="text-primary-600 font-semibold">{payload[0].payload.name}</span>
+                                          <span className="text-gray-600"> — {payload[0].value}%</span>
+                                        </div>
+                                      ) : null}
+                                    />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </>
+                            ) : (
+                              <p className="text-sm text-gray-500">No hay campo de edad en este formulario.</p>
+                            )}
+                            <div className="space-y-2 pt-2 border-t border-gray-100">
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700 flex items-center gap-1.5"><MapPin className="h-4 w-4 text-gray-400" /> Ubicación principal</span>
+                                <strong className="text-gray-900">{demo.location}</strong>
+                              </div>
+                              {demo.gender && (
+                                <div className="flex justify-between items-center text-sm">
+                                  <span className="text-gray-700 flex items-center gap-1.5"><User className="h-4 w-4 text-gray-400" /> Género predominante</span>
+                                  <strong className="text-gray-900">{demo.gender}</strong>
+                                </div>
+                              )}
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700 flex items-center gap-1.5"><Check className="h-4 w-4 text-green-500" /> Tasa de finalización</span>
+                                <strong className="text-green-600">{demo.completionRate}%</strong>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="p-5 space-y-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Respuestas hoy</span>
-                            <span className="text-sm font-bold text-green-600">+{totalResponses}</span>
+                      );
+                    })()}
+
+                    {/* Section 2.3: Tendencias */}
+                    {(() => {
+                      const trends = getTrends(responses);
+                      return (
+                        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                          <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                              Tendencias
+                            </p>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Tiempo promedio</span>
-                            <span className="text-sm font-bold text-gray-900">2:30 min</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-700">Dispositivo más usado</span>
-                            <span className="text-sm font-bold text-gray-900">Desktop</span>
+                          <div className="p-5 space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700">Respuestas hoy</span>
+                              <span className="text-sm font-bold text-green-600">+{trends.responsesToday} {trends.responsesToday > 0 ? 'Creciente' : ''}</span>
+                            </div>
+                            {trends.peakHourRange && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-700 flex items-center gap-1.5">Horario pico <Clock className="h-3.5 w-3.5 text-gray-400" /></span>
+                                <span className="text-sm font-bold text-gray-900">{trends.peakHourRange}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700">Tasa de rebote</span>
+                              <span className="text-sm font-bold text-gray-900">{trends.bounceRate}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700 flex items-center gap-1.5">Tiempo prom. <Clock className="h-3.5 w-3.5 text-gray-400" /></span>
+                              <span className="text-sm font-bold text-gray-900">{trends.avgTime}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-700 flex items-center gap-1.5">Dispositivo <Monitor className="h-3.5 w-3.5 text-gray-400" /></span>
+                              <span className="text-sm font-bold text-gray-900">{trends.device}</span>
+                            </div>
+                            {trends.improvementMessage && (
+                              <p className="text-xs text-gray-600 pt-2 flex items-center gap-1.5">
+                                <TrendingUp className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                                {trends.improvementMessage}
+                              </p>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
 
                     {/* Response Timeline */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -717,33 +828,6 @@ export default function FormAnswersPage() {
                       </div>
                     </div>
 
-                    {/* Sentiment Analysis */}
-                    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                      <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                          💬 Análisis de Sentimiento
-                        </p>
-                      </div>
-                      <div className="p-6">
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
-                            <div className="text-2xl mb-2">😊</div>
-                            <p className="text-2xl font-bold text-green-600">60%</p>
-                            <p className="text-xs text-gray-600 mt-1">Positivo</p>
-                          </div>
-                          <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-100">
-                            <div className="text-2xl mb-2">😐</div>
-                            <p className="text-2xl font-bold text-gray-600">30%</p>
-                            <p className="text-xs text-gray-600 mt-1">Neutral</p>
-                          </div>
-                          <div className="text-center p-4 bg-red-50 rounded-lg border border-red-100">
-                            <div className="text-2xl mb-2">😟</div>
-                            <p className="text-2xl font-bold text-red-600">10%</p>
-                            <p className="text-xs text-gray-600 mt-1">Negativo</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 )}
               </>
