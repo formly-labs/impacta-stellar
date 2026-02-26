@@ -28,6 +28,7 @@ import {
   getKeyInsights,
   getDatasetQuality,
   getDemographics,
+  getDemographicsInsight,
   getTrends,
   type KeyInsight,
 } from '@/lib/insightHelpers';
@@ -698,9 +699,10 @@ export default function FormAnswersPage() {
                       );
                     })()}
 
-                    {/* Section 2.2: Análisis demográfico */}
+                    {/* Section 2.2: Análisis demográfico + demographics insight */}
                     {(() => {
                       const demo = getDemographics(responses, formData.fields ?? []);
+                      const demoInsight = getDemographicsInsight(demo);
                       return (
                         <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                           <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
@@ -709,6 +711,11 @@ export default function FormAnswersPage() {
                             </p>
                           </div>
                           <div className="p-5 space-y-4">
+                            {demoInsight && (
+                              <div className="rounded-lg border border-primary-100 bg-primary-50/50 px-4 py-3">
+                                <p className="text-sm text-gray-800">{demoInsight}</p>
+                              </div>
+                            )}
                             {demo.ageDistribution && demo.ageDistribution.length > 0 ? (
                               <>
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Rango de edad</p>
@@ -796,34 +803,39 @@ export default function FormAnswersPage() {
                       );
                     })()}
 
-                    {/* Response Timeline */}
+                    {/* Section 3: Línea de tiempo de respuestas */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                      <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
+                      <div className="border-b border-gray-100 px-5 py-3 bg-primary-50 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
                         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                          ⏱️ Línea de Tiempo de Respuestas
+                          Línea de tiempo de respuestas
                         </p>
                       </div>
                       <div className="p-6">
                         <div className="space-y-3">
-                          {responses.map((resp, idx) => (
-                            <div
-                              key={idx}
-                              className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                            >
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100">
-                                <User className="h-5 w-5 text-primary-600" />
+                          {[...responses]
+                            .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+                            .map((resp, idx) => (
+                              <div
+                                key={resp.id}
+                                className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                              >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100">
+                                  <User className="h-5 w-5 text-primary-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {resp.respondent.name}
+                                  </p>
+                                  <p className="text-xs text-gray-500 font-mono truncate">
+                                    {resp.respondent.wallet === 'Sin wallet' ? 'Sin wallet' : resp.respondent.wallet}
+                                  </p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <p className="text-xs text-gray-600">{resp.date}</p>
+                                </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
-                                  {resp.respondent.name}
-                                </p>
-                                <p className="text-xs text-gray-500 font-mono truncate">{resp.respondent.wallet}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-xs text-gray-600">{resp.date}</p>
-                              </div>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       </div>
                     </div>

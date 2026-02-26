@@ -287,6 +287,27 @@ export function getDemographics(
   };
 }
 
+/**
+ * One-sentence demographics insight for the Insight tab (e.g. "El rango 25-29 predomina con un 45.2% de las respuestas.").
+ */
+export function getDemographicsInsight(demo: Demographics): string | null {
+  const parts: string[] = [];
+  if (demo.dominantAge && demo.ageDistribution?.length) {
+    const top = demo.ageDistribution[0];
+    const pct = top?.percent ?? 0;
+    parts.push(`El rango ${demo.dominantAge} predomina con un ${pct}% de las respuestas.`);
+  }
+  if (demo.gender) {
+    if (parts.length) parts.push(` Género predominante: ${demo.gender}.`);
+    else parts.push(`Género predominante: ${demo.gender}.`);
+  }
+  if (demo.completionRate >= 90 && parts.length === 0) {
+    parts.push(`Tasa de finalización del ${demo.completionRate}%, con alto engagement.`);
+  }
+  if (parts.length === 0) return null;
+  return parts.join(' ');
+}
+
 export type Trends = {
   responsesToday: number;
   peakHourRange: string | null;  // e.g. "14:00 - 16:00"
