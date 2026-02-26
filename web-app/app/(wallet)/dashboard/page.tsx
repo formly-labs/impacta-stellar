@@ -2,7 +2,6 @@
 
 import { useForms } from '@/hooks/useForms';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { isOnboardingCompleted } from '@/lib/onboardingStorage';
 import { usePollar } from '@pollar/react';
 import { AlertCircle, LayoutGrid, List, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -58,12 +57,6 @@ export default function CreatorDashboard() {
   const [ viewMode, setViewMode ] = useState<ViewMode>('list');
   const [ sortBy, setSortBy ] = useState<'date' | 'name'>('date');
   const [ inviteModalOpen, setInviteModalOpen ] = useState(false);
-
-  useEffect(() => {
-    if (!isOnboardingCompleted()) {
-      router.replace('/dashboard/onboarding?step=details');
-    }
-  }, [ router ]);
 
   useEffect(() => {
     if (tab === 'archived') {

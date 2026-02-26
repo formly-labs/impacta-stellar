@@ -29,7 +29,7 @@ export function EmptyState({ type }: EmptyStateProps) {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-medium text-gray-900">There s not a form in sight</h3>
+      <h3 className="text-lg font-medium text-gray-900">There is not a form in sight</h3>
       <p className="mt-1 text-sm text-gray-500">Create your first form to get started</p>
       <Link
         href="/dashboard/questionnaires/new?step=theme"

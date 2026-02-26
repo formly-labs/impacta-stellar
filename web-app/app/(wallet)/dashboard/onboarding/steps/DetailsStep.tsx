@@ -73,12 +73,12 @@ export default function DetailsStep() {
       <div className="w-full max-w-[520px] space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-[2rem] sm:leading-tight">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl sm:leading-tight">
             Comencemos con tus
             <br />
             datos personales
           </h1>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Esto nos ayudará a personalizar tu experiencia.
           </p>
         </div>
