@@ -4,6 +4,7 @@ import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/For
 import { useFormData } from '@/hooks';
 import { FieldInput } from '@/types';
 import {
+  Activity,
   ArrowRight,
   Check,
   ChevronLeft,
@@ -12,15 +13,19 @@ import {
   Copy,
   FileDown,
   FileSpreadsheet,
+  LogOut,
   MapPin,
   Monitor,
   Printer,
   Search,
   Smile,
   Sparkles,
+  Timer,
   Trash2,
   TrendingUp,
   User,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -238,7 +243,7 @@ export default function FormAnswersPage() {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  Insight
+                  Insights
                 </button>
                 <button
                   type="button"
@@ -699,109 +704,148 @@ export default function FormAnswersPage() {
                       );
                     })()}
 
-                    {/* Section 2.2: Análisis demográfico + demographics insight */}
-                    {(() => {
-                      const demo = getDemographics(responses, formData.fields ?? []);
-                      const demoInsight = getDemographicsInsight(demo);
-                      return (
-                        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                          <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                              Análisis demográfico
-                            </p>
-                          </div>
-                          <div className="p-5 space-y-4">
-                            {demoInsight && (
-                              <div className="rounded-lg border border-primary-100 bg-primary-50/50 px-4 py-3">
-                                <p className="text-sm text-gray-800">{demoInsight}</p>
-                              </div>
-                            )}
-                            {demo.ageDistribution && demo.ageDistribution.length > 0 ? (
-                              <>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Rango de edad</p>
-                                <ResponsiveContainer width="100%" height={demo.ageDistribution.length * 36 + 24}>
-                                  <BarChart data={demo.ageDistribution} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
-                                    <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
-                                    <YAxis type="category" dataKey="name" width={72} tick={{ fontSize: 11 }} />
-                                    <Bar dataKey="percent" fill="var(--color-primary, #7c3aed)" radius={[0, 4, 4, 0]} />
-                                    <Tooltip
-                                      content={({ active, payload }) => active && payload?.[0] ? (
-                                        <div className="bg-white border border-gray-200 rounded-lg shadow px-3 py-2 text-xs">
-                                          <span className="text-primary-600 font-semibold">{payload[0].payload.name}</span>
-                                          <span className="text-gray-600"> — {payload[0].value}%</span>
-                                        </div>
-                                      ) : null}
-                                    />
-                                  </BarChart>
-                                </ResponsiveContainer>
-                              </>
-                            ) : (
-                              <p className="text-sm text-gray-500">No hay campo de edad en este formulario.</p>
-                            )}
-                            <div className="space-y-2 pt-2 border-t border-gray-100">
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-700 flex items-center gap-1.5"><MapPin className="h-4 w-4 text-gray-400" /> Ubicación principal</span>
-                                <strong className="text-gray-900">{demo.location}</strong>
-                              </div>
-                              {demo.gender && (
-                                <div className="flex justify-between items-center text-sm">
-                                  <span className="text-gray-700 flex items-center gap-1.5"><User className="h-4 w-4 text-gray-400" /> Género predominante</span>
-                                  <strong className="text-gray-900">{demo.gender}</strong>
+                    {/* Section 2.2 + 2.3: Demographics & Tendencias — two boxes side by side */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {(() => {
+                        const demo = getDemographics(responses, formData.fields ?? []);
+                        const demoInsight = getDemographicsInsight(demo);
+                        return (
+                          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <div className="border-b border-gray-100 px-5 py-3 bg-primary-50 flex items-center gap-2">
+                              <Users className="h-4 w-4 text-blue-600" />
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                                Análisis demográfico
+                              </p>
+                            </div>
+                            <div className="p-5 space-y-4">
+                              {demoInsight && (
+                                <div className="rounded-lg border border-primary-100 bg-primary-50/50 px-4 py-3">
+                                  <p className="text-sm text-gray-800">{demoInsight}</p>
                                 </div>
                               )}
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-700 flex items-center gap-1.5"><Check className="h-4 w-4 text-green-500" /> Tasa de finalización</span>
-                                <strong className="text-green-600">{demo.completionRate}%</strong>
+                              {demo.ageDistribution && demo.ageDistribution.length > 0 ? (
+                                <>
+                                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Rango de edad</p>
+                                  <ResponsiveContainer width="100%" height={demo.ageDistribution.length * 36 + 24}>
+                                    <BarChart data={demo.ageDistribution} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
+                                      <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                                      <YAxis type="category" dataKey="name" width={72} tick={{ fontSize: 11 }} />
+                                      <Bar dataKey="percent" radius={[0, 4, 4, 0]}>
+                                        {demo.ageDistribution.map((entry) => (
+                                          <Cell
+                                            key={entry.name}
+                                            fill={entry.name === demo.dominantAge ? 'var(--color-primary, #7c3aed)' : '#e5e7eb'}
+                                          />
+                                        ))}
+                                      </Bar>
+                                      <Tooltip
+                                        content={({ active, payload }) => active && payload?.[0] ? (
+                                          <div className="bg-white border border-gray-200 rounded-lg shadow px-3 py-2 text-xs">
+                                            {payload[0].payload.name === demo.dominantAge && (
+                                              <span className="text-primary-600 font-semibold block">Predominante: {payload[0].payload.name}</span>
+                                            )}
+                                            <span className="text-gray-600">{payload[0].value}%</span>
+                                          </div>
+                                        ) : null}
+                                      />
+                                    </BarChart>
+                                  </ResponsiveContainer>
+                                  {demo.dominantAge && (
+                                    <p className="text-xs font-medium text-primary-600">Predominante: {demo.dominantAge}</p>
+                                  )}
+                                </>
+                              ) : (
+                                <p className="text-sm text-gray-500">No hay campo de edad en este formulario.</p>
+                              )}
+                              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 border-t border-gray-100">
+                                <div className="flex items-center gap-1.5 text-sm">
+                                  <MapPin className="h-4 w-4 text-blue-500 shrink-0" />
+                                  <span className="text-gray-600">Ubicación principal</span>
+                                  <strong className="text-gray-900 ml-1">{demo.location}</strong>
+                                </div>
+                                {demo.gender && (
+                                  <div className="flex items-center gap-1.5 text-sm">
+                                    <User className="h-4 w-4 text-pink-500 shrink-0" />
+                                    <span className="text-gray-600">Género predominante</span>
+                                    <strong className="text-gray-900 ml-1">{demo.gender}</strong>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                                <span className="text-2xl font-bold text-green-600">{demo.completionRate}%</span>
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
+                                  <Check className="h-5 w-5 text-white" />
+                                </div>
+                                <span className="text-sm text-gray-600">Tasa de finalización</span>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })()}
+                        );
+                      })()}
 
-                    {/* Section 2.3: Tendencias */}
-                    {(() => {
-                      const trends = getTrends(responses);
-                      return (
-                        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                          <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                              Tendencias
-                            </p>
-                          </div>
-                          <div className="p-5 space-y-3">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-700">Respuestas hoy</span>
-                              <span className="text-sm font-bold text-green-600">+{trends.responsesToday} {trends.responsesToday > 0 ? 'Creciente' : ''}</span>
-                            </div>
-                            {trends.peakHourRange && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-700 flex items-center gap-1.5">Horario pico <Clock className="h-3.5 w-3.5 text-gray-400" /></span>
-                                <span className="text-sm font-bold text-gray-900">{trends.peakHourRange}</span>
-                              </div>
-                            )}
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-700">Tasa de rebote</span>
-                              <span className="text-sm font-bold text-gray-900">{trends.bounceRate}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-700 flex items-center gap-1.5">Tiempo prom. <Clock className="h-3.5 w-3.5 text-gray-400" /></span>
-                              <span className="text-sm font-bold text-gray-900">{trends.avgTime}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-700 flex items-center gap-1.5">Dispositivo <Monitor className="h-3.5 w-3.5 text-gray-400" /></span>
-                              <span className="text-sm font-bold text-gray-900">{trends.device}</span>
-                            </div>
-                            {trends.improvementMessage && (
-                              <p className="text-xs text-gray-600 pt-2 flex items-center gap-1.5">
-                                <TrendingUp className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                                {trends.improvementMessage}
+                      {(() => {
+                        const trends = getTrends(responses);
+                        return (
+                          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                            <div className="border-b border-gray-100 px-5 py-3 bg-primary-50 flex items-center gap-2">
+                              <Activity className="h-4 w-4 text-red-500" />
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                                Tendencias
                               </p>
-                            )}
+                            </div>
+                            <div className="p-5 space-y-4">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-2xl font-bold text-green-600">+{trends.responsesToday}</span>
+                                {trends.responsesToday > 0 && (
+                                  <span className="rounded px-2 py-0.5 text-xs font-semibold bg-green-500 text-white">
+                                    CRECIENTE
+                                  </span>
+                                )}
+                                <span className="text-sm text-gray-600">Respuestas hoy</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="h-4 w-4 text-orange-500 shrink-0" />
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Horario pico</p>
+                                    <p className="text-sm font-bold text-gray-900">{trends.peakHourRange ?? '—'}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <LogOut className="h-4 w-4 text-red-500 shrink-0" />
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Tasa de rebote</p>
+                                    <p className="text-sm font-bold text-gray-900">{trends.bounceRate}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Timer className="h-4 w-4 text-blue-500 shrink-0" />
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Tiempo prom.</p>
+                                    <p className="text-sm font-bold text-gray-900">{trends.avgTime}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Monitor className="h-4 w-4 text-blue-500 shrink-0" />
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Dispositivo</p>
+                                    <p className="text-sm font-bold text-gray-900">{trends.device}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              {trends.improvementMessage && (
+                                <div className="flex gap-3 rounded-lg bg-gray-100 p-3 items-start">
+                                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-red-500">
+                                    <Zap className="h-4 w-4 text-white" />
+                                  </div>
+                                  <p className="text-sm text-gray-800">{trends.improvementMessage}</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })()}
+                        );
+                      })()}
+                    </div>
 
                     {/* Section 3: Línea de tiempo de respuestas */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
