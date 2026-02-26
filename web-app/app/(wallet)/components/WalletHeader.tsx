@@ -18,8 +18,7 @@ function getInitials(address: string) {
 }
 
 export function WalletHeader() {
-  const { walletAddress, logout } = usePollar();
-  const isConnected = !!walletAddress;
+  const { walletAddress, logout, isAuthenticated } = usePollar();
   const router = useRouter();
   const pathname = usePathname();
   const [ open, setOpen ] = useState(false);
@@ -68,7 +67,7 @@ export function WalletHeader() {
         </Link>
 
         <div className="flex items-center gap-3">
-          {!isConnected ? (
+          {!isAuthenticated ? (
             <Link
               href={`/login?redirectTo=${encodeURIComponent(pathname || '/dashboard')}`}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600"

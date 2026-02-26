@@ -6,11 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 
 export function WalletGuard({ children }: PropsWithChildren) {
-  const { walletAddress } = usePollar();
+  const { walletAddress, isAuthenticated } = usePollar();
   const router = useRouter();
   const pathname = usePathname();
   const [ isChecking, setIsChecking ] = useState(true);
-  const isConnected = !!walletAddress;
   const isLoginPage = pathname === '/login';
   const isOnboardingPage = pathname?.startsWith('/dashboard/onboarding');
   const walletStable = walletAddress ?? '';
@@ -20,7 +19,7 @@ export function WalletGuard({ children }: PropsWithChildren) {
     const timer = setTimeout(() => {
       setIsChecking(false);
 
-      if (!isConnected && !isLoginPage) {
+      if (!isAuthenticated && !isLoginPage) {
         // Guardar la ruta actual como query param para redirección
         const redirectUrl = encodeURIComponent(pathname || '/dashboard');
         router.push(`/login?redirectTo=${redirectUrl}`);
@@ -28,11 +27,11 @@ export function WalletGuard({ children }: PropsWithChildren) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [ isConnected, router, pathname, isLoginPage ]);
+  }, [ isAuthenticated, router, pathname, isLoginPage ]);
 
   // After connect: redirect to "Comencemos con tus datos personales" when profile is missing (works for social login / any entry point)
   useEffect(() => {
-    if (!isConnected || isLoginPage || isOnboardingPage) return;
+    if (!isAuthenticated || isLoginPage || isOnboardingPage) return;
     if (isOnboardingCompleted()) return;
     if (!walletStable) return;
 
@@ -56,8 +55,10 @@ export function WalletGuard({ children }: PropsWithChildren) {
         if (!cancelled) router.replace('/dashboard/onboarding?step=details');
       }
     })();
-    return () => { cancelled = true; };
-  }, [ isConnected, isLoginPage, isOnboardingPage, router, walletStable ]);
+    return () => {
+      cancelled = true;
+    };
+  }, [ isAuthenticated, isLoginPage, isOnboardingPage, router, walletStable ]);
 
   // Mostrar loading mientras verifica la conexión
   if (isChecking) {
@@ -72,7 +73,7 @@ export function WalletGuard({ children }: PropsWithChildren) {
   }
 
   // Si está conectado, mostrar el contenido
-  if (isConnected || isLoginPage) {
+  if (isAuthenticated || isLoginPage) {
     return <>{children}</>;
   }
 

@@ -11,7 +11,6 @@ export default function WalletLayout({ children }: PropsWithChildren) {
     <Suspense>
       <PollarProvider
         config={{
-          baseUrl: process.env.NEXT_PUBLIC_POLLAR_BASE_URL!,
           apiKey: process.env.NEXT_PUBLIC_POLLAR_API_KEY!,
         }}
       >

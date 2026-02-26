@@ -15,7 +15,6 @@ interface AIAssistantProps {
 
 export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => {
   const { walletAddress } = usePollar();
-  const wallet = walletAddress;
 
   const [ aiPrompt, setAiPrompt ] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -24,22 +23,22 @@ export const AIAssistantForm = ({ formData, setFormData }: AIAssistantProps) => 
   const limitReached = usageCount >= FREE_LIMIT;
 
   useEffect(() => {
-    if (!wallet) {
+    if (!walletAddress) {
       setCheckingUsage(false);
       return;
     }
-    fetch(`/api/ai/usage?wallet=${wallet}`)
+    fetch(`/api/ai/usage?wallet=${walletAddress}`)
       .then((res) => res.json())
       .then((data: { usageCount: number }) => setUsageCount(data.usageCount))
       .catch(() => {
       })
       .finally(() => setCheckingUsage(false));
-  }, [ wallet ]);
+  }, [ walletAddress ]);
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat/form-creator',
-      body: () => ({ formData, wallet }),
+      body: () => ({ formData, wallet: walletAddress }),
     }),
     onFinish: ({ message }) => {
       const parts = message.parts || [];
