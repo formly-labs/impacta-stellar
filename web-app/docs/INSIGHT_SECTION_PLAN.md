@@ -4,6 +4,13 @@ This document plans the **Insight** tab inside a specific survey’s Responses a
 
 ---
 
+## Download buttons (no integration yet)
+
+- **Location:** Top right of the Responses view, same row as the secondary tabs (Insight | Resumen | Individual).
+- **Buttons:** **Descargar CSV** and **Descargar XLSM** — placeholders only; no file generation or API until integration.
+
+---
+
 ## Current state
 
 - **Route:** `app/(wallet)/form/[id]/answers/page.tsx` — tabs: **Insight** | Resumen | Individual.
@@ -29,11 +36,19 @@ This document plans the **Insight** tab inside a specific survey’s Responses a
 | 3 | Consistencia | **Real:** `(responses with all questions answered) / totalResponses * 100`. Use `answers` length vs `formData.fields.length`. |
 | 4 | Sentimiento predominante | **Option A:** Use existing `aiScore` from DB (average, map to “Positivo/Neutral/Negativo” bands). **Option B:** For text answers, optional client-side sentiment (e.g. minimal keyword list or a small, free sentiment lib). Default to “N/A” if no data. |
 
+**Visual design (match reference):**
+
+- Section header: **"KEY INSIGHTS"** (uppercase), then "Análisis de N respuestas recibidas", then subtitle "La inteligencia artificial ha procesado los datos recientes para generar las siguientes observaciones."
+- **Four cards**, each with:
+  - Numbered badge (1–4) on the left in a colored circle.
+  - Title and description (data-driven).
+  - **Icon in the top-right of the card:** Card 1 = chart/trend (e.g. TrendingUp), Card 2 = check (Check), Card 3 = arrow (ArrowRight), Card 4 = smile (Smile). Colors: purple (participation), green (recommendation), orange (consistency), blue (sentiment).
+
 **Implementation notes:**
 
 - Reuse existing `responses` and `formData.fields` in the same page; no new API for Section 1.
-- Add a small **insight derivation helper** (e.g. `getInsightsFromResponses(responses, fields)`) that returns the 4 bullet points (or fewer when data is missing).
-- UI: keep the current card layout (numbered cards with icon/color). Replace hardcoded text with the derived values.
+- Helper `getKeyInsights(responses, fields)` returns the 4 insights (with `visible` when data exists).
+- UI: card layout with left badge + content, and optional icon on the right of each card.
 
 **Libraries:** None required. Optional: a very small sentiment library (e.g. sentiment in npm, or a few keywords) only if we want Card 4 from text answers without backend.
 

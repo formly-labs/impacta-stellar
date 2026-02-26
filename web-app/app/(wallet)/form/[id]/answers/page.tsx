@@ -3,9 +3,24 @@
 import { FormEditNavigation } from '@/app/(wallet)/form/[id]/edit/components/FormEditNavigation';
 import { useFormData } from '@/hooks';
 import { FieldInput } from '@/types';
-import { ChevronLeft, ChevronRight, Copy, Printer, Search, Trash2, User } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  FileDown,
+  FileSpreadsheet,
+  Printer,
+  Search,
+  Smile,
+  Trash2,
+  TrendingUp,
+  User,
+} from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getKeyInsights, type KeyInsight } from '@/lib/insightHelpers';
 import {
   Bar,
   BarChart,
@@ -27,6 +42,7 @@ interface SurveyResponse {
   respondentWallet?: string;
   responses: Record<string, string | number | boolean>;
   createdAt: string;
+  aiScore?: number | null;
 }
 
 interface ResponseData {
@@ -40,6 +56,40 @@ interface ResponseData {
     question: string;
     answer: string;
   }>;
+  aiScore?: number | null;
+}
+
+const INSIGHT_CARD_STYLES: Record<KeyInsight['variant'], { bg: string; border: string; badge: string }> = {
+  participation: { bg: 'bg-primary-50', border: 'border-primary-100', badge: 'bg-primary-500' },
+  recommendation: { bg: 'bg-green-50', border: 'border-green-100', badge: 'bg-green-500' },
+  consistency: { bg: 'bg-amber-50', border: 'border-amber-100', badge: 'bg-amber-500' },
+  sentiment: { bg: 'bg-blue-50', border: 'border-blue-100', badge: 'bg-blue-500' },
+};
+
+const INSIGHT_ICONS: Record<KeyInsight['variant'], React.ComponentType<{ className?: string }>> = {
+  participation: TrendingUp,
+  recommendation: Check,
+  consistency: ArrowRight,
+  sentiment: Smile,
+};
+
+function KeyInsightCard({ insight }: { insight: KeyInsight }) {
+  const style = INSIGHT_CARD_STYLES[insight.variant];
+  const Icon = INSIGHT_ICONS[insight.variant];
+  return (
+    <div className={`relative flex items-start gap-3 p-4 rounded-lg border ${style.bg} ${style.border}`}>
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white text-xs font-bold ${style.badge}`}>
+        {insight.id}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-gray-900">{insight.title}</p>
+        <p className="text-xs text-gray-600 mt-1">{insight.description}</p>
+      </div>
+      <div className="absolute right-4 top-4 text-gray-400">
+        <Icon className="h-5 w-5" />
+      </div>
+    </div>
+  );
 }
 
 export default function FormAnswersPage() {
@@ -104,6 +154,7 @@ export default function FormAnswersPage() {
                   minute: '2-digit',
                 }),
                 answers: answersArray,
+                aiScore: (r as SurveyResponse).aiScore ?? null,
               };
             });
             setResponses(formattedResponses);
@@ -156,42 +207,62 @@ export default function FormAnswersPage() {
 
       <div className="flex flex-1 gap-4 overflow-hidden p-4">
         <div className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-          {/* Tabs internos */}
+          {/* Tabs internos + Download buttons */}
           <div className="shrink-0 border-b border-gray-200 px-6 py-3 bg-gray-50">
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() => setTab('insight')}
-                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                  tab === 'insight'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Insight
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab('resumen')}
-                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                  tab === 'resumen'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Resumen
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab('individual')}
-                className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                  tab === 'individual'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Individual
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => setTab('insight')}
+                  className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    tab === 'insight'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Insight
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab('resumen')}
+                  className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    tab === 'resumen'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Resumen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab('individual')}
+                  className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    tab === 'individual'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Individual
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                  aria-label="Descargar CSV"
+                >
+                  <FileDown className="h-4 w-4 text-gray-500" />
+                  Descargar CSV
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                  aria-label="Descargar XLSM"
+                >
+                  <FileSpreadsheet className="h-4 w-4 text-gray-500" />
+                  Descargar XLSM
+                </button>
+              </div>
             </div>
           </div>
 
@@ -214,25 +285,6 @@ export default function FormAnswersPage() {
               </div>
             ) : (
               <>
-                {/* ── Insight tab (primero) ── */}
-                {tab === 'insight' && (
-                  <div className="animate-fade-in space-y-4">
-                    {/* Key Insights */}
-                    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-                      <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                          KEY INSIGHTS
-                        </p>
-                      </div>
-                      <div className="p-6">
-                        <p className="text-sm text-gray-600">
-                          Análisis de {totalResponses} respuestas recibidas
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* ── Resumen tab ── */}
                 {tab === 'resumen' && (
                   <div className="animate-fade-in space-y-4">
@@ -555,55 +607,34 @@ export default function FormAnswersPage() {
                   </div>
                 )}
 
-                {/* ── Insight tab ── */}
+                {/* ── Insight tab (Section 1: Key Insights) ── */}
                 {tab === 'insight' && (
                   <div className="animate-fade-in space-y-4">
-                    {/* Key Insights */}
+                    {/* Section 1: Key Insights Overview (match design) */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
                       <div className="border-b border-gray-100 px-5 py-3 bg-primary-50">
                         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600">
-                          📊 Insights Clave
+                          KEY INSIGHTS
                         </p>
                       </div>
-                      <div className="p-6 space-y-4">
-                        <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold">
-                            1
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">Mayor participación</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              El rango de edad 25-29 representa el 45.2% de las respuestas, siendo el grupo demográfico
-                              más activo.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-500 text-white text-xs font-bold">
-                            2
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">Alta tasa de recomendación</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              El 80% de los encuestados está dispuesto a recomendar, indicando un alto nivel de
-                              satisfacción.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">
-                            3
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">Participación consistente</p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              Tasa de respuesta del 100% en todas las preguntas, mostrando alto engagement con la
-                              encuesta.
-                            </p>
-                          </div>
-                        </div>
+                      <div className="p-6">
+                        <p className="text-sm text-gray-600">
+                          Análisis de {totalResponses} respuestas recibidas
+                        </p>
+                        <p className="mt-0.5 text-sm text-gray-500">
+                          La inteligencia artificial ha procesado los datos recientes para generar las siguientes observaciones.
+                        </p>
+                      </div>
+                      <div className="px-6 pb-6 space-y-4">
+                        {(() => {
+                          const keyInsights = getKeyInsights(responses, formData.fields ?? []).filter((i) => i.visible);
+                          if (keyInsights.length === 0) {
+                            return (
+                              <p className="text-sm text-gray-500 py-2">Completa respuestas para ver insights automáticos.</p>
+                            );
+                          }
+                          return keyInsights.map((insight) => <KeyInsightCard key={insight.id} insight={insight} />);
+                        })()}
                       </div>
                     </div>
 

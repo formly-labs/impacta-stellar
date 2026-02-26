@@ -59,13 +59,14 @@ export async function GET(
       );
     }
 
-    // Format responses to match expected structure
+    // Format responses to match expected structure (include aiScore for Insight section)
     const formattedResponses = form.responses.map((response) => ({
       id: response.id,
       respondentName: undefined, // Could be added later from UserProfile
       respondentWallet: response.walletAddress,
       responses: response.answers as Record<string, string | number | boolean>,
       createdAt: response.createdAt.toISOString(),
+      aiScore: response.aiScore ?? null,
     }));
 
     return NextResponse.json(formattedResponses);
