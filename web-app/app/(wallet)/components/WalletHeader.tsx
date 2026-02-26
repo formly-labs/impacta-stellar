@@ -56,7 +56,7 @@ export function WalletHeader() {
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Image
-            src="/logo.png"
+            src="/formly_2.png"
             alt="Formly"
             width={28}
             height={28}

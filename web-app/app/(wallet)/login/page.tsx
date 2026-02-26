@@ -33,7 +33,7 @@ function LoginContent() {
         <div className="relative z-10 mb-auto">
           <Link href="/web-app/public" className="flex items-center gap-2">
             <Image
-              src="/logo.png"
+              src="/formly_2.png"
               alt="Formly"
               width={32}
               height={32}
@@ -100,7 +100,7 @@ function LoginContent() {
           <div className="mb-8 lg:hidden">
             <Link href="/web-app/public" className="flex items-center gap-2">
               <Image
-                src="/logo.png"
+                src="/formly_2.png"
                 alt="Formly"
                 width={52}
                 height={52}
