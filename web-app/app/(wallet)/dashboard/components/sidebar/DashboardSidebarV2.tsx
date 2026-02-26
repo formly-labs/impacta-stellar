@@ -39,9 +39,11 @@ export function DashboardSidebarV2({
     pathname === '/dashboard' ||
     (pathname?.startsWith('/dashboard') &&
       pathname !== '/dashboard/rewards' &&
-      pathname !== '/dashboard/reportes');
+      pathname !== '/dashboard/reportes' &&
+      pathname !== '/dashboard/configuracion');
   const isRewardsPage = pathname === '/dashboard/rewards';
   const isReportesPage = pathname === '/dashboard/reportes';
+  const isConfigPage = pathname === '/dashboard/configuracion';
 
   useEffect(() => {
     if (!walletAddress) return;
@@ -167,9 +169,13 @@ export function DashboardSidebarV2({
                 Reportes
               </Link>
               <Link
-                href="/dashboard"
+                href="/dashboard/configuracion"
                 onClick={isMobile ? onCloseMobile : undefined}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isConfigPage
+                    ? 'border-l-4 border-primary bg-primary-50 py-2.5 pl-[calc(0.75rem-4px)] text-primary'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
               >
                 <Settings className="h-4 w-4 shrink-0" />
                 Configuración
