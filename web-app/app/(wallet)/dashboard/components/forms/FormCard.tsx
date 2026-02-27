@@ -69,7 +69,7 @@ export function FormCard({ form, isArchived = false, archivingId, onArchive }: F
           {menuOpen && (
             <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
               <Link
-                href={`/form/${form.id}/edit`}
+                href={`/form/${form.id}/answers`}
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
@@ -98,7 +98,7 @@ export function FormCard({ form, isArchived = false, archivingId, onArchive }: F
           )}
         </div>
       </div>
-      <Link href={`/form/${form.id}/edit`} className="mt-3 block">
+      <Link href={`/form/${form.id}/answers`} className="mt-3 block">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="line-clamp-2 text-sm font-medium text-gray-900">{form.title}</h3>
           <StatusPill status={status} />

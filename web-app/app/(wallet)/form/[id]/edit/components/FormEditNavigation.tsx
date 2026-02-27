@@ -17,7 +17,7 @@ function getInitials(address: string) {
   return address.slice(1, 3).toUpperCase();
 }
 
-type Tab = 'content' | 'responses' | 'rewards' | 'share';
+type Tab = 'responses' | 'rewards' | 'share';
 
 interface FormEditNavigationProps {
   formId: string,
@@ -33,10 +33,8 @@ export function FormEditNavigation({
   const [ isPublishing, setIsPublishing ] = useState(false);
   const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ copied, setCopied ] = useState(false);
-  const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
-    if (tab === 'content') {
-      router.push(`/form/${formId}/edit`);
-    } else if (tab === 'responses') {
+  const handleTabChange = (tab: 'responses' | 'rewards' | 'share') => {
+    if (tab === 'responses') {
       router.push(`/form/${formId}/answers`);
     } else if (tab === 'rewards') {
       router.push(`/form/${formId}/rewards`);
@@ -125,14 +123,17 @@ export function FormEditNavigation({
         {/* Tabs - Centro (desktop only, moves to second row on mobile) */}
         <div className="hidden items-center gap-1 rounded-lg bg-gray-100 p-1 md:flex">
           <button
-            onClick={() => handleTabChange('content')}
+            onClick={() => formData.isActive && handleTabChange('responses')}
+            disabled={!formData.isActive}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              activeTab === 'content'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+              !formData.isActive
+                ? 'cursor-not-allowed text-gray-400'
+                : activeTab === 'responses'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Content
+            Responses
           </button>
           <button
             onClick={() => handleTabChange('rewards')}
@@ -156,19 +157,6 @@ export function FormEditNavigation({
             }`}
           >
             Share
-          </button>
-          <button
-            onClick={() => formData.isActive && handleTabChange('responses')}
-            disabled={!formData.isActive}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-all ${
-              !formData.isActive
-                ? 'cursor-not-allowed text-gray-400'
-                : activeTab === 'responses'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Responses
           </button>
         </div>
 
@@ -265,7 +253,7 @@ export function FormEditNavigation({
 
       {/* Mobile tabs - second row */}
       <div className="flex overflow-x-auto border-t border-gray-100 px-4 md:hidden">
-        {([ 'content', 'rewards', 'share', 'responses' ] as const).map((tab) => {
+        {([ 'responses', 'rewards', 'share' ] as const).map((tab) => {
           const disabled = (tab === 'share' || tab === 'responses') && !formData.isActive;
           return (
             <button

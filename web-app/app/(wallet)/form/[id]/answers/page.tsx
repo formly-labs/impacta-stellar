@@ -122,7 +122,7 @@ export default function FormAnswersPage() {
   const { formData, isLoading, setFormData } = useFormData(formId);
   const [ responses, setResponses ] = useState<ResponseData[]>([]);
   const [ loadingResponses, setLoadingResponses ] = useState(true);
-  const [ tab, setTab ] = useState<Tab>('insight');
+  const [ tab, setTab ] = useState<Tab>('resumen');
   const [ currentResponse, setCurrentResponse ] = useState(0);
   const [ searchTerm, setSearchTerm ] = useState('');
 
@@ -236,17 +236,6 @@ export default function FormAnswersPage() {
               <div className="flex gap-1">
                 <button
                   type="button"
-                  onClick={() => setTab('insight')}
-                  className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                    tab === 'insight'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Insights
-                </button>
-                <button
-                  type="button"
                   onClick={() => setTab('resumen')}
                   className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                     tab === 'resumen'
@@ -255,6 +244,17 @@ export default function FormAnswersPage() {
                   }`}
                 >
                   Resumen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab('insight')}
+                  className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    tab === 'insight'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Insights
                 </button>
                 <button
                   type="button"

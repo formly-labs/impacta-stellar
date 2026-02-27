@@ -56,7 +56,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100">
         <FileText className="h-4 w-4 text-gray-600" />
       </div>
-      <Link href={`/form/${form.id}/edit`} className="min-w-0 flex-1">
+      <Link href={`/form/${form.id}/answers`} className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className={`truncate text-sm font-medium ${isArchived ? 'text-gray-600' : 'text-gray-900'}`}>
             {form.title}
@@ -84,7 +84,7 @@ export function FormListItem({ form, isArchived = false, archivingId, onArchive 
         {menuOpen && (
           <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
             <Link
-              href={`/form/${form.id}/edit`}
+              href={`/form/${form.id}/answers`}
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >

@@ -108,7 +108,10 @@ export default function CreateFormPage() {
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
+      return;
     }
+    // Default form view is Responses; redirect edit → answers
+    router.replace(`/form/${formId}/answers`);
   }, [ formId, router ]);
   
   useEffect(() => {
@@ -207,7 +210,7 @@ export default function CreateFormPage() {
     <div className="flex h-full flex-col bg-white">
       <FormEditNavigation
         formId={formId}
-        activeTab="content"
+        activeTab="responses"
       />
       
       {isReadOnly && (
