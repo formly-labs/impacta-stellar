@@ -62,6 +62,7 @@ export interface FormCreateInput {
   theme?: string;
   rewardPerGoodAnswer?: number;
   workspaceId?: string;
+  isActive?: boolean;
 }
 
 export interface ScreenContent {

@@ -28,7 +28,7 @@ export default function FinalizeStep() {
   const [ published, setPublished ] = useState(false);
   const [ publishing, setPublishing ] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
-  const [ formId, setFormId ] = useState<string | null>(null);
+  const [ formSlug, setFormSlug ] = useState<string | null>(null);
   const [ copied, setCopied ] = useState(false);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function FinalizeStep() {
   const reward = draft.rewardPerGoodAnswer;
   const themeLabel = draft.theme ? (THEME_LABELS[draft.theme] ?? draft.theme) : '—';
 
-  const handlePublish = async () => {
+  const handleSaveAndPublish = async () => {
     if (!walletAddress) {
       setError('Wallet no conectada. Vuelve a conectar tu wallet.');
       return;
@@ -70,6 +70,7 @@ export default function FinalizeStep() {
         fields,
         theme: draft.theme,
         rewardPerGoodAnswer: draft.rewardPerGoodAnswer,
+        isActive: true,
       };
 
       const res = await fetch('/api/forms', {
@@ -84,7 +85,9 @@ export default function FinalizeStep() {
       }
 
       const created = await res.json().catch(() => null);
-      if (created?.id) setFormId(created.id);
+      if (created?.id) {
+        setFormSlug(created.slug);
+      }
 
       clearQuestionnaireDraft();
       setPublished(true);
@@ -100,8 +103,8 @@ export default function FinalizeStep() {
   };
 
   const shareLink =
-    typeof window !== 'undefined' && formId
-      ? `${window.location.origin}/encuesta/${formId}`
+    typeof window !== 'undefined' && formSlug
+      ? `${window.location.origin}/f/${formSlug}`
       : '';
 
   const handleCopy = async () => {
@@ -349,7 +352,7 @@ export default function FinalizeStep() {
           </button>
           <button
             type="button"
-            onClick={handlePublish}
+            onClick={handleSaveAndPublish}
             disabled={publishing}
             className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
           >

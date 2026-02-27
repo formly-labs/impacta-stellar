@@ -8,7 +8,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id: slugOrId } = await params;
-  
+
   const form = await prisma.form.findFirst({
     where: {
       OR: [
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     select: { title: true, description: true },
   });
-  
+
   return {
     title: form ? `${form.title} — Formly` : 'Encuesta — Formly',
     description: form?.description || 'Responde esta encuesta en Formly',
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicSurveyPage({ params }: PageProps) {
   const { id: slugOrId } = await params;
-  
+
   const form = await prisma.form.findFirst({
     where: {
       OR: [
@@ -59,8 +59,8 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       },
     },
   });
-  
-  if (!form) {
+
+  if (!form || form.isArchived) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-md space-y-4 text-center">
@@ -89,8 +89,8 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       </div>
     );
   }
-  
-  if (!form.isActive || form.isArchived) {
+
+  if (!form.isActive) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-md space-y-4 text-center">
@@ -114,13 +114,13 @@ export default async function PublicSurveyPage({ params }: PageProps) {
             Encuesta no disponible
           </h1>
           <p className="text-gray-500">
-            Esta encuesta ya no está aceptando respuestas en este momento.
+            Esta encuesta no está aceptando respuestas en este momento.
           </p>
         </div>
       </div>
     );
   }
-  
+
   if (form.fields.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -135,8 +135,8 @@ export default async function PublicSurveyPage({ params }: PageProps) {
       </div>
     );
   }
-  
+
   const { isActive: _, isArchived: __, ...publicData } = form;
-  
+
   return <PublicSurveyWizard survey={publicData} />;
 }

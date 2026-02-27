@@ -17,6 +17,7 @@ export async function POST(req: Request) {
       theme = null,
       rewardPerGoodAnswer = null,
       workspaceId = null,
+      isActive = false,
     } = body;
 
     if (!ownerAddress) {
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
         theme,
         rewardPerGoodAnswer,
         workspaceId,
-        isActive: false,
+        isActive,
         budget: 0,
         fields: {
           create: fields.map((f) => ({
