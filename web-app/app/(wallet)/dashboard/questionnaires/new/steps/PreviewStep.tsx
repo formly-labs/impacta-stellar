@@ -14,13 +14,6 @@ import {
   type QuestionDraft,
 } from '@/lib/newQuestionnaireDraft';
 
-const THEME_LABELS: Record<string, string> = {
-  'Product UX': 'Experiencia de producto',
-  Segmentation: 'Segmentación',
-  Sales: 'Ventas',
-  Other: 'Otro',
-};
-
 const TYPE_LABELS: Record<string, string> = {
   radio: 'Selección única',
   checkbox: 'Selección múltiple',
@@ -37,7 +30,7 @@ export default function PreviewStep() {
   }, []);
 
   const questions = draft.questions ?? [];
-  const title = draft.firstQuestion || (draft.theme ? THEME_LABELS[draft.theme] || draft.theme : 'Sin título');
+  const title = draft.firstQuestion || 'Sin título';
 
   return (
     <div className="flex flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12">
@@ -63,11 +56,6 @@ export default function PreviewStep() {
               Título de la encuesta
             </p>
             <h2 className="mt-1 text-xl font-bold text-gray-900">{title}</h2>
-            {draft.theme && (
-              <span className="mt-2 inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                {THEME_LABELS[draft.theme] || draft.theme}
-              </span>
-            )}
           </div>
 
           {/* Questions */}

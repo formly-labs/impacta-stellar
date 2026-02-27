@@ -7,13 +7,6 @@ import { ArrowLeft, CheckCircle, Coins, Copy, FileText, HelpCircle, Loader2, Par
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const THEME_LABELS: Record<string, string> = {
-  'Product UX': 'Experiencia de producto',
-  Segmentation: 'Segmentación',
-  Sales: 'Ventas',
-  Other: 'Otro',
-};
-
 const TYPE_LABELS: Record<string, string> = {
   radio: 'Selección única',
   checkbox: 'Selección múltiple',
@@ -37,7 +30,6 @@ export default function FinalizeStep() {
 
   const questionsCount = draft.questions?.length ?? 0;
   const reward = draft.rewardPerGoodAnswer;
-  const themeLabel = draft.theme ? (THEME_LABELS[draft.theme] ?? draft.theme) : '—';
 
   const handleSaveAndPublish = async () => {
     if (!walletAddress) {
@@ -63,12 +55,9 @@ export default function FinalizeStep() {
 
       const payload = {
         title: draft.firstQuestion?.trim() || 'Nueva encuesta',
-        description: draft.theme
-          ? `Cuestionario de ${THEME_LABELS[draft.theme] || draft.theme}`
-          : 'Cuestionario general',
+        description: 'Cuestionario general',
         ownerAddress: walletAddress,
         fields,
-        theme: draft.theme,
         rewardPerGoodAnswer: draft.rewardPerGoodAnswer,
         isActive: true,
       };
@@ -203,7 +192,7 @@ export default function FinalizeStep() {
         {/* Header */}
         <div className="space-y-2">
           <p className="text-lg font-bold uppercase tracking-widest text-blue-600">
-            Paso 06 — Revisión final
+            Paso 05 — Revisión final
           </p>
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.25rem] sm:leading-tight">
             Revisa y <span className="font-bold">publica</span>
@@ -231,26 +220,6 @@ export default function FinalizeStep() {
             <button
               type="button"
               onClick={() => router.push('/dashboard/questionnaires/new?step=question')}
-              className="text-xs font-medium text-blue-600 hover:text-blue-700"
-            >
-              Editar
-            </button>
-          </div>
-
-          {/* Theme */}
-          <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-              <FileText className="h-5 w-5 text-blue-600" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Categoría
-              </p>
-              <p className="text-sm font-medium text-gray-900">{themeLabel}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard/questionnaires/new?step=theme')}
               className="text-xs font-medium text-blue-600 hover:text-blue-700"
             >
               Editar

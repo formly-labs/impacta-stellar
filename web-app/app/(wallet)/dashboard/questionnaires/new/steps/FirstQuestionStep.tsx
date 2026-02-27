@@ -66,13 +66,13 @@ export default function FirstQuestionStep() {
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:py-16">
       <div className="w-full max-w-2xl space-y-8">
         {/* Step label */}
-        <p className="text-lg font-bold uppercase tracking-widest text-blue-600">Paso 02</p>
+        <p className="text-lg font-bold uppercase tracking-widest text-blue-600">Paso 01</p>
 
         {/* Headline */}
         <div className="space-y-3">
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.5rem] sm:leading-tight">
-            ¿De qué trata tu{' '}
-            <span className="font-bold">encuesta?</span>
+            Nombre de la {' '}
+            <span className="font-bold">encuesta</span>
           </h1>
           <p className="text-gray-400">
             Este será el título de tu encuesta.

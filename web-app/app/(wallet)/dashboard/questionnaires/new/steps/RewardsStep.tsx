@@ -173,7 +173,7 @@ export default function RewardsStep() {
         {/* Header */}
         <div className="space-y-2">
           <p className="text-lg font-bold uppercase tracking-widest text-blue-600">
-            Paso 05 — Recompensas
+            Paso 04 — Recompensas
           </p>
           <h1 className="text-3xl font-light tracking-tight text-gray-900 sm:text-[2.25rem] sm:leading-tight">
             Configurar <span className="font-bold">recompensas</span>

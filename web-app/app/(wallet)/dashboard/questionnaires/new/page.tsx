@@ -3,7 +3,6 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import NewQuestionnaireShell from './components/NewQuestionnaireShell';
-import ThemeStep from './steps/ThemeStep';
 import FirstQuestionStep from './steps/FirstQuestionStep';
 import QuestionsStep from './steps/QuestionsStep';
 import PreviewStep from './steps/PreviewStep';
@@ -12,12 +11,10 @@ import FinalizeStep from './steps/FinalizeStep';
 
 function NewQuestionnaireContent() {
   const searchParams = useSearchParams();
-  const step = searchParams.get('step') || 'theme';
+  const step = searchParams.get('step') || 'question';
 
   const renderStep = () => {
     switch (step) {
-      case 'theme':
-        return <ThemeStep />;
       case 'question':
         return <FirstQuestionStep />;
       case 'questions':
@@ -29,7 +26,7 @@ function NewQuestionnaireContent() {
       case 'finalize':
         return <FinalizeStep />;
       default:
-        return <ThemeStep />;
+        return <FirstQuestionStep />;
     }
   };
 

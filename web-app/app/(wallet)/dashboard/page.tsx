@@ -25,7 +25,6 @@ export default function CreatorDashboard() {
 
   const [ selectedWorkspaceId, setSelectedWorkspaceId ] = useState<string | undefined>();
   const [ searchQuery, setSearchQuery ] = useState('');
-  const [ isCreatingForm, setIsCreatingForm ] = useState(false);
   const [ createError, setCreateError ] = useState<string | null>(null);
   const [ mobileSidebarOpen, setMobileSidebarOpen ] = useState(false);
 
@@ -64,34 +63,10 @@ export default function CreatorDashboard() {
     }
   }, [ tab, fetchArchived ]);
 
-  const handleCreateForm = async () => {
-    if (!walletAddress) return;
+  const handleCreateForm = () => {
     setCreateError(null);
-    setIsCreatingForm(true);
-    try {
-      const workspaceIdToSend = selectedWorkspaceId === 'default' ? null : selectedWorkspaceId;
-      const res = await fetch('/api/forms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ownerAddress: walletAddress,
-          workspaceId: workspaceIdToSend,
-          title: 'Untitled Form',
-          description: '',
-          fields: [],
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || 'Error al crear el formulario');
-      }
-      const { id } = await res.json();
-      setMobileSidebarOpen(false);
-      router.push(`/form/${id}/edit`);
-    } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'Error al crear el formulario');
-      setIsCreatingForm(false);
-    }
+    setMobileSidebarOpen(false);
+    router.push('/dashboard/questionnaires/new');
   };
 
   const handleLeaveConfirm = () => {
@@ -138,7 +113,7 @@ export default function CreatorDashboard() {
           selectedWorkspaceId={selectedWorkspaceId}
           onWorkspaceSelect={setSelectedWorkspaceId}
           onCreateForm={handleCreateForm}
-          isCreatingForm={isCreatingForm}
+          isCreatingForm={false}
           onCloseMobile={() => setMobileSidebarOpen(false)}
           isMobile={mobileSidebarOpen}
         />

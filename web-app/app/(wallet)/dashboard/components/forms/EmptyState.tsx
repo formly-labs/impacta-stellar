@@ -32,7 +32,7 @@ export function EmptyState({ type }: EmptyStateProps) {
       <h3 className="text-lg font-medium text-gray-900">There is not a form in sight</h3>
       <p className="mt-1 text-sm text-gray-500">Create your first form to get started</p>
       <Link
-        href="/dashboard/questionnaires/new?step=theme"
+        href="/dashboard/questionnaires/new?step=question"
         className="mt-6 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
       >
         <Plus className="h-4 w-4" />

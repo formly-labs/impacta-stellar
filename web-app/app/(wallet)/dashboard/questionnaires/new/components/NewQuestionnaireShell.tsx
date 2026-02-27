@@ -6,23 +6,21 @@ import Link from 'next/link';
 import { type ReactNode, useState, useCallback, useEffect } from 'react';
 
 const STEPS = [
-  { key: 'theme', label: 'INICIO', number: 1 },
-  { key: 'question', label: 'DETALLES', number: 2 },
-  { key: 'questions', label: 'PREGUNTAS', number: 3 },
-  { key: 'preview', label: 'VISTA PREVIA', number: 4 },
-  { key: 'rewards', label: 'RECOMPENSAS', number: 5 },
-  { key: 'finalize', label: 'FINALIZAR', number: 6 },
+  { key: 'question', label: 'INICIO', number: 1 },
+  { key: 'questions', label: 'PREGUNTAS', number: 2 },
+  { key: 'preview', label: 'VISTA PREVIA', number: 3 },
+  { key: 'rewards', label: 'RECOMPENSAS', number: 4 },
+  { key: 'finalize', label: 'FINALIZAR', number: 5 },
 ] as const;
 
 export type StepKey = (typeof STEPS)[number]['key'];
 
-// Progress percentages for each step
+// Progress percentages for each step (visible progress as user advances)
 const PROGRESS: Record<string, number> = {
-  theme: 0,
-  question: 16,
-  questions: 33,
-  preview: 50,
-  rewards: 66,
+  question: 20,
+  questions: 40,
+  preview: 60,
+  rewards: 80,
   finalize: 100,
 };
 
@@ -32,9 +30,12 @@ interface NewQuestionnaireShellProps {
 
 export default function NewQuestionnaireShell({ children }: NewQuestionnaireShellProps) {
   const searchParams = useSearchParams();
-  const currentStep = (searchParams.get('step') as StepKey) || 'theme';
-  const currentIndex = STEPS.findIndex((s) => s.key === currentStep);
-  const progress = PROGRESS[currentStep] ?? 0;
+  const rawStep = (searchParams.get('step') as StepKey) || 'question';
+  const currentIndex = STEPS.findIndex((s) => s.key === rawStep);
+  // Normalize: invalid or unknown step → treat as step 1 (question)
+  const currentStep: StepKey = currentIndex >= 0 ? rawStep : 'question';
+  const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+  const progress = PROGRESS[currentStep] ?? 20;
 
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -63,7 +64,7 @@ export default function NewQuestionnaireShell({ children }: NewQuestionnaireShel
           <div className="flex items-center gap-0">
             {STEPS.map((step, i) => {
               const isActive = step.key === currentStep;
-              const isPast = i < currentIndex;
+              const isPast = i < safeIndex;
 
               return (
                 <span key={step.key} className="flex items-center">
@@ -100,9 +101,9 @@ export default function NewQuestionnaireShell({ children }: NewQuestionnaireShel
                   {i < STEPS.length - 1 && (
                     <span
                       className={`mx-3 hidden h-px w-16 sm:block lg:w-24 ${
-                        i < currentIndex ? 'bg-blue-300' : 'bg-gray-200'
+                        i < safeIndex ? 'bg-blue-300' : 'bg-gray-200'
                       }`}
-                      style={{ borderTop: i < currentIndex ? undefined : '1px dashed #d1d5db' }}
+                      style={{ borderTop: i < safeIndex ? undefined : '1px dashed #d1d5db' }}
                     />
                   )}
                 </span>

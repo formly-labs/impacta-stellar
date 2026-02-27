@@ -24,7 +24,7 @@ export function MobileControls({
       <div className="mb-4 flex items-center justify-between lg:hidden">
         <h1 className="text-lg font-semibold text-gray-900">{workspaceName}</h1>
         <Link
-          href="/dashboard/questionnaires/new?step=theme"
+          href="/dashboard/questionnaires/new?step=question"
           className="flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
         >
           <Plus className="h-4 w-4" />
