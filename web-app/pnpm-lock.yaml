@@ -15,11 +15,11 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.3))
       '@pollar/core':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.4.3
+        version: 0.4.3
       '@pollar/react':
-        specifier: ^0.4.2
-        version: 0.4.2(@pollar/core@0.4.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: ^0.4.3
+        version: 0.4.3(@pollar/core@0.4.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@prisma/adapter-neon':
         specifier: ^7.3.0
         version: 7.4.1
@@ -539,11 +539,11 @@ packages:
     resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
     engines: {node: '>=8.0.0'}
 
-  '@pollar/core@0.4.2':
-    resolution: {integrity: sha512-YCRxlpz3ZE8aO5yUSHLWnCwSZw4NU3M/rdBguo7Pjc3EHfbhPuB8l/M+Qoqh8qNgaywUENP5h9E6PoOzegZmKQ==}
+  '@pollar/core@0.4.3':
+    resolution: {integrity: sha512-Kt26WCrpq0Hs0UkMN9vqjPThi2lEFaJMj3449HfTNZoipAREaRvnw+ki6elTz0k0f6gLa2tF/w8HyC9Ie+zz7A==}
 
-  '@pollar/react@0.4.2':
-    resolution: {integrity: sha512-V5js2weV681M0lWoId/THy9MLtQZLFoJ7IcDcNuCiiemEfPD9fBgmd4zJ2IyrvCsn1MH/g67bQf4vcLuX/cRHA==}
+  '@pollar/react@0.4.3':
+    resolution: {integrity: sha512-hQiSgudFDzAL0MWmSd96SVaEcy4ZFBgQ2x91mg1qOeVu7LE8nflk0M22vnss1BSEmPw76osmP0rNIVmI5LywJQ==}
     peerDependencies:
       '@pollar/core': '*'
       react: '>=18'
@@ -3335,14 +3335,14 @@ snapshots:
 
   '@opentelemetry/api@1.9.0': {}
 
-  '@pollar/core@0.4.2':
+  '@pollar/core@0.4.3':
     dependencies:
       '@stellar/freighter-api': 2.0.0
       openapi-fetch: 0.17.0
 
-  '@pollar/react@0.4.2(@pollar/core@0.4.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@pollar/react@0.4.3(@pollar/core@0.4.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
-      '@pollar/core': 0.4.2
+      '@pollar/core': 0.4.3
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
