@@ -37,6 +37,7 @@ export function clearDraft(): void {
 }
 
 export function isOnboardingCompleted(): boolean {
+  return true;
   if (typeof window === 'undefined') return false;
   return localStorage.getItem(COMPLETED_KEY) === 'true';
 }
