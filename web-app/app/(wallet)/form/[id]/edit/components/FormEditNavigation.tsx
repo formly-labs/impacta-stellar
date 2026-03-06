@@ -33,8 +33,10 @@ export function FormEditNavigation({
   const [ isPublishing, setIsPublishing ] = useState(false);
   const [ isEditModalOpen, setIsEditModalOpen ] = useState(false);
   const [ copied, setCopied ] = useState(false);
-  const handleTabChange = (tab: 'responses' | 'rewards' | 'share') => {
-    if (tab === 'responses') {
+  const handleTabChange = (tab: 'content' | 'responses' | 'rewards' | 'share') => {
+    if (tab === 'content') {
+      router.push(`/form/${formId}/edit`);
+    } else if (tab === 'responses') {
       router.push(`/form/${formId}/answers`);
     } else if (tab === 'rewards') {
       router.push(`/form/${formId}/rewards`);

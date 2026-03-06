@@ -247,7 +247,7 @@ export default function PublicSurveyWizard({ survey }: PublicSurveyWizardProps) 
   }
 
   return (
-    <div className="flex min-h-[100dvh] flex-col sm:min-h-0 sm:h-full">
+    <div className="flex h-full flex-col">
       <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-6 sm:py-12">
         <div className="w-full max-w-2xl animate-fade-in" key={step}>
           {/* Step indicator */}

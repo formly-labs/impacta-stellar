@@ -91,7 +91,7 @@ const FIELD_TYPES = [
 ];
 
 export default function CreateFormPage() {
-  
+
   const router = useRouter();
   const params = useParams();
   const formId = params.id as string;
@@ -104,29 +104,29 @@ export default function CreateFormPage() {
   const [ selectedScreen, setSelectedScreen ] = useState<'question' | 'welcome' | 'ending'>('question');
   const [ showMobileSidebar, setShowMobileSidebar ] = useState(false);
   const [ showMobileAI, setShowMobileAI ] = useState(false);
-  
+
   useEffect(() => {
     if (!formId) {
       router.push('/dashboard');
       return;
     }
     // Default form view is Responses; redirect edit → answers
-    router.replace(`/form/${formId}/answers`);
+    // router.replace(`/form/${formId}/answers`);
   }, [ formId, router ]);
-  
+
   useEffect(() => {
     const hasFields = formData.fields && formData.fields.length > 0;
     const isValidIndex = selectedQuestionIndex !== null &&
       formData.fields &&
       selectedQuestionIndex < formData.fields.length;
-    
+
     if (hasFields && !isValidIndex) {
       setSelectedQuestionIndex(0);
     } else if (!hasFields && selectedQuestionIndex !== null) {
       setSelectedQuestionIndex(null);
     }
   }, [ formData.fields, selectedQuestionIndex ]);
-  
+
   const addField = async () => {
     const newField: FieldInput = {
       type: 'text',
@@ -140,14 +140,14 @@ export default function CreateFormPage() {
     setSelectedScreen('question');
     // await save();
   };
-  
+
   const updateField = async (index: number, updatedField: Partial<FieldInput>) => {
     const newFields = [ ...(formData.fields || []) ];
     newFields[index] = { ...newFields[index], ...updatedField };
     setFormData({ ...formData, fields: newFields });
     // await save();
   };
-  
+
   const removeField = async (index: number) => {
     const newFields = formData.fields?.filter((_, i) => i !== index);
     setFormData({
@@ -161,37 +161,37 @@ export default function CreateFormPage() {
     }
     // await save();
   };
-  
+
   const duplicateField = async (index: number) => {
     const fieldToDuplicate = formData.fields?.[index];
     if (!fieldToDuplicate) return;
-    
+
     const duplicatedField: FieldInput = {
       ...fieldToDuplicate,
       label: `${fieldToDuplicate.label} (copia)`,
     };
-    
+
     const newFields = [ ...(formData.fields || []) ];
     newFields.splice(index + 1, 0, duplicatedField);
     setFormData({ ...formData, fields: newFields });
     setSelectedQuestionIndex(index + 1);
     // await save();
   };
-  
+
   const handleRewardsYes = () => {
     setShowRewardsModal(false);
     router.push(`/form/${formId}/rewards`);
   };
-  
+
   const handleRewardsNo = () => {
     setShowRewardsModal(false);
     setShowSuccessModal(true);
   };
-  
+
   const handleSuccessComplete = () => {
     router.push(`/form/${formId}/share`);
   };
-  
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center bg-gray-50">
@@ -202,17 +202,17 @@ export default function CreateFormPage() {
       </div>
     );
   }
-  
+
   const isReadOnly = !!formData.isActive;
   const selectedField = selectedQuestionIndex !== null && formData.fields ? formData.fields[selectedQuestionIndex] : null;
-  
+
   return (
     <div className="flex h-full flex-col bg-white">
       <FormEditNavigation
         formId={formId}
         activeTab="responses"
       />
-      
+
       {isReadOnly && (
         <div className="shrink-0 flex items-center gap-3 border-b border-amber-200 bg-amber-50 px-6 py-3">
           <Lock className="h-4 w-4 shrink-0 text-amber-600" />
@@ -222,19 +222,19 @@ export default function CreateFormPage() {
           </p>
         </div>
       )}
-      
+
       <RewardsModal
         isOpen={showRewardsModal}
         onClose={() => setShowRewardsModal(false)}
         onYes={handleRewardsYes}
         onNo={handleRewardsNo}
       />
-      
+
       <PublishSuccessModal
         isOpen={showSuccessModal}
         onComplete={handleSuccessComplete}
       />
-      
+
       <div className={`flex flex-1 gap-0 overflow-hidden p-0 lg:gap-4 lg:p-4 ${isReadOnly ? 'pointer-events-none select-none opacity-50' : ''}`}>
         {/* Mobile sidebar overlay */}
         {showMobileSidebar && (
@@ -243,21 +243,33 @@ export default function CreateFormPage() {
             <aside className="absolute left-0 top-0 flex h-full w-72 flex-col gap-3 bg-white p-4 shadow-2xl">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-gray-900">Preguntas</h3>
-                <button onClick={() => setShowMobileSidebar(false)} className="rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+                <button
+                  onClick={() => setShowMobileSidebar(false)}
+                  className="rounded-lg p-1 text-gray-500 hover:bg-gray-100"
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>
               {/* Mobile sidebar: Welcome (top), Questions, End screen (bottom) */}
               <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-                <button onClick={() => { setSelectedScreen('welcome'); setShowMobileSidebar(false); }}
-                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                <button
+                  onClick={() => {
+                    setSelectedScreen('welcome');
+                    setShowMobileSidebar(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'welcome' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                >
                   Welcome screen <Plus className="h-4 w-4 text-gray-400" />
                 </button>
                 <div className="flex-1 space-y-0.5">
                   {formData.fields?.map((field, index) => (
                     <button
                       key={index}
-                      onClick={() => { setSelectedQuestionIndex(index); setSelectedScreen('question'); setShowMobileSidebar(false); }}
+                      onClick={() => {
+                        setSelectedQuestionIndex(index);
+                        setSelectedScreen('question');
+                        setShowMobileSidebar(false);
+                      }}
                       className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all ${selectedQuestionIndex === index ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
                     >
                       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs font-semibold text-gray-600">{index + 1}</span>
@@ -268,8 +280,13 @@ export default function CreateFormPage() {
                     <p className="py-6 text-center text-sm text-gray-400">No hay preguntas</p>
                   )}
                 </div>
-                <button onClick={() => { setSelectedScreen('ending'); setShowMobileSidebar(false); }}
-                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                <button
+                  onClick={() => {
+                    setSelectedScreen('ending');
+                    setShowMobileSidebar(false);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition-colors ${selectedScreen === 'ending' ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                >
                   <span className="flex items-center gap-2">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">N</span>
                     screen
@@ -288,7 +305,10 @@ export default function CreateFormPage() {
             <div className="absolute bottom-0 left-0 right-0 flex h-[75dvh] flex-col rounded-t-2xl bg-white shadow-2xl">
               <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
                 <span className="text-sm font-bold text-gray-900">AI Assistant</span>
-                <button onClick={() => setShowMobileAI(false)} className="rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+                <button
+                  onClick={() => setShowMobileAI(false)}
+                  className="rounded-lg p-1 text-gray-500 hover:bg-gray-100"
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -355,7 +375,7 @@ export default function CreateFormPage() {
                           </button>
                         )}
                       </div>
-                      
+
                       {/* Mini modal de acciones - Solo cuando está seleccionada */}
                       {selectedQuestionIndex === index && showActionsMenu && (
                         <>
@@ -364,7 +384,7 @@ export default function CreateFormPage() {
                             className="fixed inset-0 z-40"
                             onClick={() => setShowActionsMenu(false)}
                           />
-                          
+
                           {/* Menú de acciones */}
                           <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
                             <div className="p-1">
@@ -398,7 +418,7 @@ export default function CreateFormPage() {
                   );
                 })}
               </div>
-              
+
               {/* Mensaje cuando no hay preguntas */}
               {(!formData.fields || formData.fields.length === 0) && (
                 <div className="mt-6 text-center">
@@ -425,7 +445,7 @@ export default function CreateFormPage() {
             </button>
           </div>
         </aside>
-        
+
         {/* Área central - Toolbar + Contenido */}
         <main className="flex flex-1 flex-col gap-0 overflow-hidden lg:gap-4">
           {/* Toolbar superior con controles */}
@@ -447,16 +467,16 @@ export default function CreateFormPage() {
               <span className="hidden sm:inline">Añadir pregunta</span>
               <span className="sm:hidden">Añadir</span>
             </button>
-            
+
             {selectedScreen === 'question' && selectedField && (
               <>
                 <div className="hidden h-6 w-px bg-gray-300 sm:block" />
-                
+
                 <QuestionTypeSelector
                   value={selectedField.type}
                   onChange={(type) => updateField(selectedQuestionIndex!, { type })}
                 />
-                
+
                 <label className="ml-auto flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors hover:bg-gray-50">
                   <span className="text-sm font-medium text-gray-700">required</span>
                   <button
@@ -473,7 +493,7 @@ export default function CreateFormPage() {
                     />
                   </button>
                 </label>
-                
+
                 <button
                   onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
                   className="hidden items-center justify-center rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 sm:flex"
@@ -483,7 +503,7 @@ export default function CreateFormPage() {
                 </button>
               </>
             )}
-            
+
             {(selectedScreen === 'welcome' || selectedScreen === 'ending') && (
               <button
                 onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
@@ -493,7 +513,7 @@ export default function CreateFormPage() {
               </button>
             )}
           </div>
-          
+
           {/* Editor de pregunta o screens */}
           <div className="flex-1 overflow-hidden bg-white lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-sm">
             {/* Welcome Screen */}
@@ -529,7 +549,7 @@ export default function CreateFormPage() {
                           viewMode === 'mobile' ? 'text-xl' : 'text-3xl'
                         }`}
                       />
-                      
+
                       {/* Descripción editable */}
                       <input
                         type="text"
@@ -543,7 +563,7 @@ export default function CreateFormPage() {
                           viewMode === 'mobile' ? 'text-sm' : 'text-base'
                         }`}
                       />
-                      
+
                       {/* Botón Start: ir a la primera pregunta */}
                       <div className="flex items-center gap-3 mb-4">
                         <button
@@ -562,7 +582,7 @@ export default function CreateFormPage() {
                           press <span className="font-semibold">Enter ↵</span>
                         </span>
                       </div>
-                      
+
                       {/* Tiempo estimado */}
                       <p className="text-xs text-gray-400">
                         <span className="inline-flex items-center gap-1">
@@ -578,7 +598,7 @@ export default function CreateFormPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Ending Screen */}
             {selectedScreen === 'ending' && (
               <div
@@ -599,7 +619,7 @@ export default function CreateFormPage() {
                       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                         <Check className="h-8 w-8 text-green-600" />
                       </div>
-                      
+
                       {/* Título editable */}
                       <input
                         type="text"
@@ -613,7 +633,7 @@ export default function CreateFormPage() {
                           viewMode === 'mobile' ? 'text-2xl' : 'text-4xl'
                         }`}
                       />
-                      
+
                       {/* Descripción editable */}
                       <textarea
                         value={formData.ending?.description || ''}
@@ -632,7 +652,7 @@ export default function CreateFormPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Question Editor */}
             {selectedScreen === 'question' && selectedField && (
               <div
@@ -660,7 +680,7 @@ export default function CreateFormPage() {
                         <span className="ml-2">→</span>
                       </span>
                     </div>
-                    
+
                     {/* Pregunta - Editable */}
                     <div className={viewMode === 'mobile' ? 'mb-2' : 'mb-3'}>
                       <input
@@ -672,7 +692,7 @@ export default function CreateFormPage() {
                         }`}
                       />
                     </div>
-                    
+
                     {/* Descripción opcional */}
                     <div className={viewMode === 'mobile' ? 'mb-8' : 'mb-10'}>
                       <input
@@ -684,7 +704,7 @@ export default function CreateFormPage() {
                         }`}
                       />
                     </div>
-                    
+
                     {/* Vista previa de respuesta según tipo */}
                     <div className={viewMode === 'mobile' ? 'space-y-3' : 'space-y-4'}>
                       {/* Vista previa según tipo de campo */}
@@ -697,7 +717,7 @@ export default function CreateFormPage() {
                           }`}
                         />
                       )}
-                      
+
                       {selectedField.type === 'long_text' && (
                         <div>
                           <textarea
@@ -716,7 +736,7 @@ export default function CreateFormPage() {
                           </p>
                         </div>
                       )}
-                      
+
                       {selectedField.type === 'email' && (
                         <input
                           type="email"
@@ -726,7 +746,7 @@ export default function CreateFormPage() {
                           }`}
                         />
                       )}
-                      
+
                       {selectedField.type === 'number' && (
                         <input
                           type="number"
@@ -736,7 +756,7 @@ export default function CreateFormPage() {
                           }`}
                         />
                       )}
-                      
+
                       {selectedField.type === 'phone' && (
                         <input
                           type="tel"
@@ -750,7 +770,7 @@ export default function CreateFormPage() {
                       {/* NPS 1-10 estrellas */}
                       {selectedField.type === 'nps_stars' && (
                         <div className="flex items-center gap-1 sm:gap-2">
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                          {[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map((n) => (
                             <span
                               key={n}
                               className={`${viewMode === 'mobile' ? 'h-8 w-8' : 'h-10 w-10'} flex shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-amber-50`}
@@ -761,7 +781,7 @@ export default function CreateFormPage() {
                           <span className="ml-2 text-sm text-gray-500">1 → 10</span>
                         </div>
                       )}
-                      
+
                       {/* Opciones para radio y checkbox */}
                       {(selectedField.type === 'radio' || selectedField.type === 'checkbox') && (
                         <div className={viewMode === 'mobile' ? 'space-y-2' : 'space-y-3'}>
@@ -816,7 +836,7 @@ export default function CreateFormPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Mensaje cuando no hay pregunta seleccionada */}
             {selectedScreen === 'question' && !selectedField && (
               <div className="flex h-full w-full items-center justify-center bg-white rounded-lg">
@@ -835,7 +855,7 @@ export default function CreateFormPage() {
             )}
           </div>
         </main>
-        
+
         {/* AI Assistant — desktop only */}
         <div className="hidden w-80 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm lg:block">
           <AIAssistantForm formData={formData} setFormData={setFormData} />
