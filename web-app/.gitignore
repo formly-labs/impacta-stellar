@@ -42,3 +42,5 @@ next-env.d.ts
 
 # prisma
 lib/db/prisma/generated
+
+reinstall-pollar.sh
